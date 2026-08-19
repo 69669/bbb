@@ -3,10 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { generateCode, TYPE_NAMES } from "../../../lib/license";
 
-// 密码哈希（简单的字符串哈希，非明文存储）
-// 实际密码：LG@Admin2024!
-const PASSWORD_HASH = 1234567890; // 占位，下面用实际哈希
-
+// 密码哈希（非明文存储，修改密码需重新计算哈希值）
 function simpleHash(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -16,7 +13,7 @@ function simpleHash(str: string): number {
   return Math.abs(hash);
 }
 
-const ADMIN_PASSWORD_HASH = simpleHash("LG@Admin2024!");
+const ADMIN_PASSWORD_HASH = 61720636597745170743;
 
 export default class GeneratePage extends React.Component {
   constructor(props: {}) {
