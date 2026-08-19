@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-black text-zinc-100 antialiased;
+}
+
+.bg-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #000;
+}
+.bg-aurora::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 30%, rgba(236, 72, 153, 0.08), transparent),
+    radial-gradient(ellipse 50% 30% at 85% 20%, rgba(139, 92, 246, 0.06), transparent);
+}
+
+.game-container {
+  @apply relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 p-4 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-8;
+}
+
+.game-title {
+  @apply text-center text-3xl font-bold tracking-tight text-white sm:text-5xl;
+  text-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(236,72,153,0.2);
+}
+
+.game-title-underline {
+  @apply mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-pink-500 to-red-500;
+}

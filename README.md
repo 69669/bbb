@@ -1,26 +1,29 @@
-# 激活码生成器 - 独立源码
+# 激活码生成器 - 独立部署版
 
-## 文件说明
+## 简介
 
-```
-license-generator/
-├── app/
-│   └── tools/
-│       └── gen-license/
-│           └── page.tsx    # 生成页面（含密码保护）
-└── lib/
-    └── license.ts           # 激活码工具函数（生成/验证/激活）
-```
+这是一个独立的、可直接部署到 GitHub Pages 的激活码生成器，带密码保护。
 
-## 部署方式
+## 部署步骤
 
-将这两个文件放入你的 Next.js 项目对应目录即可：
-- `app/tools/gen-license/page.tsx` → 项目的 `app/tools/gen-license/page.tsx`
-- `lib/license.ts` → 项目的 `lib/license.ts`
+### 1. 创建新仓库
 
-## 访问地址
+在 GitHub 创建一个新仓库（比如叫 `license-gen`）。
 
-部署后访问：`https://你的域名/tools/gen-license`
+### 2. 上传文件
+
+把本项目所有文件上传到新仓库的根目录。
+
+### 3. 启用 GitHub Pages
+
+- 进入仓库 Settings → Pages
+- Source 选择 "GitHub Actions"
+
+### 4. 自动部署
+
+推送代码后，GitHub Actions 会自动构建并部署。
+
+部署完成后访问：`https://你的用户名.github.io/仓库名/`
 
 ## 管理密码
 
@@ -28,41 +31,31 @@ license-generator/
 
 ### 修改密码
 
-打开 `app/tools/gen-license/page.tsx`，找到第 20 行左右：
+打开 `app/tools/gen-license/page.tsx`，找到：
 ```ts
 const ADMIN_PASSWORD_HASH = simpleHash("LG@Admin2024!");
 ```
-把 `LG@Admin2024!` 改成你想要的密码即可。
+把 `LG@Admin2024!` 改成你想要的密码。
 
 ## 激活码类型
 
-| 类型 | 有效期 | 类型码 |
-|------|--------|--------|
-| 天卡 | 1天 | 1 |
-| 周卡 | 7天 | 2 |
-| 月卡 | 30天 | 3 |
-| 季卡 | 90天 | 4 |
+| 类型 | 有效期 |
+|------|--------|
+| 天卡 | 1天 |
+| 周卡 | 7天 |
+| 月卡 | 30天 |
+| 季卡 | 90天 |
 
-## 激活码格式
+## 功能
 
-`XXXX-XXXX-XXXXX`（13位，含校验位）
-
-- 前缀：LG
-- 类型：1位（1-4）
-- 随机字符：8位（去掉易混淆字符）
-- 校验位：2位
-
-## 功能特性
-
-- 🔐 密码保护，防止未授权访问
-- 📅 支持天卡/周卡/月卡/季卡
+- 🔐 密码保护
+- 📅 天卡/周卡/月卡/季卡
 - 🔢 批量生成（1-50个）
-- 📋 一键复制全部
-- 💾 下载TXT文件
-- 📱 单个激活码复制
-- 🚪 退出登录
+- 📋 一键复制
+- 💾 下载TXT
 
-## 配合使用
+## 注意
 
-激活页面：`/activate`（用户输入激活码）
-游戏页面：5个游戏已集成激活验证（飞行棋除外）
+- 首页会自动跳转到生成页面 `/tools/gen-license`
+- 密码验证状态保存在浏览器本地，关闭浏览器后需重新验证
+- 激活码校验逻辑在 `lib/license.ts`，需与主游戏项目保持一致
