@@ -35,3 +35,6 @@ body {
 .game-title-underline {
   @apply mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-pink-500 to-red-500;
 }
+.back-btn {
+  @apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-900/80 px-4 py-2 text-sm text-white/80 backdrop-blur transition hover:border-white/25 hover:bg-zinc-800/80 hover:text-white;
+}
