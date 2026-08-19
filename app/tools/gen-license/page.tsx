@@ -16,7 +16,7 @@ function simpleHash(str: string): number {
   return Math.abs(hash);
 }
 
-const ADMIN_PASSWORD_HASH = simpleHash("xiaokun0529");
+const ADMIN_PASSWORD_HASH = simpleHash("61720636597745170743");
 
 export default class GeneratePage extends React.Component {
   constructor(props: {}) {
