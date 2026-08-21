@@ -34,11 +34,13 @@ export function initAntiDebug() {
     }
   });
 
-  // 3. 控制台检测 - 如果打开了控制台，执行保护动作
+  // 3. 控制台检测 - 如果打开了控制台，执行保护动作（仅桌面端启用，避免手机端输入法误触）
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
   let devToolsOpen = false;
   const threshold = 160; // 控制台宽度阈值
 
   const checkDevTools = () => {
+    if (isMobile) return; // 手机端不检测，避免输入法键盘弹出误触
     const widthThreshold = window.outerWidth - window.innerWidth > threshold;
     const heightThreshold = window.outerHeight - window.innerHeight > threshold;
     if (widthThreshold || heightThreshold) {
