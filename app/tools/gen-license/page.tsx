@@ -3,6 +3,9 @@ import Link from "next/link";
 import React from "react";
 import { generateCode, TYPE_NAMES } from "../../../lib/license";
 
+// Cloudflare Worker API 地址（用于查询激活码真实使用状态）
+const API_BASE_URL = "https://license-check.yellowjiba.workers.dev";
+
 // 密码哈希（非明文存储，修改密码需重新计算哈希值）
 function simpleHash(str: string): number {
   let hash = 0;
@@ -36,6 +39,7 @@ export default class GeneratePage extends React.Component {
       history: [] as HistoryItem[],
       showHistory: false,
       filterType: 0, // 0=全部
+      checking: false, // 是否正在从云端查询状态
     };
   }
 
@@ -50,6 +54,7 @@ export default class GeneratePage extends React.Component {
     history: HistoryItem[];
     showHistory: boolean;
     filterType: number;
+    checking: boolean;
   };
 
   componentDidMount() {
@@ -189,8 +194,47 @@ export default class GeneratePage extends React.Component {
     return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
   };
 
+  // 从云端查询单个激活码的使用状态
+  checkCodeFromCloud = async (code: string): Promise<boolean | null> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/check?code=${encodeURIComponent(code)}`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return !!data.used;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  // 从云端刷新所有历史记录的使用状态
+  refreshAllStatus = async () => {
+    const { history } = this.state;
+    if (history.length === 0) return;
+    this.setState({ checking: true });
+    const newHistory = [...history];
+    let updated = 0;
+    for (let i = 0; i < newHistory.length; i++) {
+      const cloudUsed = await this.checkCodeFromCloud(newHistory[i].code);
+      if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
+        newHistory[i] = { ...newHistory[i], used: cloudUsed };
+        updated++;
+      }
+    }
+    localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
+    this.setState({ history: newHistory, checking: false });
+    if (updated > 0) {
+      alert(`已从云端同步状态，更新了 ${updated} 条记录`);
+    } else {
+      alert("云端状态同步完成，所有记录状态已是最新");
+    }
+  };
+
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking } = this.state;
 
     if (!authenticated) {
       return (
@@ -321,10 +365,19 @@ export default class GeneratePage extends React.Component {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mb-4 text-sm">
-                <span className="text-white/60">共 {history.length} 条</span>
-                <span className="text-green-400">已用 {usedCount}</span>
-                <span className="text-yellow-400">未用 {history.length - usedCount}</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3 text-sm">
+                  <span className="text-white/60">共 {history.length} 条</span>
+                  <span className="text-green-400">已用 {usedCount}</span>
+                  <span className="text-yellow-400">未用 {history.length - usedCount}</span>
+                </div>
+                <button
+                  onClick={this.refreshAllStatus}
+                  disabled={checking}
+                  className="shrink-0 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50"
+                >
+                  {checking ? "⏳ 查询中..." : "🔄 刷新云端状态"}
+                </button>
               </div>
 
               <div className="flex gap-2 mb-4 flex-wrap">
