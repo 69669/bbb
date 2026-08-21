@@ -441,7 +441,11 @@ export default class GeneratePage extends React.Component {
         alert("清空失败：" + (data.message || "未知错误"));
       }
     } catch (e: any) {
-      alert("清空失败：" + (e?.message || String(e)));
+      let msg = e?.message || String(e);
+      if (msg === "Failed to fetch" || msg.includes("NetworkError")) {
+        msg = "网络请求失败，请检查：\n1. Worker是否已部署最新版本（含/codes/clear接口）\n2. api.ttla.top是否可正常访问\n3. 网络连接是否正常";
+      }
+      alert("清空失败：" + msg);
     }
   };
 
