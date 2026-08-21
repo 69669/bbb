@@ -561,11 +561,33 @@ export default class GeneratePage extends React.Component {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3 text-sm">
+              <div className="mb-4">
+                <div className="flex items-center gap-3 text-sm mb-3">
                   <span className="text-white/60">共 {history.length} 条</span>
                   <span className="text-green-400">已用 {usedCount}</span>
                   <span className="text-yellow-400">未用 {history.length - usedCount}</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((type) => {
+                    const typeHistory = history.filter((h) => h.type === type);
+                    const typeUsed = typeHistory.filter((h) => h.used).length;
+                    const typeUnused = typeHistory.length - typeUsed;
+                    return (
+                      <div key={type} className="rounded-lg border border-white/10 bg-white/5 p-2 text-center">
+                        <div className="text-sm font-semibold text-white">{TYPE_NAMES[type]}</div>
+                        <div className="text-xs mt-1">
+                          <span className="text-green-400">已用 {typeUsed}</span>
+                          <span className="text-white/30 mx-1">/</span>
+                          <span className="text-yellow-400">未用 {typeUnused}</span>
+                        </div>
+                        <div className="text-xs text-white/40 mt-0.5">共 {typeHistory.length}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3 text-sm">
                 </div>
                 <button
                   onClick={this.refreshAllStatus}
