@@ -42,6 +42,8 @@ export default class GeneratePage extends React.Component {
       checking: false, // 是否正在从云端查询状态
       adminPassword: "", // 管理密码（用于调用Worker生成接口）
       generating: false, // 是否正在生成
+      progress: 0, // 生成进度（已完成数量）
+      totalCount: 0, // 总生成数量
     };
   }
 
@@ -59,6 +61,8 @@ export default class GeneratePage extends React.Component {
     checking: boolean;
     adminPassword: string;
     generating: boolean;
+    progress: number;
+    totalCount: number;
   };
 
   componentDidMount() {
@@ -100,55 +104,78 @@ export default class GeneratePage extends React.Component {
   };
 
   handleGenerate = async () => {
-    const { type, count, history, adminPassword } = this.state;
-    this.setState({ generating: true });
+    const { type, count, history } = this.state;
+    const BATCH_SIZE = 10; // 每批生成10个，避免Worker超时
+    const allCodes: string[] = [];
+    const newHistory: HistoryItem[] = [...history];
+    let completed = 0;
+
+    this.setState({ generating: true, progress: 0, totalCount: count });
+
     try {
-      const res = await fetch(`${API_BASE_URL}/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, count, passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
-        signal: AbortSignal.timeout(15000),
-      });
-      if (res.status === 404) {
-        alert("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker");
-        this.setState({ generating: false });
-        return;
-      }
-      if (res.status === 403) {
-        alert("生成失败：管理密码错误，请退出重新登录");
-        this.setState({ generating: false });
-        return;
-      }
-      if (!res.ok) {
-        alert(`生成失败：Worker返回错误 HTTP ${res.status}`);
-        this.setState({ generating: false });
-        return;
-      }
-      const data = await res.json();
-      if (!data.success) {
-        alert(data.message || "生成失败");
-        this.setState({ generating: false });
-        return;
-      }
-      const newCodes: string[] = data.codes;
-      const newHistory: HistoryItem[] = [...history];
-      for (const code of newCodes) {
-        newHistory.unshift({
-          code,
-          type,
-          createdAt: Date.now(),
-          used: false,
+      // 分批生成
+      while (completed < count) {
+        const batchCount = Math.min(BATCH_SIZE, count - completed);
+        const res = await fetch(`${API_BASE_URL}/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, count: batchCount, passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+          signal: AbortSignal.timeout(30000),
         });
+
+        if (res.status === 404) {
+          alert("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker");
+          this.setState({ generating: false });
+          return;
+        }
+        if (res.status === 403) {
+          alert("生成失败：管理密码错误，请退出重新登录");
+          this.setState({ generating: false });
+          return;
+        }
+        if (!res.ok) {
+          alert(`生成失败：Worker返回错误 HTTP ${res.status}`);
+          this.setState({ generating: false });
+          return;
+        }
+
+        const data = await res.json();
+        if (!data.success) {
+          alert(data.message || "生成失败");
+          this.setState({ generating: false });
+          return;
+        }
+
+        // 收集这批生成的码
+        for (const code of data.codes) {
+          allCodes.push(code);
+          newHistory.unshift({
+            code,
+            type,
+            createdAt: Date.now(),
+            used: false,
+          });
+        }
+
+        completed += batchCount;
+        this.setState({ progress: completed });
       }
+
+      // 全部生成完成，保存历史
       this.saveHistory(newHistory);
-      this.setState({ codes: newCodes, copied: false, generating: false });
+      this.setState({ codes: allCodes, copied: false, generating: false, progress: 0, totalCount: 0 });
     } catch (e: any) {
       if (e?.name === "TimeoutError") {
-        alert("生成失败：请求超时（15秒），请检查网络或Worker状态");
+        alert(`生成失败：请求超时，已生成 ${completed}/${count} 个。已生成的码已保存，请减少数量重试。`);
       } else {
-        alert("生成失败：网络错误 - " + (e?.message || String(e)) + "\n请检查Worker是否正常部署，api.ttla.top是否可访问");
+        alert(`生成失败：网络错误 - ${e?.message || String(e)}。已生成 ${completed}/${count} 个，已生成的码已保存。`);
       }
-      this.setState({ generating: false });
+      // 即使失败，也保存已生成的码
+      if (allCodes.length > 0) {
+        this.saveHistory(newHistory);
+        this.setState({ codes: allCodes, copied: false });
+      }
+      this.setState({ generating: false, progress: 0, totalCount: 0 });
     }
   };
 
@@ -329,7 +356,7 @@ export default class GeneratePage extends React.Component {
   };
 
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount } = this.state;
 
     if (!authenticated) {
       return (
@@ -420,9 +447,17 @@ export default class GeneratePage extends React.Component {
                 <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>300</span></div>
               </div>
 
-              <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-6 disabled:opacity-50 disabled:cursor-not-allowed">
-                {generating ? "⏳ 生成中..." : "🎫 生成激活码"}
+              <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                {generating ? `⏳ 生成中... ${progress}/${totalCount}` : "🎫 生成激活码"}
               </button>
+              {generating && totalCount > 0 && (
+                <div className="mb-6">
+                  <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300" style={{ width: `${(progress / totalCount) * 100}%` }} />
+                  </div>
+                  <p className="text-center text-xs text-white/40 mt-1">每批生成10个，避免超时，请耐心等待</p>
+                </div>
+              )}
 
               {codes.length > 0 && (
                 <div className="space-y-4">
