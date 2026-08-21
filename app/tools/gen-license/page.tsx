@@ -417,6 +417,34 @@ export default class GeneratePage extends React.Component {
     }
   };
 
+  // 清空云端所有激活码记录
+  clearCloud = async () => {
+    if (!confirm("⚠️ 确定要清空云端所有激活码记录吗？\n\n此操作不可恢复！清空后：\n1. 之前生成的所有激活码全部失效\n2. 云端记录全部删除\n3. 本地记录也会同步清空\n\n确定继续吗？")) {
+      return;
+    }
+    if (!confirm("再次确认：真的要清空所有激活码吗？此操作不可恢复！")) {
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/clear`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+        signal: AbortSignal.timeout(60000),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.removeItem("lg_gen_history");
+        this.setState({ history: [] });
+        alert(`云端记录已清空，共删除 ${data.deleted} 条激活码`);
+      } else {
+        alert("清空失败：" + (data.message || "未知错误"));
+      }
+    } catch (e: any) {
+      alert("清空失败：" + (e?.message || String(e)));
+    }
+  };
+
   render() {
     const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing } = this.state;
 
