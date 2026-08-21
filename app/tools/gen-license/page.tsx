@@ -142,11 +142,11 @@ export default class GeneratePage extends React.Component {
       }
       this.saveHistory(newHistory);
       this.setState({ codes: newCodes, copied: false, generating: false });
-    } catch (e) {
-      if (e.name === "TimeoutError") {
+    } catch (e: any) {
+      if (e?.name === "TimeoutError") {
         alert("生成失败：请求超时（15秒），请检查网络或Worker状态");
       } else {
-        alert("生成失败：网络错误 - " + e.message + "\n请检查Worker是否正常部署，api.ttla.top是否可访问");
+        alert("生成失败：网络错误 - " + (e?.message || String(e)) + "\n请检查Worker是否正常部署，api.ttla.top是否可访问");
       }
       this.setState({ generating: false });
     }
