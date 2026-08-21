@@ -44,6 +44,7 @@ export default class GeneratePage extends React.Component {
       generating: false, // 是否正在生成
       progress: 0, // 生成进度（已完成数量）
       totalCount: 0, // 总生成数量
+      syncing: false, // 是否正在从云端同步
     };
   }
 
@@ -63,6 +64,7 @@ export default class GeneratePage extends React.Component {
     generating: boolean;
     progress: number;
     totalCount: number;
+    syncing: boolean;
   };
 
   componentDidMount() {
@@ -70,6 +72,8 @@ export default class GeneratePage extends React.Component {
       const auth = localStorage.getItem("lg_admin_auth");
       if (auth === "1") {
         this.setState({ authenticated: true });
+        // 登录后自动从云端同步生成记录
+        setTimeout(() => this.syncFromCloud(), 500);
       }
       const historyData = localStorage.getItem("lg_gen_history");
       if (historyData) {
@@ -355,8 +359,61 @@ export default class GeneratePage extends React.Component {
     }
   };
 
+  // 从云端同步所有生成记录（电脑手机通用）
+  syncFromCloud = async () => {
+    this.setState({ syncing: true });
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/list`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+        signal: AbortSignal.timeout(30000),
+      });
+      if (!res.ok) {
+        this.setState({ syncing: false });
+        return;
+      }
+      const data = await res.json();
+      if (!data.success) {
+        this.setState({ syncing: false });
+        return;
+      }
+      // 合并云端记录到本地（去重）
+      const { history } = this.state;
+      const localCodes = new Set(history.map((h) => h.code));
+      const newHistory = [...history];
+      let added = 0;
+      for (const item of data.codes) {
+        if (!localCodes.has(item.code)) {
+          newHistory.unshift({
+            code: item.code,
+            type: item.type,
+            createdAt: item.generatedAt,
+            used: item.used,
+          });
+          added++;
+        } else {
+          // 更新本地记录的使用状态
+          const idx = newHistory.findIndex((h) => h.code === item.code);
+          if (idx >= 0 && newHistory[idx].used !== item.used) {
+            newHistory[idx] = { ...newHistory[idx], used: item.used };
+          }
+        }
+      }
+      // 按生成时间倒序
+      newHistory.sort((a, b) => b.createdAt - a.createdAt);
+      localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
+      this.setState({ history: newHistory, syncing: false });
+      if (added > 0) {
+        // 静默同步，不弹窗打扰用户
+      }
+    } catch (e) {
+      this.setState({ syncing: false });
+    }
+  };
+
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing } = this.state;
 
     if (!authenticated) {
       return (
@@ -490,6 +547,9 @@ export default class GeneratePage extends React.Component {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">📋 生成记录</h2>
                 <div className="flex gap-2 flex-wrap">
+                  <button onClick={this.syncFromCloud} disabled={syncing} className="rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50">
+                    {syncing ? "⏳ 同步中..." : "☁️ 云端同步"}
+                  </button>
                   <button onClick={this.copyAllUnused} className="rounded-full border border-green-400/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-300 hover:bg-green-500/20 transition">复制未使用</button>
                   <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === 0 ? "全部" : TYPE_NAMES[filterType]}</button>
                   <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空</button>
