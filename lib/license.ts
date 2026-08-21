@@ -1,9 +1,7 @@
 // 激活码工具函数
 // 类型：A=周卡(7天), B=月卡(30天), C=季卡(90天), D=年卡(365天)
 // 格式：7位字母+数字大写（无横线）
-// ============================================
-// ⚠️ 重要配置：Cloudflare Workers API 地址
-// ============================================
+
 const API_BASE_URL = "https://api.ttla.top";
 
 const TYPE_DAYS: Record<string, number> = {
@@ -20,7 +18,6 @@ export const TYPE_NAMES: Record<number, string> = {
   4: "年卡",
 };
 
-// 类型数字到字母的映射
 const TYPE_NUM_TO_CHAR: Record<number, string> = {
   1: "A",
   2: "B",
@@ -28,7 +25,6 @@ const TYPE_NUM_TO_CHAR: Record<number, string> = {
   4: "D",
 };
 
-// 类型字母到数字的映射
 const TYPE_CHAR_TO_NUM: Record<string, number> = {
   A: 1,
   B: 2,
@@ -36,7 +32,6 @@ const TYPE_CHAR_TO_NUM: Record<string, number> = {
   D: 4,
 };
 
-// 可用字符（去掉易混淆的I/O/0/1）
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function hashStr(str: string): number {
@@ -56,13 +51,11 @@ function randomStr(len: number): string {
   return result;
 }
 
-// 计算校验位（基于前6位）
 function calcCheckChar(raw6: string): string {
   const hash = hashStr(raw6);
   return CHARS[hash % CHARS.length];
 }
 
-// 生成激活码（7位，无横线）
 export function generateCode(type: number): string {
   const typeChar = TYPE_NUM_TO_CHAR[type] || "A";
   const random = randomStr(5);
@@ -71,7 +64,6 @@ export function generateCode(type: number): string {
   return raw6 + check;
 }
 
-// 解析激活码
 export function parseCode(code: string): { type: number } | null {
   const clean = code.toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
   if (clean.length !== 7) return null;
@@ -85,7 +77,6 @@ export function parseCode(code: string): { type: number } | null {
   return { type };
 }
 
-// 云端验证：检查码是否已使用
 async function cloudCheck(code: string): Promise<{ used: boolean } | null> {
   if (!API_BASE_URL) return null;
   try {
@@ -103,7 +94,6 @@ async function cloudCheck(code: string): Promise<{ used: boolean } | null> {
   }
 }
 
-// 云端激活：标记码为已使用
 async function cloudActivate(code: string): Promise<{ success: boolean; message: string } | null> {
   if (!API_BASE_URL) return null;
   try {
@@ -123,7 +113,6 @@ async function cloudActivate(code: string): Promise<{ success: boolean; message:
   }
 }
 
-// 验证激活码并激活
 export function activateCode(code: string): Promise<{ success: boolean; message: string; type?: number; expireAt?: number }> {
   return (async () => {
     if (typeof window === "undefined") {
@@ -134,14 +123,12 @@ export function activateCode(code: string): Promise<{ success: boolean; message:
       return { success: false, message: "激活码格式不正确或已失效" };
     }
     const clean = code.toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
-    // ===== 云端验证（一人一码核心）=====
     const cloudResult = await cloudActivate(clean);
     if (cloudResult !== null) {
       if (!cloudResult.success) {
         return { success: false, message: cloudResult.message || "该激活码已被使用" };
       }
     } else {
-      // 云端不可用，降级到本地检查
       try {
         const usedCodes = JSON.parse(localStorage.getItem("lg_used_codes") || "[]");
         if (usedCodes.includes(clean)) {
@@ -151,7 +138,6 @@ export function activateCode(code: string): Promise<{ success: boolean; message:
         localStorage.setItem("lg_used_codes", JSON.stringify(usedCodes));
       } catch {}
     }
-    // 保存激活信息到本地
     const days = TYPE_DAYS[clean[0]] || 7;
     const now = Date.now();
     const expireAt = now + days * 24 * 60 * 60 * 1000;
@@ -171,7 +157,6 @@ export function activateCode(code: string): Promise<{ success: boolean; message:
   })();
 }
 
-// 检查是否已激活且未过期
 export function checkActivation(): { active: boolean; type?: number; expireAt?: number; daysLeft?: number } {
   if (typeof window === "undefined") {
     return { active: false };
