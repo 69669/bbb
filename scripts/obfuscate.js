@@ -14,7 +14,6 @@ try {
   execSync("npm install javascript-obfuscator --save-dev", { stdio: "inherit" });
 }
 
-const JavaScriptObfuscator = require("javascript-obfuscator");
 
 const OUT_DIR = path.join(__dirname, "..", "out");
 const STATIC_DIR = path.join(OUT_DIR, "_next", "static");
@@ -74,6 +73,16 @@ function main() {
   if (!fs.existsSync(STATIC_DIR)) {
     console.log("未找到 out/_next/static 目录，请先运行 npm run build");
     process.exit(1);
+  }
+
+  // 动态加载 javascript-obfuscator（安装后再require）
+  let JavaScriptObfuscator;
+  try {
+    JavaScriptObfuscator = require("javascript-obfuscator");
+  } catch (e) {
+    console.log("安装 javascript-obfuscator...");
+    execSync("npm install javascript-obfuscator --no-save", { stdio: "inherit", cwd: path.join(__dirname, "..") });
+    JavaScriptObfuscator = require("javascript-obfuscator");
   }
 
   const jsFiles = getAllJsFiles(STATIC_DIR);
