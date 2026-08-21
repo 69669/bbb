@@ -11,6 +11,7 @@ const TYPE_NAMES: Record<number, string> = {
   2: "月卡",
   3: "季卡",
   4: "年卡",
+  5: "测试卡",
 };
 
 // 密码哈希（非明文存储，修改密码需重新计算哈希值）
@@ -36,7 +37,7 @@ export default class GeneratePage extends React.Component {
   constructor(props: {}) {
     super(props);
     this.state = {
-      type: 3,
+      type: 5,
       count: 1,
       codes: [] as string[],
       copied: false,
