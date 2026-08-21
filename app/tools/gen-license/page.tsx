@@ -128,7 +128,17 @@ export default class GeneratePage extends React.Component {
       this.saveHistory(newHistory);
       this.setState({ codes: newCodes, copied: false, generating: false });
     } catch (e) {
-      alert("生成失败：网络错误，请检查Worker是否正常部署");
+      let errMsg = "网络错误，请检查Worker是否正常部署";
+      try {
+        // 尝试获取更详细的错误信息
+        const res = await fetch(`${API_BASE_URL}/health`);
+        if (!res.ok) {
+          errMsg = `Worker返回错误：HTTP ${res.status}`;
+        }
+      } catch (e2) {
+        errMsg = "无法连接到Worker，请检查api.ttla.top是否正常";
+      }
+      alert("生成失败：" + errMsg);
       this.setState({ generating: false });
     }
   };
