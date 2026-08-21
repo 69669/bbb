@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { TYPE_NAMES } from "../../../lib/license";
+import { TYPE_NAMES } from "@/lib/license";
 
 // Cloudflare Worker API 地址（用于查询激活码真实使用状态）
 const API_BASE_URL = "https://api.ttla.top";
