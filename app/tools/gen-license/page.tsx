@@ -497,6 +497,7 @@ export default class GeneratePage extends React.Component {
     }
 
     const typeOptions = [
+      { value: 5, label: "测试卡", desc: "5分钟" },
       { value: 1, label: "周卡", desc: "7天" },
       { value: 2, label: "月卡", desc: "30天" },
       { value: 3, label: "季卡", desc: "90天" },
@@ -527,7 +528,7 @@ export default class GeneratePage extends React.Component {
               <div className="text-center mb-6">
                 <h1 className="game-title">激活码生成器</h1>
                 <div className="game-title-underline" />
-                <p className="mt-3 text-sm text-white/60">生成周卡 / 月卡 / 季卡 / 年卡激活码</p>
+                <p className="mt-3 text-sm text-white/60">生成测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
               </div>
 
               <div className="mb-6">
