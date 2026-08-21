@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "next build && node scripts/obfuscate.js",
+    "start": "next start",
+    "obfuscate": "node scripts/obfuscate.js"
   },
   "dependencies": {
     "next": "14.2.5",

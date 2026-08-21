@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { generateCode, TYPE_NAMES } from "../../../lib/license";
+import { TYPE_NAMES } from "../../../lib/license";
 
 // Cloudflare Worker API 地址（用于查询激活码真实使用状态）
 const API_BASE_URL = "https://api.ttla.top";
@@ -40,6 +40,8 @@ export default class GeneratePage extends React.Component {
       showHistory: false,
       filterType: 0, // 0=全部
       checking: false, // 是否正在从云端查询状态
+      adminPassword: "", // 管理密码（用于调用Worker生成接口）
+      generating: false, // 是否正在生成
     };
   }
 
@@ -55,6 +57,8 @@ export default class GeneratePage extends React.Component {
     showHistory: boolean;
     filterType: number;
     checking: boolean;
+    adminPassword: string;
+    generating: boolean;
   };
 
   componentDidMount() {
@@ -82,7 +86,7 @@ export default class GeneratePage extends React.Component {
     const { password } = this.state;
     if (simpleHash(password) === ADMIN_PASSWORD_HASH) {
       localStorage.setItem("lg_admin_auth", "1");
-      this.setState({ authenticated: true, password: "", error: "" });
+      this.setState({ authenticated: true, password: "", error: "", adminPassword: password });
     } else {
       this.setState({ error: "密码错误，请重试" });
     }
@@ -93,22 +97,38 @@ export default class GeneratePage extends React.Component {
     this.setState({ authenticated: false });
   };
 
-  handleGenerate = () => {
-    const { type, count, history } = this.state;
-    const newCodes: string[] = [];
-    const newHistory: HistoryItem[] = [...history];
-    for (let i = 0; i < count; i++) {
-      const code = generateCode(type);
-      newCodes.push(code);
-      newHistory.unshift({
-        code,
-        type,
-        createdAt: Date.now(),
-        used: false,
+  handleGenerate = async () => {
+    const { type, count, history, adminPassword } = this.state;
+    this.setState({ generating: true });
+    try {
+      const res = await fetch(`${API_BASE_URL}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, count, password: adminPassword }),
+        signal: AbortSignal.timeout(15000),
       });
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.message || "生成失败");
+        this.setState({ generating: false });
+        return;
+      }
+      const newCodes: string[] = data.codes;
+      const newHistory: HistoryItem[] = [...history];
+      for (const code of newCodes) {
+        newHistory.unshift({
+          code,
+          type,
+          createdAt: Date.now(),
+          used: false,
+        });
+      }
+      this.saveHistory(newHistory);
+      this.setState({ codes: newCodes, copied: false, generating: false });
+    } catch (e) {
+      alert("生成失败：网络错误，请检查Worker是否正常部署");
+      this.setState({ generating: false });
     }
-    this.saveHistory(newHistory);
-    this.setState({ codes: newCodes, copied: false });
   };
 
   handleCopy = async () => {
@@ -234,7 +254,7 @@ export default class GeneratePage extends React.Component {
   };
 
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating } = this.state;
 
     if (!authenticated) {
       return (
@@ -325,8 +345,8 @@ export default class GeneratePage extends React.Component {
                 <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>50</span></div>
               </div>
 
-              <button onClick={this.handleGenerate} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-6">
-                🎫 生成激活码
+              <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-6 disabled:opacity-50 disabled:cursor-not-allowed">
+                {generating ? "⏳ 生成中..." : "🎫 生成激活码"}
               </button>
 
               {codes.length > 0 && (

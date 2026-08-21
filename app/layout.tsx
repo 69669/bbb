@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import AntiDebugProvider from '../components/AntiDebugProvider'
 
 export const metadata: Metadata = {
   title: '工具',
@@ -14,7 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body>
+        <AntiDebugProvider>
+          {children}
+        </AntiDebugProvider>
+      </body>
     </html>
   )
 }
