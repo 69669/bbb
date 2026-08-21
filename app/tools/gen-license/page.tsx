@@ -4,7 +4,7 @@ import React from "react";
 import { generateCode, TYPE_NAMES } from "../../../lib/license";
 
 // Cloudflare Worker API 地址（用于查询激活码真实使用状态）
-const API_BASE_URL = "https://license-check.yellowjiba.workers.dev";
+const API_BASE_URL = "https://api.ttla.top";
 
 // 密码哈希（非明文存储，修改密码需重新计算哈希值）
 function simpleHash(str: string): number {

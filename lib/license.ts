@@ -7,7 +7,7 @@
 // 例如：https://license-check.yourname.workers.dev
 // 留空则使用本地验证模式（无法防止跨设备重复使用）
 // ============================================
-const API_BASE_URL = "https://license-check.yellowjiba.workers.dev";
+const API_BASE_URL = "https://api.ttla.top";
 
 const TYPE_DAYS: Record<number, number> = {
   1: 1,
