@@ -395,8 +395,8 @@ export default class GeneratePage extends React.Component {
 
               <div className="mb-6">
                 <label className="block text-sm text-white/70 mb-2">生成数量：{count} 个</label>
-                <input type="range" min="1" max="50" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-pink-500" />
-                <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>50</span></div>
+                <input type="range" min="1" max="300" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-pink-500" />
+                <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>300</span></div>
               </div>
 
               <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-6 disabled:opacity-50 disabled:cursor-not-allowed">
