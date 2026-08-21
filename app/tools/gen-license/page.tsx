@@ -53,7 +53,9 @@ export default class GeneratePage extends React.Component {
       progress: 0, // 生成进度（已完成数量）
       totalCount: 0, // 总生成数量
       syncing: false, // 是否正在从云端同步
+      lastRefresh: "", // 最后刷新时间
     };
+    this.autoRefreshTimer = null as any;
   }
 
   state: {
@@ -73,7 +75,9 @@ export default class GeneratePage extends React.Component {
     progress: number;
     totalCount: number;
     syncing: boolean;
+    lastRefresh: string;
   };
+  autoRefreshTimer: any;
 
   componentDidMount() {
     if (typeof window !== "undefined") {
@@ -82,6 +86,8 @@ export default class GeneratePage extends React.Component {
         this.setState({ authenticated: true });
         // 登录后自动从云端同步生成记录
         setTimeout(() => this.syncFromCloud(), 500);
+        // 启动自动刷新定时器（每60秒刷新一次云端状态）
+        this.startAutoRefresh();
       }
       const historyData = localStorage.getItem("lg_gen_history");
       if (historyData) {
@@ -89,6 +95,42 @@ export default class GeneratePage extends React.Component {
           this.setState({ history: JSON.parse(historyData) });
         } catch {}
       }
+    }
+  }
+
+  // 启动自动刷新
+  startAutoRefresh = () => {
+    if (this.autoRefreshTimer) clearInterval(this.autoRefreshTimer);
+    this.autoRefreshTimer = setInterval(() => {
+      // 静默刷新（不显示loading，不弹窗提示）
+      this.silentRefreshStatus();
+    }, 60000); // 每60秒刷新一次
+  };
+
+  // 静默刷新云端状态（不弹窗）
+  silentRefreshStatus = async () => {
+    const { history } = this.state;
+    if (history.length === 0) return;
+    try {
+      const newHistory = [...history];
+      for (let i = 0; i < newHistory.length; i++) {
+        const cloudUsed = await this.checkCodeFromCloud(newHistory[i].code);
+        if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
+          newHistory[i] = { ...newHistory[i], used: cloudUsed };
+        }
+      }
+      localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+      this.setState({ history: newHistory, lastRefresh: timeStr });
+    } catch {}
+  };
+
+  // 页面卸载时清除定时器
+  componentWillUnmount() {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
     }
   }
 
@@ -104,6 +146,8 @@ export default class GeneratePage extends React.Component {
       localStorage.setItem("lg_admin_auth", "1");
       localStorage.setItem("lg_admin_hash", String(simpleHash(password)));
       this.setState({ authenticated: true, password: "", error: "", adminPassword: password });
+      // 登录成功后启动自动刷新
+      setTimeout(() => this.startAutoRefresh(), 1000);
     } else {
       this.setState({ error: "密码错误，请重试" });
     }
@@ -113,6 +157,11 @@ export default class GeneratePage extends React.Component {
     localStorage.removeItem("lg_admin_auth");
     localStorage.removeItem("lg_admin_hash");
     this.setState({ authenticated: false });
+    // 退出时清除自动刷新定时器
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
   };
 
   handleGenerate = async () => {
