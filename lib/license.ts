@@ -10,16 +10,16 @@
 const API_BASE_URL = "https://api.ttla.top";
 
 const TYPE_DAYS: Record<number, number> = {
-  1: 1,
-  2: 7,
-  3: 30,
-  4: 90,
+  1: 7,
+  2: 30,
+  3: 90,
+  4: 365,
 };
 export const TYPE_NAMES: Record<number, string> = {
-  1: "天卡",
-  2: "周卡",
-  3: "月卡",
-  4: "季卡",
+  1: "周卡",
+  2: "月卡",
+  3: "季卡",
+  4: "年卡",
 };
 
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

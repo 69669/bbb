@@ -193,20 +193,74 @@ export default class GeneratePage extends React.Component {
   };
 
   exportHistory = () => {
-    const { history } = this.state;
-    const lines = history.map((h) => {
-      const date = new Date(h.createdAt).toLocaleString("zh-CN");
-      const status = h.used ? "已使用" : "未使用";
-      return `${h.code}\t${TYPE_NAMES[h.type]}\t${date}\t${status}`;
-    });
-    const text = "激活码\t类型\t生成时间\t状态\n" + lines.join("\n");
+    const { history, filterType } = this.state;
+    // 按当前筛选导出
+    const filtered = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    if (filtered.length === 0) {
+      alert("没有可导出的记录");
+      return;
+    }
+    // 按类型分组
+    const grouped: Record<number, HistoryItem[]> = {};
+    for (const item of filtered) {
+      if (!grouped[item.type]) grouped[item.type] = [];
+      grouped[item.type].push(item);
+    }
+    // 生成文本，按类型分类
+    let text = "";
+    for (const typeStr of Object.keys(grouped).sort()) {
+      const type = parseInt(typeStr);
+      const items = grouped[type];
+      text += `========== ${TYPE_NAMES[type]} (${items.length}个) ==========\n`;
+      for (const h of items) {
+        const date = new Date(h.createdAt).toLocaleString("zh-CN");
+        const status = h.used ? "已使用" : "未使用";
+        text += `${h.code}\t${date}\t${status}\n`;
+      }
+      text += "\n";
+    }
+    const typeLabel = filterType === 0 ? "全部" : TYPE_NAMES[filterType];
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `激活码生成记录_${new Date().toLocaleDateString()}.txt`;
+    a.download = `激活码_${typeLabel}_${new Date().toLocaleDateString()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // 批量复制当前筛选的所有未使用激活码
+  copyAllUnused = () => {
+    const { history, filterType } = this.state;
+    const filtered = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    const unused = filtered.filter((h) => !h.used);
+    if (unused.length === 0) {
+      alert("没有未使用的激活码");
+      return;
+    }
+    const text = unused.map((h) => h.code).join("\n");
+    this.copyToClipboard(text);
+    alert(`已复制 ${unused.length} 个未使用激活码`);
+  };
+
+  copyToClipboard = (text: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).catch(() => {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      });
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
   };
 
   formatDate = (timestamp: number) => {
@@ -293,10 +347,10 @@ export default class GeneratePage extends React.Component {
     }
 
     const typeOptions = [
-      { value: 1, label: "天卡", desc: "1天" },
-      { value: 2, label: "周卡", desc: "7天" },
-      { value: 3, label: "月卡", desc: "30天" },
-      { value: 4, label: "季卡", desc: "90天" },
+      { value: 1, label: "周卡", desc: "7天" },
+      { value: 2, label: "月卡", desc: "30天" },
+      { value: 3, label: "季卡", desc: "90天" },
+      { value: 4, label: "年卡", desc: "365天" },
     ];
 
     const filteredHistory = filterType === 0 ? history : history.filter((h) => h.type === filterType);
@@ -323,7 +377,7 @@ export default class GeneratePage extends React.Component {
               <div className="text-center mb-6">
                 <h1 className="game-title">激活码生成器</h1>
                 <div className="game-title-underline" />
-                <p className="mt-3 text-sm text-white/60">生成天卡 / 周卡 / 月卡 / 季卡激活码</p>
+                <p className="mt-3 text-sm text-white/60">生成周卡 / 月卡 / 季卡 / 年卡激活码</p>
               </div>
 
               <div className="mb-6">
@@ -379,8 +433,9 @@ export default class GeneratePage extends React.Component {
             <div className="game-container">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">📋 生成记录</h2>
-                <div className="flex gap-2">
-                  <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出</button>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={this.copyAllUnused} className="rounded-full border border-green-400/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-300 hover:bg-green-500/20 transition">复制未使用</button>
+                  <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === 0 ? "全部" : TYPE_NAMES[filterType]}</button>
                   <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空</button>
                 </div>
               </div>
