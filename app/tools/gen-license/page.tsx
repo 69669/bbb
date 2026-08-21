@@ -1,10 +1,17 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { TYPE_NAMES } from "../../../lib/license";
 
 // Cloudflare Worker API 地址（用于查询激活码真实使用状态）
 const API_BASE_URL = "https://api.ttla.top";
+
+// 卡类型名称
+const TYPE_NAMES: Record<number, string> = {
+  1: "周卡",
+  2: "月卡",
+  3: "季卡",
+  4: "年卡",
+};
 
 // 密码哈希（非明文存储，修改密码需重新计算哈希值）
 function simpleHash(str: string): number {
