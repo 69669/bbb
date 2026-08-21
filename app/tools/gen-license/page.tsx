@@ -109,6 +109,21 @@ export default class GeneratePage extends React.Component {
         body: JSON.stringify({ type, count, passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
         signal: AbortSignal.timeout(15000),
       });
+      if (res.status === 404) {
+        alert("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker");
+        this.setState({ generating: false });
+        return;
+      }
+      if (res.status === 403) {
+        alert("生成失败：管理密码错误，请退出重新登录");
+        this.setState({ generating: false });
+        return;
+      }
+      if (!res.ok) {
+        alert(`生成失败：Worker返回错误 HTTP ${res.status}`);
+        this.setState({ generating: false });
+        return;
+      }
       const data = await res.json();
       if (!data.success) {
         alert(data.message || "生成失败");
@@ -128,17 +143,11 @@ export default class GeneratePage extends React.Component {
       this.saveHistory(newHistory);
       this.setState({ codes: newCodes, copied: false, generating: false });
     } catch (e) {
-      let errMsg = "网络错误，请检查Worker是否正常部署";
-      try {
-        // 尝试获取更详细的错误信息
-        const res = await fetch(`${API_BASE_URL}/health`);
-        if (!res.ok) {
-          errMsg = `Worker返回错误：HTTP ${res.status}`;
-        }
-      } catch (e2) {
-        errMsg = "无法连接到Worker，请检查api.ttla.top是否正常";
+      if (e.name === "TimeoutError") {
+        alert("生成失败：请求超时（15秒），请检查网络或Worker状态");
+      } else {
+        alert("生成失败：网络错误 - " + e.message + "\n请检查Worker是否正常部署，api.ttla.top是否可访问");
       }
-      alert("生成失败：" + errMsg);
       this.setState({ generating: false });
     }
   };
