@@ -86,6 +86,7 @@ export default class GeneratePage extends React.Component {
     const { password } = this.state;
     if (simpleHash(password) === ADMIN_PASSWORD_HASH) {
       localStorage.setItem("lg_admin_auth", "1");
+      localStorage.setItem("lg_admin_hash", String(simpleHash(password)));
       this.setState({ authenticated: true, password: "", error: "", adminPassword: password });
     } else {
       this.setState({ error: "密码错误，请重试" });
@@ -94,6 +95,7 @@ export default class GeneratePage extends React.Component {
 
   handleLogout = () => {
     localStorage.removeItem("lg_admin_auth");
+    localStorage.removeItem("lg_admin_hash");
     this.setState({ authenticated: false });
   };
 
@@ -104,7 +106,7 @@ export default class GeneratePage extends React.Component {
       const res = await fetch(`${API_BASE_URL}/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, count, password: adminPassword }),
+        body: JSON.stringify({ type, count, passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
         signal: AbortSignal.timeout(15000),
       });
       const data = await res.json();
