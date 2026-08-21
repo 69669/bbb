@@ -131,7 +131,7 @@ export default class GeneratePage extends React.Component {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ type, count: batchCount, passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
-          signal: AbortSignal.timeout(60000),
+          signal: AbortSignal.timeout(120000),
         });
 
         if (res.status === 404) {
@@ -374,7 +374,7 @@ export default class GeneratePage extends React.Component {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(120000),
       });
       if (!res.ok) {
         this.setState({ syncing: false });
@@ -437,7 +437,7 @@ export default class GeneratePage extends React.Component {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(120000),
       });
       const data = await res.json();
       if (data.success) {
