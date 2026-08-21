@@ -404,11 +404,16 @@ export default class GeneratePage extends React.Component {
       newHistory.sort((a, b) => b.createdAt - a.createdAt);
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
       this.setState({ history: newHistory, syncing: false });
+      // 显示同步结果
       if (added > 0) {
-        // 静默同步，不弹窗打扰用户
+        alert(`云端同步完成：新增 ${added} 条记录，当前共 ${newHistory.length} 条`);
+      } else {
+        alert(`云端同步完成：没有新增记录，当前共 ${newHistory.length} 条`);
       }
-    } catch (e) {
+    } catch (e: any) {
       this.setState({ syncing: false });
+      alert(`云端同步失败：${e?.message || String(e)}
+请检查Worker是否已部署最新版本，或网络是否正常`);
     }
   };
 
@@ -500,8 +505,8 @@ export default class GeneratePage extends React.Component {
 
               <div className="mb-6">
                 <label className="block text-sm text-white/70 mb-2">生成数量：{count} 个</label>
-                <input type="range" min="1" max="300" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-pink-500" />
-                <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>300</span></div>
+                <input type="range" min="1" max="50" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-pink-500" />
+                <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>50</span></div>
               </div>
 
               <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
