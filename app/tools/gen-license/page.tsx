@@ -424,23 +424,32 @@ export default class GeneratePage extends React.Component {
   // 从云端刷新所有历史记录的使用状态
   refreshAllStatus = async () => {
     const { history } = this.state;
-    if (history.length === 0) return;
-    this.setState({ checking: true });
-    const newHistory = [...history];
-    let updated = 0;
-    for (let i = 0; i < newHistory.length; i++) {
-      const cloudUsed = await this.checkCodeFromCloud(newHistory[i].code);
-      if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
-        newHistory[i] = { ...newHistory[i], used: cloudUsed };
-        updated++;
-      }
+    if (history.length === 0) {
+      alert("暂无记录可查询");
+      return;
     }
-    localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
-    this.setState({ history: newHistory, checking: false });
-    if (updated > 0) {
-      alert(`已从云端同步状态，更新了 ${updated} 条记录`);
-    } else {
-      alert("云端状态同步完成，所有记录状态已是最新");
+    this.setState({ checking: true });
+    try {
+      const newHistory = [...history];
+      let updated = 0;
+      for (let i = 0; i < newHistory.length; i++) {
+        const cloudUsed = await this.checkCodeFromCloud(newHistory[i].code);
+        if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
+          newHistory[i] = { ...newHistory[i], used: cloudUsed };
+          updated++;
+        }
+      }
+      localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
+      this.setState({ history: newHistory });
+      if (updated > 0) {
+        this.showToast(`✓ 已同步 ${updated} 条`);
+      } else {
+        this.showToast("✓ 已是最新");
+      }
+    } catch (e) {
+      this.showToast("查询失败，请重试");
+    } finally {
+      this.setState({ checking: false });
     }
   };
 
@@ -818,9 +827,16 @@ export default class GeneratePage extends React.Component {
                 <button
                   onClick={this.refreshAllStatus}
                   disabled={checking}
-                  className="shrink-0 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50"
+                  className="shrink-0 inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50 whitespace-nowrap"
                 >
-                  {checking ? "⏳ 查询中..." : "🔄 刷新云端状态"}
+                  {checking ? (
+                    <>
+                      <span className="inline-block w-3 h-3 border-2 border-blue-300/30 border-t-blue-300 rounded-full animate-spin" />
+                      查询中...
+                    </>
+                  ) : (
+                    <>🔄 刷新状态</>
+                  )}
                 </button>
               </div>
 
