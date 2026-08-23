@@ -31,6 +31,12 @@ interface HistoryItem {
   type: number;
   createdAt: number;
   used: boolean;
+  disabled?: boolean;
+  usedAt?: number | null;
+  usedIp?: string | null;
+  generatedIp?: string | null;
+  disabledAt?: number | null;
+  disabledReason?: string | null;
 }
 
 export default class GeneratePage extends React.Component {
@@ -54,6 +60,8 @@ export default class GeneratePage extends React.Component {
       totalCount: 0, // 总生成数量
       syncing: false, // 是否正在从云端同步
       lastRefresh: "", // 最后刷新时间
+      disabling: false, // 是否正在禁用/启用
+      showDetail: null as number | null, // 当前查看详情的索引
     };
     this.autoRefreshTimer = null as any;
   }
@@ -76,6 +84,8 @@ export default class GeneratePage extends React.Component {
     totalCount: number;
     syncing: boolean;
     lastRefresh: string;
+    disabling: boolean;
+    showDetail: number | null;
   };
   autoRefreshTimer: any;
 
@@ -447,13 +457,28 @@ export default class GeneratePage extends React.Component {
             type: item.type,
             createdAt: item.generatedAt,
             used: item.used,
+            disabled: item.disabled || false,
+            usedAt: item.usedAt || null,
+            usedIp: item.usedIp || null,
+            generatedIp: item.generatedIp || null,
+            disabledAt: item.disabledAt || null,
+            disabledReason: item.disabledReason || null,
           });
           added++;
         } else {
-          // 更新本地记录的使用状态
+          // 更新本地记录的使用状态和其他字段
           const idx = newHistory.findIndex((h) => h.code === item.code);
-          if (idx >= 0 && newHistory[idx].used !== item.used) {
-            newHistory[idx] = { ...newHistory[idx], used: item.used };
+          if (idx >= 0) {
+            newHistory[idx] = {
+              ...newHistory[idx],
+              used: item.used,
+              disabled: item.disabled || false,
+              usedAt: item.usedAt || null,
+              usedIp: item.usedIp || null,
+              generatedIp: item.generatedIp || null,
+              disabledAt: item.disabledAt || null,
+              disabledReason: item.disabledReason || null,
+            };
           }
         }
       }
@@ -474,6 +499,89 @@ export default class GeneratePage extends React.Component {
     }
   };
 
+  // 禁用激活码
+  disableCode = async (index: number) => {
+    const { history } = this.state;
+    const item = history[index];
+    if (!item) return;
+    if (item.used) {
+      alert("已使用的激活码无法禁用");
+      return;
+    }
+    const reason = prompt("请输入禁用原因（可选）：", "管理员禁用");
+    if (reason === null) return;
+    this.setState({ disabling: true });
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/disable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: item.code,
+          reason: reason || "管理员禁用",
+          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const newHistory = [...history];
+        newHistory[index] = { ...newHistory[index], disabled: true, disabledAt: Date.now(), disabledReason: reason || "管理员禁用" };
+        this.saveHistory(newHistory);
+        alert("激活码已禁用");
+      } else {
+        alert("禁用失败：" + (data.message || "未知错误"));
+      }
+    } catch (e: any) {
+      alert("禁用失败：" + (e?.message || String(e)));
+    }
+    this.setState({ disabling: false });
+  };
+  // 启用激活码
+  enableCode = async (index: number) => {
+    const { history } = this.state;
+    const item = history[index];
+    if (!item) return;
+    if (!confirm("确定要启用此激活码吗？")) return;
+    this.setState({ disabling: true });
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/enable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: item.code,
+          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const newHistory = [...history];
+        newHistory[index] = { ...newHistory[index], disabled: false, disabledAt: null, disabledReason: null };
+        this.saveHistory(newHistory);
+        alert("激活码已启用");
+      } else {
+        alert("启用失败：" + (data.message || "未知错误"));
+      }
+    } catch (e: any) {
+      alert("启用失败：" + (e?.message || String(e)));
+    }
+    this.setState({ disabling: false });
+  };
+  // 格式化IP（隐藏部分）
+  formatIp = (ip: string | null | undefined): string => {
+    if (!ip || ip === "unknown") return "未知";
+    const parts = ip.split(".");
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.*.*`;
+    }
+    return ip;
+  };
+  // 格式化完整时间
+  formatFullDate = (timestamp: number | null | undefined): string => {
+    if (!timestamp) return "未激活";
+    const d = new Date(timestamp);
+    return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+  };
   // 清空云端所有激活码记录
   clearCloud = async () => {
     if (!confirm("⚠️ 确定要清空云端所有激活码记录吗？\n\n此操作不可恢复！清空后：\n1. 之前生成的所有激活码全部失效\n2. 云端记录全部删除\n3. 本地记录也会同步清空\n\n确定继续吗？")) {
@@ -507,7 +615,7 @@ export default class GeneratePage extends React.Component {
   };
 
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail } = this.state;
 
     if (!authenticated) {
       return (
@@ -555,6 +663,7 @@ export default class GeneratePage extends React.Component {
 
     const filteredHistory = filterType === 0 ? history : history.filter((h) => h.type === filterType);
     const usedCount = history.filter((h) => h.used).length;
+    const disabledCount = history.filter((h) => h.disabled).length;
 
     return (
       <>
@@ -653,10 +762,11 @@ export default class GeneratePage extends React.Component {
               </div>
 
               <div className="mb-4">
-                <div className="flex items-center gap-3 text-sm mb-3">
+                <div className="flex items-center gap-3 text-sm mb-3 flex-wrap">
                   <span className="text-white/60">共 {history.length} 条</span>
                   <span className="text-green-400">已用 {usedCount}</span>
-                  <span className="text-yellow-400">未用 {history.length - usedCount}</span>
+                  <span className="text-yellow-400">未用 {history.length - usedCount - disabledCount}</span>
+                  <span className="text-red-400">已禁用 {disabledCount}</span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[1, 2, 3, 4].map((type) => {
@@ -699,22 +809,41 @@ export default class GeneratePage extends React.Component {
               {filteredHistory.length === 0 ? (
                 <div className="text-center py-12 text-white/40">暂无记录</div>
               ) : (
-                <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                <div className="space-y-2 max-h-[65vh] overflow-y-auto pr-1">
                   {filteredHistory.map((item, i) => (
-                    <div key={i} className={`flex items-center gap-3 rounded-xl border p-3 ${item.used ? "border-green-400/20 bg-green-500/5" : "border-white/10 bg-white/5"}`}>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-mono text-sm text-pink-200 truncate">{item.code}</div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-white/50">
-                          <span>{TYPE_NAMES[item.type]}</span>
-                          <span>·</span>
-                          <span>{this.formatDate(item.createdAt)}</span>
+                    <div key={i} className={`rounded-xl border p-3 transition-all ${item.disabled ? "border-red-400/30 bg-red-500/10 opacity-70" : item.used ? "border-green-400/20 bg-green-500/5" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm text-pink-200 truncate">{item.code}</span>
+                            {item.disabled && <span className="shrink-0 rounded bg-red-500/30 px-1.5 py-0.5 text-[10px] text-red-200">已禁用</span>}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-white/50 flex-wrap">
+                            <span className="rounded bg-white/10 px-1.5 py-0.5">{TYPE_NAMES[item.type]}</span>
+                            <span>生成: {this.formatDate(item.createdAt)}</span>
+                            {item.used && <span className="text-green-400">✓ 已激活</span>}
+                          </div>
+                          {item.used && (
+                            <div className="mt-1.5 grid grid-cols-2 gap-1 text-[11px] text-white/40">
+                              <div>🕐 {this.formatFullDate(item.usedAt)}</div>
+                              <div>🌐 {this.formatIp(item.usedIp)}</div>
+                            </div>
+                          )}
+                          {item.disabled && item.disabledReason && (
+                            <div className="mt-1 text-[11px] text-red-300/70">原因: {item.disabledReason}</div>
+                          )}
                         </div>
                       </div>
-                      <button onClick={() => this.toggleUsed(i)} className={`shrink-0 rounded-full px-3 py-1 text-xs transition ${item.used ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"}`}>
-                        {item.used ? "✓ 已用" : "未用"}
-                      </button>
-                      <button onClick={() => this.handleCopyCode(item.code)} className="shrink-0 text-xs text-white/40 hover:text-white/70 px-2">复制</button>
-                      <button onClick={() => this.deleteHistory(i)} className="shrink-0 text-xs text-red-400/60 hover:text-red-400 px-2">删除</button>
+                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
+                        {!item.used && !item.disabled && (
+                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-300 hover:bg-red-500/25 transition disabled:opacity-50">禁用</button>
+                        )}
+                        {item.disabled && (
+                          <button onClick={() => this.enableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-green-500/15 px-2 py-1 text-[11px] text-green-300 hover:bg-green-500/25 transition disabled:opacity-50">启用</button>
+                        )}
+                        <button onClick={() => this.handleCopyCode(item.code)} className="flex-1 rounded-full bg-white/5 px-2 py-1 text-[11px] text-white/60 hover:bg-white/10 transition">复制</button>
+                        <button onClick={() => this.deleteHistory(i)} className="flex-1 rounded-full bg-red-500/10 px-2 py-1 text-[11px] text-red-400/70 hover:bg-red-500/20 transition">删除</button>
+                      </div>
                     </div>
                   ))}
                 </div>
