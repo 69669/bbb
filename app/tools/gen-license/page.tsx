@@ -772,22 +772,6 @@ export default class GeneratePage extends React.Component {
                   ))}
                 </div>
               </div>
-              {/* 搜索框 */}
-              <div className="mb-4">
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
-                    placeholder="搜索激活码..."
-                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
-                  />
-                  {search && (
-                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
-                  )}
-                </div>
-              </div>
 
               <div className="mb-6">
                 <label className="block text-sm text-white/70 mb-2">生成数量：{count} 个</label>
@@ -832,26 +816,6 @@ export default class GeneratePage extends React.Component {
                   </div>
                 </div>
               )}
-              {/* 分页控件 */}
-              {filteredHistory.length > pageSize && (
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="text-xs text-white/40">
-                    共 {filteredHistory.length} 条，第 {safePage}/{totalPages} 页
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })}
-                      disabled={safePage <= 1}
-                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                    >上一页</button>
-                    <button
-                      onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })}
-                      disabled={safePage >= totalPages}
-                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                    >下一页</button>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="game-container">
@@ -865,22 +829,6 @@ export default class GeneratePage extends React.Component {
                   <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === 0 ? "全部" : TYPE_NAMES[filterType]}</button>
                   <button onClick={this.clearCloud} className="rounded-full border border-red-500/50 bg-red-500/20 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/30 transition">☁️ 清空云端</button>
                   <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空本地</button>
-                </div>
-              </div>
-              {/* 搜索框 */}
-              <div className="mb-4">
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
-                    placeholder="搜索激活码..."
-                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
-                  />
-                  {search && (
-                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
-                  )}
                 </div>
               </div>
 
@@ -910,22 +858,6 @@ export default class GeneratePage extends React.Component {
                   })}
                 </div>
               </div>
-              {/* 搜索框 */}
-              <div className="mb-4">
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
-                    placeholder="搜索激活码..."
-                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
-                  />
-                  {search && (
-                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
-                  )}
-                </div>
-              </div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3 text-sm">
                 </div>
@@ -952,22 +884,6 @@ export default class GeneratePage extends React.Component {
                   {typeOptions.map((opt) => (
                     <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>{opt.label}</button>
                   ))}
-                </div>
-              </div>
-              {/* 搜索框 */}
-              <div className="mb-4">
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
-                    placeholder="搜索激活码..."
-                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
-                  />
-                  {search && (
-                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
-                  )}
                 </div>
               </div>
               <div className="mb-4">
