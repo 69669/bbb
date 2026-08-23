@@ -62,6 +62,7 @@ export default class GeneratePage extends React.Component {
       lastRefresh: "", // 最后刷新时间
       disabling: false, // 是否正在禁用/启用
       showDetail: null as number | null, // 当前查看详情的索引
+      toast: "", // 提示信息
     };
     this.autoRefreshTimer = null as any;
   }
@@ -86,6 +87,7 @@ export default class GeneratePage extends React.Component {
     lastRefresh: string;
     disabling: boolean;
     showDetail: number | null;
+    toast: string;
   };
   autoRefreshTimer: any;
 
@@ -271,6 +273,7 @@ export default class GeneratePage extends React.Component {
   handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
+      this.showToast("✓ 已复制");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -278,6 +281,7 @@ export default class GeneratePage extends React.Component {
       textarea.select();
       document.execCommand("copy");
       document.body.removeChild(textarea);
+      this.showToast("✓ 已复制");
     }
   };
 
@@ -300,9 +304,11 @@ export default class GeneratePage extends React.Component {
   };
 
   deleteHistory = (index: number) => {
+    if (!confirm("确定要删除此记录吗？")) return;
     const { history } = this.state;
     const newHistory = history.filter((_, i) => i !== index);
     this.saveHistory(newHistory);
+    this.showToast("✓ 已删除");
   };
 
   clearHistory = () => {
@@ -359,7 +365,7 @@ export default class GeneratePage extends React.Component {
     }
     const text = unused.map((h) => h.code).join("\n");
     this.copyToClipboard(text);
-    alert(`已复制 ${unused.length} 个未使用激活码`);
+    this.showToast(`✓ 已复制 ${unused.length} 个未使用激活码`);
   };
 
   copyToClipboard = (text: string) => {
@@ -582,6 +588,11 @@ export default class GeneratePage extends React.Component {
     const d = new Date(timestamp);
     return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
   };
+  // 显示提示
+  showToast = (msg: string) => {
+    this.setState({ toast: msg });
+    setTimeout(() => this.setState({ toast: "" }), 2000);
+  };
   // 清空云端所有激活码记录
   clearCloud = async () => {
     if (!confirm("⚠️ 确定要清空云端所有激活码记录吗？\n\n此操作不可恢复！清空后：\n1. 之前生成的所有激活码全部失效\n2. 云端记录全部删除\n3. 本地记录也会同步清空\n\n确定继续吗？")) {
@@ -617,6 +628,7 @@ export default class GeneratePage extends React.Component {
   render() {
     const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail } = this.state;
 
+    const { toast } = this.state;
     if (!authenticated) {
       return (
         <>
@@ -649,6 +661,11 @@ export default class GeneratePage extends React.Component {
               </div>
             </div>
           </div>
+          {toast && (
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 rounded-full bg-black/80 px-6 py-3 text-sm text-white shadow-lg backdrop-blur-sm animate-fade-in">
+              {toast}
+            </div>
+          )}
         </>
       );
     }
@@ -851,6 +868,11 @@ export default class GeneratePage extends React.Component {
             </div>
           )}
         </div>
+        {toast && (
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 rounded-full bg-black/80 px-6 py-3 text-sm text-white shadow-lg backdrop-blur-sm">
+            {toast}
+          </div>
+        )}
       </>
     );
   }
