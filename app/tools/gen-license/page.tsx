@@ -63,6 +63,7 @@ export default class GeneratePage extends React.Component {
       disabling: false, // 是否正在禁用/启用
       showDetail: null as number | null, // 当前查看详情的索引
       toast: "", // 提示信息
+      statusFilter: 0, // 0=全部, 1=未激活, 2=已激活, 3=已禁用
     };
     this.autoRefreshTimer = null as any;
   }
@@ -88,6 +89,7 @@ export default class GeneratePage extends React.Component {
     disabling: boolean;
     showDetail: number | null;
     toast: string;
+    statusFilter: number;
   };
   autoRefreshTimer: any;
 
@@ -643,7 +645,7 @@ export default class GeneratePage extends React.Component {
   };
 
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail, statusFilter } = this.state;
 
     const { toast } = this.state;
     if (!authenticated) {
@@ -695,7 +697,15 @@ export default class GeneratePage extends React.Component {
       { value: 4, label: "年卡", desc: "365天" },
     ];
 
-    const filteredHistory = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    let filteredHistory = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    // 按状态筛选
+    if (statusFilter === 1) {
+      filteredHistory = filteredHistory.filter((h) => !h.used && !h.disabled);
+    } else if (statusFilter === 2) {
+      filteredHistory = filteredHistory.filter((h) => h.used);
+    } else if (statusFilter === 3) {
+      filteredHistory = filteredHistory.filter((h) => h.disabled);
+    }
     const usedCount = history.filter((h) => h.used).length;
     const disabledCount = history.filter((h) => h.disabled).length;
 
@@ -840,11 +850,23 @@ export default class GeneratePage extends React.Component {
                 </button>
               </div>
 
-              <div className="flex gap-2 mb-4 flex-wrap">
-                <button onClick={() => this.setState({ filterType: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === 0 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
-                {typeOptions.map((opt) => (
-                  <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>{opt.label}</button>
-                ))}
+              <div className="mb-3">
+                <div className="text-xs text-white/40 mb-2">卡类型</div>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={() => this.setState({ filterType: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === 0 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
+                  {typeOptions.map((opt) => (
+                    <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="text-xs text-white/40 mb-2">激活状态</div>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={() => this.setState({ statusFilter: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 0 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
+                  <button onClick={() => this.setState({ statusFilter: 1 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 1 ? "bg-yellow-500 text-black" : "bg-white/5 text-white/60"}`}>未激活 ({history.filter(h => !h.used && !h.disabled).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 2 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 2 ? "bg-green-500 text-white" : "bg-white/5 text-white/60"}`}>已激活 ({history.filter(h => h.used).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 3 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 3 ? "bg-red-500 text-white" : "bg-white/5 text-white/60"}`}>已禁用 ({history.filter(h => h.disabled).length})</button>
+                </div>
               </div>
 
               {filteredHistory.length === 0 ? (
