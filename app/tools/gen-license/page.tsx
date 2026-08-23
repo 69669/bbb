@@ -551,11 +551,7 @@ export default class GeneratePage extends React.Component {
     const { history } = this.state;
     const item = history[index];
     if (!item) return;
-    if (item.used) {
-      alert("已使用的激活码无法禁用");
-      return;
-    }
-    const reason = prompt("请输入禁用原因（可选）：", "管理员禁用");
+    const reason = prompt("请输入封禁原因（可选）：", "管理员封禁");
     if (reason === null) return;
     this.setState({ disabling: true });
     try {
@@ -564,7 +560,7 @@ export default class GeneratePage extends React.Component {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: cleanCode(item.code),
-          reason: reason || "管理员禁用",
+          reason: reason || "管理员封禁",
           passwordHash: localStorage.getItem("lg_admin_hash") || "",
         }),
         signal: AbortSignal.timeout(30000),
@@ -572,14 +568,14 @@ export default class GeneratePage extends React.Component {
       const data = await res.json();
       if (data.success) {
         const newHistory = [...history];
-        newHistory[index] = { ...newHistory[index], disabled: true, disabledAt: Date.now(), disabledReason: reason || "管理员禁用" };
+        newHistory[index] = { ...newHistory[index], disabled: true, disabledAt: Date.now(), disabledReason: reason || "管理员封禁" };
         this.saveHistory(newHistory);
-        alert("激活码已禁用");
+        this.showToast("✓ 已封禁");
       } else {
-        alert("禁用失败：" + (data.message || "未知错误"));
+        this.showToast("封禁失败：" + (data.message || "未知错误"));
       }
     } catch (e: any) {
-      alert("禁用失败：" + (e?.message || String(e)));
+      this.showToast("封禁失败：" + (e?.message || String(e)));
     }
     this.setState({ disabling: false });
   };
@@ -605,12 +601,12 @@ export default class GeneratePage extends React.Component {
         const newHistory = [...history];
         newHistory[index] = { ...newHistory[index], disabled: false, disabledAt: null, disabledReason: null };
         this.saveHistory(newHistory);
-        alert("激活码已启用");
+        this.showToast("✓ 已解封");
       } else {
-        alert("启用失败：" + (data.message || "未知错误"));
+        this.showToast("解封失败：" + (data.message || "未知错误"));
       }
     } catch (e: any) {
-      alert("启用失败：" + (e?.message || String(e)));
+      this.showToast("解封失败：" + (e?.message || String(e)));
     }
     this.setState({ disabling: false });
   };
