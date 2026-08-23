@@ -941,7 +941,7 @@ export default class GeneratePage extends React.Component {
                         </div>
                       </div>
                       <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
-                        {item.used && !item.disabled && (
+                        {!item.disabled && (
                           <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-300 hover:bg-red-500/25 transition disabled:opacity-50">封禁</button>
                         )}
                         {item.disabled && (
