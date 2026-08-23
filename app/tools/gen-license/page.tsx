@@ -137,11 +137,19 @@ export default class GeneratePage extends React.Component {
     if (history.length === 0) return;
     try {
       const newHistory = [...history];
-      for (let i = 0; i < newHistory.length; i++) {
-        const cloudUsed = await this.checkCodeFromCloud(cleanCode(newHistory[i].code));
-        if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
-          newHistory[i] = { ...newHistory[i], used: cloudUsed };
-        }
+      // 并发检测，每批20个
+      const BATCH_SIZE = 20;
+      for (let i = 0; i < newHistory.length; i += BATCH_SIZE) {
+        const batch = newHistory.slice(i, i + BATCH_SIZE);
+        const results = await Promise.all(
+          batch.map((item) => this.checkCodeFromCloud(cleanCode(item.code)))
+        );
+        results.forEach((cloudUsed, idx) => {
+          const globalIdx = i + idx;
+          if (cloudUsed !== null && cloudUsed !== newHistory[globalIdx].used) {
+            newHistory[globalIdx] = { ...newHistory[globalIdx], used: cloudUsed };
+          }
+        });
       }
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
       const now = new Date();
