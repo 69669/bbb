@@ -23,6 +23,10 @@ function simpleHash(str: string): number {
   }
   return Math.abs(hash);
 }
+// 清理激活码：去掉横线和空格，转大写
+function cleanCode(code: string): string {
+  return (code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
 
 const ADMIN_PASSWORD_HASH = 535441809;
 
@@ -128,7 +132,7 @@ export default class GeneratePage extends React.Component {
     try {
       const newHistory = [...history];
       for (let i = 0; i < newHistory.length; i++) {
-        const cloudUsed = await this.checkCodeFromCloud(newHistory[i].code);
+        const cloudUsed = await this.checkCodeFromCloud(cleanCode(newHistory[i].code));
         if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
           newHistory[i] = { ...newHistory[i], used: cloudUsed };
         }
@@ -223,9 +227,10 @@ export default class GeneratePage extends React.Component {
 
         // 收集这批生成的码
         for (const code of data.codes) {
-          allCodes.push(code);
+          const clean = cleanCode(code);
+          allCodes.push(clean);
           newHistory.unshift({
-            code,
+            code: clean,
             type,
             createdAt: Date.now(),
             used: false,
@@ -319,7 +324,7 @@ export default class GeneratePage extends React.Component {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        code: item.code,
+        code: cleanCode(item.code),
         passwordHash: localStorage.getItem("lg_admin_hash") || "",
       }),
     }).catch(() => {});
@@ -435,7 +440,7 @@ export default class GeneratePage extends React.Component {
       const newHistory = [...history];
       let updated = 0;
       for (let i = 0; i < newHistory.length; i++) {
-        const cloudUsed = await this.checkCodeFromCloud(newHistory[i].code);
+        const cloudUsed = await this.checkCodeFromCloud(cleanCode(newHistory[i].code));
         if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
           newHistory[i] = { ...newHistory[i], used: cloudUsed };
           updated++;
@@ -476,30 +481,37 @@ export default class GeneratePage extends React.Component {
       }
       // 合并云端记录到本地（去重）
       const { history } = this.state;
-      const localCodes = new Set(history.map((h) => h.code));
+      const localCodes = new Set(history.map((h) => cleanCode(h.code)));
       const newHistory = [...history];
       let added = 0;
       for (const item of data.codes) {
-        if (!localCodes.has(item.code)) {
-          newHistory.unshift({
-            code: item.code,
-            type: item.type,
-            createdAt: item.generatedAt,
-            used: item.used,
-            disabled: item.disabled || false,
-            usedAt: item.usedAt || null,
-            usedIp: item.usedIp || null,
-            generatedIp: item.generatedIp || null,
-            disabledAt: item.disabledAt || null,
-            disabledReason: item.disabledReason || null,
-          });
+        const clean = cleanCode(item.code);
+        if (!localCodes.has(clean)) {
+          const clean = cleanCode(item.code);
+          // 检查是否已存在（去重）
+          if (!localCodes.has(clean)) {
+            newHistory.unshift({
+              code: clean,
+              type: item.type,
+              createdAt: item.generatedAt,
+              used: item.used,
+              disabled: item.disabled || false,
+              usedAt: item.usedAt || null,
+              usedIp: item.usedIp || null,
+              generatedIp: item.generatedIp || null,
+              disabledAt: item.disabledAt || null,
+              disabledReason: item.disabledReason || null,
+            });
+            added++;
+          }
           added++;
         } else {
           // 更新本地记录的使用状态和其他字段
-          const idx = newHistory.findIndex((h) => h.code === item.code);
+          const idx = newHistory.findIndex((h) => cleanCode(h.code) === clean);
           if (idx >= 0) {
             newHistory[idx] = {
               ...newHistory[idx],
+              code: clean, // 统一为无横线格式
               used: item.used,
               disabled: item.disabled || false,
               usedAt: item.usedAt || null,
@@ -545,7 +557,7 @@ export default class GeneratePage extends React.Component {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code: item.code,
+          code: cleanCode(item.code),
           reason: reason || "管理员禁用",
           passwordHash: localStorage.getItem("lg_admin_hash") || "",
         }),
@@ -577,7 +589,7 @@ export default class GeneratePage extends React.Component {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code: item.code,
+          code: cleanCode(item.code),
           passwordHash: localStorage.getItem("lg_admin_hash") || "",
         }),
         signal: AbortSignal.timeout(30000),
