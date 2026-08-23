@@ -303,29 +303,24 @@ export default class GeneratePage extends React.Component {
     this.saveHistory(newHistory);
   };
 
-  deleteHistory = async (index: number) => {
+  deleteHistory = (index: number) => {
     if (!confirm("确定要删除此激活码吗？删除后云端也会同步删除，无法恢复！")) return;
     const { history } = this.state;
     const item = history[index];
     if (!item) return;
-    try {
-      // 从云端删除
-      await fetch(`${API_BASE_URL}/codes/delete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: item.code,
-          passwordHash: localStorage.getItem("lg_admin_hash") || "",
-        }),
-        signal: AbortSignal.timeout(15000),
-      });
-    } catch (e) {
-      // 云端删除失败不影响本地删除
-    }
-    // 从本地删除
+    // 先从本地删除（立即消失）
     const newHistory = history.filter((_, i) => i !== index);
     this.saveHistory(newHistory);
     this.showToast("✓ 已删除");
+    // 异步从云端删除（不等待）
+    fetch(`${API_BASE_URL}/codes/delete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: item.code,
+        passwordHash: localStorage.getItem("lg_admin_hash") || "",
+      }),
+    }).catch(() => {});
   };
 
   clearHistory = () => {
@@ -590,13 +585,9 @@ export default class GeneratePage extends React.Component {
     }
     this.setState({ disabling: false });
   };
-  // 格式化IP（隐藏部分）
+  // 格式化IP（显示完整）
   formatIp = (ip: string | null | undefined): string => {
     if (!ip || ip === "unknown") return "未知";
-    const parts = ip.split(".");
-    if (parts.length === 4) {
-      return `${parts[0]}.${parts[1]}.*.*`;
-    }
     return ip;
   };
   // 格式化完整时间
