@@ -303,9 +303,26 @@ export default class GeneratePage extends React.Component {
     this.saveHistory(newHistory);
   };
 
-  deleteHistory = (index: number) => {
-    if (!confirm("确定要删除此记录吗？")) return;
+  deleteHistory = async (index: number) => {
+    if (!confirm("确定要删除此激活码吗？删除后云端也会同步删除，无法恢复！")) return;
     const { history } = this.state;
+    const item = history[index];
+    if (!item) return;
+    try {
+      // 从云端删除
+      await fetch(`${API_BASE_URL}/codes/delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: item.code,
+          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+        }),
+        signal: AbortSignal.timeout(15000),
+      });
+    } catch (e) {
+      // 云端删除失败不影响本地删除
+    }
+    // 从本地删除
     const newHistory = history.filter((_, i) => i !== index);
     this.saveHistory(newHistory);
     this.showToast("✓ 已删除");
