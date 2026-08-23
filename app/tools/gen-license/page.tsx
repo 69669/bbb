@@ -68,6 +68,9 @@ export default class GeneratePage extends React.Component {
       showDetail: null as number | null, // 当前查看详情的索引
       toast: "", // 提示信息
       statusFilter: 0, // 0=全部, 1=未激活, 2=已激活, 3=已禁用
+      search: "", // 搜索关键词
+      currentPage: 1, // 当前页码
+      pageSize: 50, // 每页50条
     };
     this.autoRefreshTimer = null as any;
   }
@@ -94,6 +97,9 @@ export default class GeneratePage extends React.Component {
     showDetail: number | null;
     toast: string;
     statusFilter: number;
+    search: string;
+    currentPage: number;
+    pageSize: number;
   };
   autoRefreshTimer: any;
 
@@ -657,7 +663,7 @@ export default class GeneratePage extends React.Component {
   };
 
   render() {
-    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail, statusFilter } = this.state;
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail, statusFilter, search, currentPage, pageSize } = this.state;
 
     const { toast } = this.state;
     if (!authenticated) {
@@ -718,6 +724,15 @@ export default class GeneratePage extends React.Component {
     } else if (statusFilter === 3) {
       filteredHistory = filteredHistory.filter((h) => h.disabled);
     }
+    // 搜索过滤
+    if (search.trim()) {
+      const keyword = search.trim().toUpperCase();
+      filteredHistory = filteredHistory.filter((h) => h.code.toUpperCase().includes(keyword));
+    }
+    // 分页
+    const totalPages = Math.max(1, Math.ceil(filteredHistory.length / pageSize));
+    const safePage = Math.min(currentPage, totalPages);
+    const pagedHistory = filteredHistory.slice((safePage - 1) * pageSize, safePage * pageSize);
     const usedCount = history.filter((h) => h.used).length;
     const disabledCount = history.filter((h) => h.disabled).length;
 
@@ -755,6 +770,22 @@ export default class GeneratePage extends React.Component {
                       <div className="text-xs text-white/50 mt-1">{opt.desc}</div>
                     </button>
                   ))}
+                </div>
+              </div>
+              {/* 搜索框 */}
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
+                    placeholder="搜索激活码..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  />
+                  {search && (
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                  )}
                 </div>
               </div>
 
@@ -801,6 +832,26 @@ export default class GeneratePage extends React.Component {
                   </div>
                 </div>
               )}
+              {/* 分页控件 */}
+              {filteredHistory.length > pageSize && (
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-xs text-white/40">
+                    共 {filteredHistory.length} 条，第 {safePage}/{totalPages} 页
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })}
+                      disabled={safePage <= 1}
+                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >上一页</button>
+                    <button
+                      onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })}
+                      disabled={safePage >= totalPages}
+                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >下一页</button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="game-container">
@@ -814,6 +865,22 @@ export default class GeneratePage extends React.Component {
                   <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === 0 ? "全部" : TYPE_NAMES[filterType]}</button>
                   <button onClick={this.clearCloud} className="rounded-full border border-red-500/50 bg-red-500/20 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/30 transition">☁️ 清空云端</button>
                   <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空本地</button>
+                </div>
+              </div>
+              {/* 搜索框 */}
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
+                    placeholder="搜索激活码..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  />
+                  {search && (
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                  )}
                 </div>
               </div>
 
@@ -841,6 +908,22 @@ export default class GeneratePage extends React.Component {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+              {/* 搜索框 */}
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
+                    placeholder="搜索激活码..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  />
+                  {search && (
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                  )}
                 </div>
               </div>
               <div className="flex items-center justify-between mb-4">
@@ -871,6 +954,22 @@ export default class GeneratePage extends React.Component {
                   ))}
                 </div>
               </div>
+              {/* 搜索框 */}
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
+                    placeholder="搜索激活码..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  />
+                  {search && (
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                  )}
+                </div>
+              </div>
               <div className="mb-4">
                 <div className="text-xs text-white/40 mb-2">激活状态</div>
                 <div className="flex gap-2 flex-wrap">
@@ -880,12 +979,28 @@ export default class GeneratePage extends React.Component {
                   <button onClick={() => this.setState({ statusFilter: 3 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 3 ? "bg-red-500 text-white" : "bg-white/5 text-white/60"}`}>已禁用 ({history.filter(h => h.disabled).length})</button>
                 </div>
               </div>
+              {/* 搜索框 */}
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
+                    placeholder="搜索激活码..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  />
+                  {search && (
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                  )}
+                </div>
+              </div>
 
               {filteredHistory.length === 0 ? (
-                <div className="text-center py-12 text-white/40">暂无记录</div>
+                <div className="text-center py-12 text-white/40">{search ? "未找到匹配的激活码" : "暂无记录"}</div>
               ) : (
                 <div className="space-y-2 max-h-[65vh] overflow-y-auto pr-1">
-                  {filteredHistory.map((item, i) => (
+                  {pagedHistory.map((item, i) => (
                     <div key={i} className={`rounded-xl border p-3 transition-all ${item.disabled ? "border-red-400/30 bg-red-500/10 opacity-70" : item.used ? "border-green-400/20 bg-green-500/5" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
                       <div className="flex items-center gap-3">
                         <div className="flex-1 min-w-0">
@@ -910,17 +1025,37 @@ export default class GeneratePage extends React.Component {
                         </div>
                       </div>
                       <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
-                        {!item.used && !item.disabled && (
-                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-300 hover:bg-red-500/25 transition disabled:opacity-50">禁用</button>
+                        {item.used && !item.disabled && (
+                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-300 hover:bg-red-500/25 transition disabled:opacity-50">封禁</button>
                         )}
                         {item.disabled && (
-                          <button onClick={() => this.enableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-green-500/15 px-2 py-1 text-[11px] text-green-300 hover:bg-green-500/25 transition disabled:opacity-50">启用</button>
+                          <button onClick={() => this.enableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-green-500/15 px-2 py-1 text-[11px] text-green-300 hover:bg-green-500/25 transition disabled:opacity-50">解封</button>
                         )}
                         <button onClick={() => this.handleCopyCode(item.code)} className="flex-1 rounded-full bg-white/5 px-2 py-1 text-[11px] text-white/60 hover:bg-white/10 transition">复制</button>
                         <button onClick={() => this.deleteHistory(i)} className="flex-1 rounded-full bg-red-500/10 px-2 py-1 text-[11px] text-red-400/70 hover:bg-red-500/20 transition">删除</button>
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+              {/* 分页控件 */}
+              {filteredHistory.length > pageSize && (
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-xs text-white/40">
+                    共 {filteredHistory.length} 条，第 {safePage}/{totalPages} 页
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })}
+                      disabled={safePage <= 1}
+                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >上一页</button>
+                    <button
+                      onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })}
+                      disabled={safePage >= totalPages}
+                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >下一页</button>
+                  </div>
                 </div>
               )}
             </div>
