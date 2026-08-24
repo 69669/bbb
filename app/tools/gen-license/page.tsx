@@ -753,6 +753,9 @@ export default class GeneratePage extends React.Component {
               <button onClick={() => this.setState({ showHistory: !showHistory })} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/70 hover:bg-white/10 transition">
                 {showHistory ? "返回生成" : `📋 记录(${history.length})`}
               </button>
+              <button onClick={() => window.location.href = "/ticket-admin.html"} className="rounded-full border border-pink-400/30 bg-pink-500/10 px-4 py-2 text-sm text-pink-300 hover:bg-pink-500/20 transition">
+                🎫 工单
+              </button>
               <button onClick={this.handleLogout} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/60 hover:bg-white/10 transition">
                 退出
               </button>

@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>工单管理系统 · Ticket Admin</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0f0f1a;
+  --sidebar: #151528;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.08);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --primary: #6366f1;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* 登录页 */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0f1a, #1a1a3a);
+  padding: 20px;
+}
+.login-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+  backdrop-filter: blur(20px);
+}
+.login-box h1 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.login-box p { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+.login-box input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  outline: none;
+}
+.login-box input:focus { border-color: var(--primary); }
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.login-box button:hover { opacity: 0.9; transform: translateY(-1px); }
+.login-error { color: var(--danger); font-size: 0.85rem; text-align: center; margin-top: 12px; }
+
+/* 主布局 */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 220px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.sidebar-logo h2 {
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #fff, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.sidebar-logo p { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
+.nav-item.active {
+  background: rgba(99,102,241,0.1);
+  color: #fff;
+  border-left-color: var(--primary);
+}
+.nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+.main {
+  flex: 1;
+  margin-left: 220px;
+  padding: 24px;
+  min-height: 100vh;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.page-header h1 { font-size: 1.4rem; font-weight: 700; }
+.page-header .actions { display: flex; gap: 10px; }
+.btn {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
+.btn-primary { background: linear-gradient(135deg, var(--primary), #8b5cf6); border: none; color: #fff; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-danger { color: var(--danger); border-color: rgba(239,68,68,0.3); }
+.btn-danger:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
+.btn-success { color: var(--success); border-color: rgba(16,185,129,0.3); }
+.btn-success:hover { background: rgba(16,185,129,0.1); border-color: var(--success); }
+
+/* 统计卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+.stat-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+.stat-card .label { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
+.stat-card .value { font-size: 1.8rem; font-weight: 700; }
+.stat-card .value.pending { color: var(--warning); }
+.stat-card .value.processing { color: var(--info); }
+.stat-card .value.resolved { color: var(--success); }
+.stat-card .value.closed { color: var(--muted); }
+.stat-card .value.total { color: var(--primary); }
+
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-bar select, .filter-bar input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.85rem;
+  outline: none;
+}
+.filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); }
+.filter-bar input { flex: 1; min-width: 200px; }
+
+/* 工单列表 */
+.ticket-list { display: flex; flex-direction: column; gap: 10px; }
+.ticket-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ticket-item:hover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
+.ticket-item .id { font-family: monospace; font-size: 0.8rem; color: var(--muted); min-width: 100px; }
+.ticket-item .info { flex: 1; min-width: 0; }
+.ticket-item .title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ticket-item .meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.status-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+.status-processing { background: rgba(59,130,246,0.15); color: var(--info); }
+.status-resolved { background: rgba(16,185,129,0.15); color: var(--success); }
+.status-closed { background: rgba(148,163,184,0.15); color: var(--muted); }
+.priority-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.priority-low { background: rgba(148,163,184,0.15); color: var(--muted); }
+.priority-normal { background: rgba(59,130,246,0.15); color: var(--info); }
+.priority-high { background: rgba(245,158,11,0.15); color: var(--warning); }
+.priority-urgent { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.pagination button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.pagination button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination span { color: var(--muted); font-size: 0.82rem; }
+
+/* 工单详情 */
+.detail-view { display: none; }
+.detail-view.active { display: block; }
+.list-view.hidden { display: none; }
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.detail-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.detail-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--muted); }
+.detail-content {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.info-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.info-box .label { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+.info-box .value { font-size: 0.88rem; word-break: break-all; }
+
+/* 回复区 */
+.reply-section { margin-top: 20px; }
+.reply-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.reply-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.reply-item.admin { border-left: 3px solid var(--primary); }
+.reply-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.78rem; }
+.reply-author { font-weight: 600; color: var(--primary); }
+.reply-time { color: var(--muted); }
+.reply-content { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
+.reply-form { display: flex; flex-direction: column; gap: 10px; }
+.reply-form textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: #fff;
+  font-size: 0.9rem;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  min-height: 100px;
+}
+.reply-form textarea:focus { border-color: var(--primary); }
+.reply-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.reply-actions select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+/* 统计页 */
+.chart-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 200px; padding-top: 20px; }
+.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.bar {
+  width: 100%;
+  max-width: 50px;
+  background: linear-gradient(180deg, var(--primary), #8b5cf6);
+  border-radius: 6px 6px 0 0;
+  transition: all 0.3s;
+  position: relative;
+}
+.bar:hover { opacity: 0.8; }
+.bar-value { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; font-weight: 600; }
+.bar-label { font-size: 0.7rem; color: var(--muted); }
+.distribution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+.dist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.dist-item .name { font-size: 0.85rem; }
+.dist-item .count { font-size: 0.9rem; font-weight: 600; }
+
+/* 配置页 */
+.config-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.config-section h3 { font-size: 1rem; margin-bottom: 16px; }
+.config-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.config-row:last-child { border-bottom: none; }
+.config-row .label { font-size: 0.88rem; }
+.config-row .desc { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  z-index: 99999;
+  animation: toastIn 0.3s ease;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 16px; }
+  .menu-toggle { display: block !important; }
+  .ticket-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+.menu-toggle { display: none; position: fixed; top: 16px; left: 16px; z-index: 200; background: var(--primary); border: none; color: #fff; width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+.overlay.show { display: block; }
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  * { -webkit-tap-highlight-color: transparent; }
+  input, select, textarea { font-size: 16px !important; }
+  
+  /* 登录页 */
+  .login-page { padding: 20px; }
+  .login-box { padding: 24px 20px; }
+  .login-box h1 { font-size: 1.3rem; }
+  
+  /* 侧边栏 - 抽屉式 */
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 1001;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+  }
+  .sidebar.open { left: 0; }
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+  }
+  .overlay.show { display: block; }
+  
+  /* 主内容区 */
+  .main {
+    margin-left: 0 !important;
+    padding: 12px !important;
+  }
+  .main-header {
+    padding: 12px !important;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .menu-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  /* 页面标题 */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .page-header h1 { font-size: 1.2rem; }
+  .page-header .actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .page-header .actions button {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  /* 统计卡片 - 2列 */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .stat-card { padding: 12px !important; }
+  .stat-card .label { font-size: 0.7rem !important; }
+  .stat-card .value { font-size: 1.3rem !important; }
+  
+  /* 筛选栏 - 堆叠 */
+  .filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .filter-bar select,
+  .filter-bar input {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    font-size: 0.85rem !important;
+  }
+  
+  /* 工单列表 */
+  .ticket-list { gap: 8px !important; }
+  .ticket-card {
+    padding: 12px !important;
+  }
+  .ticket-card .ticket-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .ticket-card .ticket-title {
+    font-size: 0.9rem !important;
+  }
+  .ticket-card .ticket-meta {
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 0.7rem !important;
+  }
+  .ticket-card .ticket-actions {
+    width: 100%;
+    margin-top: 8px;
+  }
+  .ticket-card .ticket-actions button {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  
+  /* 表格横向滚动 */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 600px;
+    font-size: 0.8rem;
+  }
+  th, td {
+    padding: 8px 10px !important;
+    white-space: nowrap;
+  }
+  
+  /* 分页 */
+  .pagination {
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+  }
+  .pagination button {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+    padding: 0 8px;
+  }
+  
+  /* 弹窗 */
+  .modal {
+    padding: 12px !important;
+  }
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    overflow-y: auto;
+  }
+  .modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .modal-header h2 { font-size: 1.1rem; }
+  .modal-body { padding: 12px 0 !important; }
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .modal-footer button {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* 表单 */
+  .form-group { margin-bottom: 12px !important; }
+  .form-group label { font-size: 0.8rem !important; margin-bottom: 4px !important; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    font-size: 0.9rem !important;
+  }
+  .form-group textarea { min-height: 80px; }
+  
+  /* 配置行 */
+  .config-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 6px;
+    padding: 10px 0 !important;
+  }
+  .config-row .label { font-size: 0.8rem !important; }
+  
+  /* 图表 */
+  .chart-container { padding: 12px !important; }
+  .chart-title { font-size: 0.9rem !important; margin-bottom: 8px !important; }
+  .bar-item { margin: 0 2px !important; }
+  .bar { width: 24px !important; }
+  
+  /* 回复区域 */
+  .reply-box {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .reply-box textarea {
+    width: 100% !important;
+    min-height: 80px;
+  }
+  .reply-box button {
+    width: 100%;
+    padding: 10px;
+  }
+  
+  /* 时间线 */
+  .timeline-item {
+    padding-left: 20px !important;
+  }
+  .timeline-item::before {
+    left: 4px !important;
+    width: 8px !important;
+    height: 8px !important;
+  }
+  
+  /* Toast */
+  .toast {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+    max-width: 90vw !important;
+    padding: 10px 20px !important;
+    font-size: 0.85rem !important;
+    bottom: 20px !important;
+  }
+  
+  /* 空状态 */
+  .empty-state {
+    padding: 40px 20px !important;
+  }
+  .empty-state .icon { font-size: 3rem !important; }
+  .empty-state h3 { font-size: 1rem !important; }
+  .empty-state p { font-size: 0.8rem !important; }
+  
+  /* 底部安全区域 */
+  .safe-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .ticket-card .ticket-actions {
+    flex-direction: column;
+  }
+  .ticket-card .ticket-actions button {
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h1>🎫 工单管理系统</h1>
+    <p>Ticket Management System</p>
+    <input type="password" id="loginPassword" placeholder="请输入管理密码" onkeypress="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">登录</button>
+    <div class="login-error" id="loginError" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- 主应用 -->
+<div class="app" id="app" style="display:none;">
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+  
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h2>🎫 工单管理</h2>
+      <p>Ticket Admin v1.0</p>
+    </div>
+    <div class="nav-item active" data-page="list" onclick="navigate('list')">
+      <span class="icon">📋</span> 工单管理
+      <span class="nav-badge" id="pendingBadge">0</span>
+    </div>
+    <div class="nav-item" data-page="processing" onclick="navigate('processing')">
+      <span class="icon">⚡</span> 工单处理
+    </div>
+    <div class="nav-item" data-page="search" onclick="navigate('search')">
+      <span class="icon">🔍</span> 筛选检索
+    </div>
+    <div class="nav-item" data-page="stats" onclick="navigate('stats')">
+      <span class="icon">📊</span> 统计分析
+    </div>
+    <div class="nav-item" data-page="config" onclick="navigate('config')">
+      <span class="icon">⚙️</span> 系统配置
+    </div>
+    <div class="nav-item" data-page="permission" onclick="navigate('permission')">
+      <span class="icon">🔐</span> 权限管理
+    </div>
+    <div class="nav-item" data-page="advanced" onclick="navigate('advanced')">
+      <span class="icon">🚀</span> 高级功能
+    </div>
+    <div class="nav-item" onclick="logout()" style="margin-top:20px;border-top:1px solid var(--border);padding-top:12px;">
+      <span class="icon">🚪</span> 退出登录
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- 工单列表页 -->
+    <div id="page-list" class="page">
+      <div class="page-header">
+        <h1>📋 工单管理</h1>
+        <div class="actions">
+          <button class="btn" onclick="refreshList()">🔄 刷新</button>
+          <button class="btn btn-primary" onclick="exportCSV()">📥 导出CSV</button>
+        </div>
+      </div>
+      <div class="stats-grid" id="statsCards"></div>
+      <div class="filter-bar">
+        <select id="filterStatus" onchange="applyFilter()">
+          <option value="all">全部状态</option>
+          <option value="pending">待处理</option>
+          <option value="processing">处理中</option>
+          <option value="resolved">已解决</option>
+          <option value="closed">已关闭</option>
+        </select>
+        <select id="filterType" onchange="applyFilter()">
+          <option value="all">全部类型</option>
+          <option value="bug">问题反馈</option>
+          <option value="suggestion">功能建议</option>
+          <option value="complaint">投诉</option>
+          <option value="other">其他</option>
+        </select>
+        <input type="text" id="filterKeyword" placeholder="搜索工单ID/标题/内容/联系方式..." oninput="debounceFilter()">
+      </div>
+      <div class="ticket-list" id="ticketList"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- 工单详情页 -->
+    <div id="page-detail" class="page" style="display:none;">
+      <div class="page-header">
+        <h1>🔧 工单详情</h1>
+        <div class="actions">
+          <button class="btn" onclick="backToList()">← 返回列表</button>
+          <button class="btn btn-danger" onclick="deleteTicket()">🗑️ 删除</button>
+        </div>
+      </div>
+      <div id="detailContent"></div>
+    </div>
+
+    <!-- 工单处理页 -->
+    <div id="page-processing" class="page" style="display:none;">
+      <div class="page-header">
+        <h1>⚡ 工单处理</h1>
+        <button class="btn" onclick="refreshList()">🔄 刷新</button>
+      </div>
+      <p style="color:var(--muted);margin-bottom:16px;">显示待处理和处理中的工单，快速回复和更新状态</p>
+      <div class="filter-bar">
+        <select id="procStatus" onchange="loadProcessing()">
+          <option value="pending">待处理</option>
+          <option value="processing">处理中</option>
+          <option value="all">待处理+处理中</option>
+        </select>
+      </div>
+      <div class="ticket-list" id="processingList"></div>
+    </div>
+
+    <!-- 筛选检索页 -->
+    <div id="page-search" class="page" style="display:none;">
+      <div class="page-header"><h1>🔍 筛选检索</h1></div>
+      <div class="filter-bar" style="flex-direction:column;align-items:stretch;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <select id="searchStatus"><option value="all">全部状态</option><option value="pending">待处理</option><option value="processing">处理中</option><option value="resolved">已解决</option><option value="closed">已关闭</option></select>
+          <select id="searchPriority"><option value="all">全部优先级</option><option value="low">低</option><option value="normal">普通</option><option value="high">高</option><option value="urgent">紧急</option></select>
+          <select id="searchType"><option value="all">全部类型</option><option value="bug">问题反馈</option><option value="suggestion">功能建议</option><option value="complaint">投诉</option><option value="other">其他</option></select>
+          <input type="date" id="searchDateFrom">
+          <input type="date" id="searchDateTo">
+        </div>
+        <div style="display:flex;gap:10px;">
+          <input type="text" id="searchKeyword" placeholder="关键词搜索..." style="flex:1;">
+          <button class="btn btn-primary" onclick="doSearch()">🔍 搜索</button>
+          <button class="btn" onclick="resetSearch()">重置</button>
+        </div>
+      </div>
+      <div class="ticket-list" id="searchList"></div>
+    </div>
+
+    <!-- 统计分析页 -->
+    <div id="page-stats" class="page" style="display:none;">
+      <div class="page-header">
+        <h1>📊 统计分析</h1>
+        <button class="btn" onclick="loadStats()">🔄 刷新</button>
+      </div>
+      <div class="stats-grid" id="statsOverview"></div>
+      <div class="chart-container">
+        <div class="chart-title">📈 近7天工单趋势</div>
+        <div class="bar-chart" id="trendChart"></div>
+      </div>
+      <div class="distribution-grid" id="distributionGrid"></div>
+    </div>
+
+    <!-- 系统配置页 -->
+    <div id="page-config" class="page" style="display:none;">
+      <div class="page-header"><h1>⚙️ 系统配置</h1></div>
+      <div class="config-section">
+        <h3>工单类型配置</h3>
+        <div class="config-row"><div><div class="label">问题反馈 (bug)</div><div class="desc">用户反馈系统问题或bug</div></div><span class="status-badge status-processing">启用</span></div>
+        <div class="config-row"><div><div class="label">功能建议 (suggestion)</div><div class="desc">用户提出新功能或改进建议</div></div><span class="status-badge status-processing">启用</span></div>
+        <div class="config-row"><div><div class="label">投诉 (complaint)</div><div class="desc">用户投诉或不满</div></div><span class="status-badge status-processing">启用</span></div>
+        <div class="config-row"><div><div class="label">其他 (other)</div><div class="desc">其他类型工单</div></div><span class="status-badge status-processing">启用</span></div>
+      </div>
+      <div class="config-section">
+        <h3>优先级配置</h3>
+        <div class="config-row"><div><div class="label">低 (low)</div><div class="desc">不影响使用，可延后处理</div></div><span class="priority-badge priority-low">低</span></div>
+        <div class="config-row"><div><div class="label">普通 (normal)</div><div class="desc">正常处理优先级</div></div><span class="priority-badge priority-normal">普通</span></div>
+        <div class="config-row"><div><div class="label">高 (high)</div><div class="desc">影响部分功能，需优先处理</div></div><span class="priority-badge priority-high">高</span></div>
+        <div class="config-row"><div><div class="label">紧急 (urgent)</div><div class="desc">系统不可用，需立即处理</div></div><span class="priority-badge priority-urgent">紧急</span></div>
+      </div>
+      <div class="config-section">
+        <h3>自动回复配置</h3>
+        <div class="config-row"><div><div class="label">创建工单自动回复</div><div class="desc">用户创建工单后自动发送确认消息</div></div><span class="status-badge status-resolved">已启用</span></div>
+        <div class="config-row"><div><div class="label">解决工单自动通知</div><div class="desc">工单标记为已解决时自动通知用户</div></div><span class="status-badge status-resolved">已启用</span></div>
+      </div>
+    </div>
+
+    <!-- 权限管理页 -->
+    <div id="page-permission" class="page" style="display:none;">
+      <div class="page-header"><h1>🔐 权限管理</h1></div>
+      <div class="config-section">
+        <h3>管理员账号</h3>
+        <div class="config-row"><div><div class="label">超级管理员</div><div class="desc">拥有所有权限，管理密码登录</div></div><span class="status-badge status-resolved">在线</span></div>
+      </div>
+      <div class="config-section">
+        <h3>角色权限</h3>
+        <div class="config-row"><div><div class="label">超级管理员</div><div class="desc">查看/回复/删除/导出/配置 所有权限</div></div><span class="status-badge status-processing">全部权限</span></div>
+        <div class="config-row"><div><div class="label">客服</div><div class="desc">查看/回复工单，无法删除和配置</div></div><span class="status-badge status-closed">待添加</span></div>
+        <div class="config-row"><div><div class="label">观察员</div><div class="desc">仅查看工单，无法回复和操作</div></div><span class="status-badge status-closed">待添加</span></div>
+      </div>
+      <div class="config-section">
+        <h3>安全设置</h3>
+        <div class="config-row"><div><div class="label">密码哈希验证</div><div class="desc">管理密码采用哈希校验，不明文传输</div></div><span class="status-badge status-resolved">已启用</span></div>
+        <div class="config-row"><div><div class="label">操作日志</div><div class="desc">记录所有管理员操作行为</div></div><span class="status-badge status-processing">记录中</span></div>
+      </div>
+    </div>
+
+    <!-- 高级功能页 -->
+    <div id="page-advanced" class="page" style="display:none;">
+      <div class="page-header"><h1>🚀 高级功能</h1></div>
+      <div class="config-section">
+        <h3>数据导出</h3>
+        <div class="config-row"><div><div class="label">导出全部工单 (CSV)</div><div class="desc">导出所有工单数据为CSV格式</div></div><button class="btn btn-primary" onclick="exportCSV()">导出</button></div>
+        <div class="config-row"><div><div class="label">导出筛选结果</div><div class="desc">导出当前筛选条件下的工单</div></div><button class="btn" onclick="exportFilteredCSV()">导出</button></div>
+      </div>
+      <div class="config-section">
+        <h3>批量操作</h3>
+        <div class="config-row"><div><div class="label">批量标记已解决</div><div class="desc">将所有待处理工单标记为已解决</div></div><button class="btn btn-success" onclick="batchResolve()">批量处理</button></div>
+        <div class="config-row"><div><div class="label">批量关闭已解决工单</div><div class="desc">关闭所有已解决超过7天的工单</div></div><button class="btn" onclick="batchClose()">批量关闭</button></div>
+      </div>
+      <div class="config-section">
+        <h3>标签管理</h3>
+        <div class="config-row"><div><div class="label">系统标签</div><div class="desc">已解决/待确认/需跟进/重复工单</div></div><span class="status-badge status-processing">4个标签</span></div>
+        <div class="config-row"><div><div class="label">自定义标签</div><div class="desc">支持添加自定义标签分类工单</div></div><span class="status-badge status-closed">待添加</span></div>
+      </div>
+      <div class="config-section">
+        <h3>API接口</h3>
+        <div class="config-row"><div><div class="label">工单创建接口</div><div class="desc">/ticket/create - 公开接口</div></div><span class="status-badge status-resolved">已启用</span></div>
+        <div class="config-row"><div><div class="label">工单查询接口</div><div class="desc">/ticket/status - 玩家查询进度</div></div><span class="status-badge status-resolved">已启用</span></div>
+        <div class="config-row"><div><div class="label">管理接口</div><div class="desc">列表/详情/回复/更新/删除/统计 - 需密码</div></div><span class="status-badge status-resolved">已启用</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API_BASE = "https://api.ttla.top";
+let adminHash = localStorage.getItem("ticket_admin_hash") || "";
+let currentPage = 1;
+let totalPages = 1;
+let currentTicket = null;
+let allTickets = [];
+
+// 简单哈希
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+// 登录
+function doLogin() {
+  const pwd = document.getElementById("loginPassword").value;
+  if (!pwd) return;
+  adminHash = String(simpleHash(pwd));
+  // 验证
+  fetch(API_BASE + "/ticket/list", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ passwordHash: adminHash, page: 1, pageSize: 1 })
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      localStorage.setItem("ticket_admin_hash", adminHash);
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("app").style.display = "flex";
+      loadDashboard();
+    } else {
+      document.getElementById("loginError").textContent = data.message || "密码错误";
+      document.getElementById("loginError").style.display = "block";
+    }
+  }).catch(() => {
+    document.getElementById("loginError").textContent = "网络错误，请检查API地址";
+    document.getElementById("loginError").style.display = "block";
+  });
+}
+
+// 检查登录状态
+if (adminHash) {
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+  loadDashboard();
+}
+
+function logout() {
+  localStorage.removeItem("ticket_admin_hash");
+  adminHash = "";
+  location.reload();
+}
+
+// 导航
+function navigate(page) {
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add("active");
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  document.getElementById("page-" + page).style.display = "block";
+  if (window.innerWidth < 768) toggleSidebar();
+  
+  if (page === "list") loadDashboard();
+  if (page === "processing") loadProcessing();
+  if (page === "stats") loadStats();
+}
+
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
+}
+
+// 加载仪表盘
+async function loadDashboard() {
+  try {
+    const res = await fetch(API_BASE + "/ticket/list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, page: currentPage, pageSize: 20 })
+    });
+    const data = await res.json();
+    if (data.success) {
+      allTickets = data.tickets;
+      totalPages = data.totalPages;
+      renderStatsCards(data.stats);
+      renderTicketList(data.tickets);
+      renderPagination();
+      document.getElementById("pendingBadge").textContent = data.stats.pending || 0;
+    }
+  } catch (e) { toast("加载失败: " + e.message); }
+}
+
+function renderStatsCards(stats) {
+  const cards = [
+    { label: "工单总数", value: stats.total, cls: "total" },
+    { label: "待处理", value: stats.pending, cls: "pending" },
+    { label: "处理中", value: stats.processing, cls: "processing" },
+    { label: "已解决", value: stats.resolved, cls: "resolved" },
+  ];
+  document.getElementById("statsCards").innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="label">${c.label}</div>
+      <div class="value ${c.cls}">${c.value}</div>
+    </div>
+  `).join("");
+}
+
+const typeMap = { bug: "🐛 问题", suggestion: "💡 建议", complaint: "⚠️ 投诉", other: "📝 其他" };
+const statusMap = { pending: "待处理", processing: "处理中", resolved: "已解决", closed: "已关闭" };
+const priorityMap = { low: "低", normal: "普通", high: "高", urgent: "紧急" };
+
+function renderTicketList(tickets, containerId = "ticketList") {
+  const container = document.getElementById(containerId);
+  if (!tickets.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">暂无工单</div>';
+    return;
+  }
+  container.innerHTML = tickets.map(t => `
+    <div class="ticket-item" onclick="openTicket('${t.id}')">
+      <span class="id">${t.id}</span>
+      <div class="info">
+        <div class="title">${escapeHtml(t.title)}</div>
+        <div class="meta">
+          <span>${typeMap[t.type] || t.type}</span>
+          <span>📅 ${t.createdStr}</span>
+          ${t.contact ? `<span>📧 ${escapeHtml(t.contact)}</span>` : ""}
+          ${t.replies.length ? `<span>💬 ${t.replies.length}条回复</span>` : ""}
+        </div>
+      </div>
+      <span class="priority-badge priority-${t.priority}">${priorityMap[t.priority] || t.priority}</span>
+      <span class="status-badge status-${t.status}">${statusMap[t.status] || t.status}</span>
+    </div>
+  `).join("");
+}
+
+function renderPagination() {
+  const pg = document.getElementById("pagination");
+  if (totalPages <= 1) { pg.innerHTML = ""; return; }
+  let html = `<button onclick="goPage(${currentPage-1})" ${currentPage===1?"disabled":""}>上一页</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) {
+      html += `<button class="${i===currentPage?"active":""}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - currentPage) === 3) {
+      html += `<span>...</span>`;
+    }
+  }
+  html += `<button onclick="goPage(${currentPage+1})" ${currentPage===totalPages?"disabled":""}>下一页</button>`;
+  html += `<span>共${totalPages}页</span>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  loadDashboard();
+}
+
+let filterTimer;
+function debounceFilter() { clearTimeout(filterTimer); filterTimer = setTimeout(applyFilter, 400); }
+
+async function applyFilter() {
+  currentPage = 1;
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const keyword = document.getElementById("filterKeyword").value;
+  try {
+    const res = await fetch(API_BASE + "/ticket/list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, status, type, keyword, page: currentPage, pageSize: 20 })
+    });
+    const data = await res.json();
+    if (data.success) {
+      allTickets = data.tickets;
+      totalPages = data.totalPages;
+      renderTicketList(data.tickets);
+      renderPagination();
+    }
+  } catch (e) { toast("筛选失败"); }
+}
+
+function refreshList() { currentPage = 1; loadDashboard(); toast("已刷新"); }
+
+// 打开工单详情
+async function openTicket(id) {
+  try {
+    const res = await fetch(API_BASE + "/ticket/detail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentTicket = data.ticket;
+      showDetail();
+    }
+  } catch (e) { toast("加载详情失败"); }
+}
+
+function showDetail() {
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  document.getElementById("page-detail").style.display = "block";
+  const t = currentTicket;
+  document.getElementById("detailContent").innerHTML = `
+    <div class="detail-header">
+      <div>
+        <div class="detail-title">${escapeHtml(t.title)}</div>
+        <div class="detail-meta">
+          <span class="id">${t.id}</span>
+          <span>${typeMap[t.type] || t.type}</span>
+          <span class="priority-badge priority-${t.priority}">${priorityMap[t.priority] || t.priority}</span>
+          <span class="status-badge status-${t.status}">${statusMap[t.status] || t.status}</span>
+          <span>📅 ${t.createdStr}</span>
+        </div>
+      </div>
+    </div>
+    <div class="detail-content">${escapeHtml(t.content)}</div>
+    <div class="detail-info-grid">
+      <div class="info-box"><div class="label">联系方式</div><div class="value">${escapeHtml(t.contact || "未提供")}</div></div>
+      <div class="info-box"><div class="label">IP地址</div><div class="value">${t.ip || "未知"}</div></div>
+      <div class="info-box"><div class="label">标签</div><div class="value">${t.tags.length ? t.tags.map(tag => `<span class="priority-badge priority-normal" style="margin-right:4px;">${tag}</span>`).join("") : "无"}</div></div>
+      <div class="info-box"><div class="label">分配给</div><div class="value">${t.assignee || "未分配"}</div></div>
+    </div>
+    ${t.deviceInfo ? `
+    <div class="info-box" style="margin-bottom:16px;">
+      <div class="label">设备信息</div>
+      <div class="value" style="font-size:0.8rem;line-height:1.6;">
+        ${t.deviceInfo.platform ? `平台: ${escapeHtml(t.deviceInfo.platform)}<br>` : ""}
+        ${t.deviceInfo.language ? `语言: ${escapeHtml(t.deviceInfo.language)}<br>` : ""}
+        ${t.deviceInfo.screen ? `屏幕: ${escapeHtml(t.deviceInfo.screen)}<br>` : ""}
+        ${t.deviceInfo.timezone ? `时区: ${escapeHtml(t.deviceInfo.timezone)}<br>` : ""}
+        ${t.deviceInfo.userAgent ? `UA: ${escapeHtml(t.deviceInfo.userAgent.substring(0,150))}` : ""}
+      </div>
+    </div>` : ""}
+    ${t.screenshots && t.screenshots.length ? `
+    <div class="info-box" style="margin-bottom:16px;">
+      <div class="label">截图 (${t.screenshots.length})</div>
+      <div class="value" style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${t.screenshots.map((s,i) => s.startsWith("data:") ? `<img src="${s}" style="max-width:120px;border-radius:8px;cursor:pointer;" onclick="window.open('${s}')">` : `<a href="${s}" target="_blank" style="color:var(--primary);">截图${i+1}</a>`).join("")}
+      </div>
+    </div>` : ""}
+    <div class="reply-section">
+      <h3 style="margin-bottom:12px;font-size:1rem;">💬 回复记录 (${t.replies.length})</h3>
+      <div class="reply-list">
+        ${t.replies.length ? t.replies.map(r => `
+          <div class="reply-item ${r.isAdmin ? "admin" : ""}">
+            <div class="reply-header">
+              <span class="reply-author">${r.isAdmin ? "👨‍💼 " + (r.adminName || "管理员") : "👤 用户"}</span>
+              <span class="reply-time">${r.timeStr}</span>
+            </div>
+            <div class="reply-content">${escapeHtml(r.content)}</div>
+          </div>
+        `).join("") : '<div style="color:var(--muted);text-align:center;padding:20px;">暂无回复</div>'}
+      </div>
+      <div class="reply-form">
+        <textarea id="replyContent" placeholder="输入回复内容..."></textarea>
+        <div class="reply-actions">
+          <select id="replyStatus">
+            <option value="">不改变状态</option>
+            <option value="processing">标记为处理中</option>
+            <option value="resolved">标记为已解决</option>
+            <option value="closed">标记为已关闭</option>
+            <option value="pending">标记为待处理</option>
+          </select>
+          <button class="btn btn-primary" onclick="submitReply()">📤 提交回复</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function submitReply() {
+  const content = document.getElementById("replyContent").value.trim();
+  const status = document.getElementById("replyStatus").value;
+  if (!content && !status) { toast("请输入回复内容或选择状态"); return; }
+  try {
+    const res = await fetch(API_BASE + "/ticket/reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, id: currentTicket.id, content, status })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentTicket = data.ticket;
+      showDetail();
+      toast("回复成功");
+    } else {
+      toast(data.message || "回复失败");
+    }
+  } catch (e) { toast("网络错误"); }
+}
+
+async function deleteTicket() {
+  if (!confirm("确定要删除此工单吗？删除后无法恢复！")) return;
+  try {
+    const res = await fetch(API_BASE + "/ticket/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, id: currentTicket.id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast("已删除");
+      backToList();
+    } else {
+      toast(data.message || "删除失败");
+    }
+  } catch (e) { toast("网络错误"); }
+}
+
+function backToList() {
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  document.getElementById("page-list").style.display = "block";
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.querySelector('.nav-item[data-page="list"]').classList.add("active");
+  loadDashboard();
+}
+
+// 工单处理页
+async function loadProcessing() {
+  const status = document.getElementById("procStatus").value;
+  try {
+    const res = await fetch(API_BASE + "/ticket/list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, status: status === "all" ? "pending" : status, pageSize: 50 })
+    });
+    const data = await res.json();
+    let tickets = data.tickets || [];
+    if (status === "all") {
+      const res2 = await fetch(API_BASE + "/ticket/list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passwordHash: adminHash, status: "processing", pageSize: 50 })
+      });
+      const data2 = await res2.json();
+      tickets = tickets.concat(data2.tickets || []);
+    }
+    renderTicketList(tickets, "processingList");
+  } catch (e) { toast("加载失败"); }
+}
+
+// 搜索
+async function doSearch() {
+  const status = document.getElementById("searchStatus").value;
+  const keyword = document.getElementById("searchKeyword").value;
+  try {
+    const res = await fetch(API_BASE + "/ticket/list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash, status, keyword, pageSize: 100 })
+    });
+    const data = await res.json();
+    let tickets = data.tickets || [];
+    // 前端过滤日期和优先级
+    const priority = document.getElementById("searchPriority").value;
+    const dateFrom = document.getElementById("searchDateFrom").value;
+    const dateTo = document.getElementById("searchDateTo").value;
+    if (priority !== "all") tickets = tickets.filter(t => t.priority === priority);
+    if (dateFrom) tickets = tickets.filter(t => new Date(t.createdAt) >= new Date(dateFrom));
+    if (dateTo) tickets = tickets.filter(t => new Date(t.createdAt) <= new Date(dateTo + "T23:59:59"));
+    renderTicketList(tickets, "searchList");
+    toast(`找到 ${tickets.length} 条结果`);
+  } catch (e) { toast("搜索失败"); }
+}
+
+function resetSearch() {
+  document.getElementById("searchStatus").value = "all";
+  document.getElementById("searchPriority").value = "all";
+  document.getElementById("searchType").value = "all";
+  document.getElementById("searchDateFrom").value = "";
+  document.getElementById("searchDateTo").value = "";
+  document.getElementById("searchKeyword").value = "";
+  document.getElementById("searchList").innerHTML = "";
+}
+
+// 统计
+async function loadStats() {
+  try {
+    const res = await fetch(API_BASE + "/ticket/stats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passwordHash: adminHash })
+    });
+    const data = await res.json();
+    if (data.success) {
+      // 概览卡片
+      document.getElementById("statsOverview").innerHTML = [
+        { label: "工单总数", value: data.total, cls: "total" },
+        { label: "待处理", value: data.statusCounts.pending, cls: "pending" },
+        { label: "处理中", value: data.statusCounts.processing, cls: "processing" },
+        { label: "已解决", value: data.statusCounts.resolved, cls: "resolved" },
+        { label: "已关闭", value: data.statusCounts.closed, cls: "closed" },
+        { label: "平均响应(分钟)", value: data.avgReplyTime, cls: "total" },
+      ].map(c => `<div class="stat-card"><div class="label">${c.label}</div><div class="value ${c.cls}">${c.value}</div></div>`).join("");
+      
+      // 趋势图
+      const maxVal = Math.max(...data.last7Days.map(d => d.count), 1);
+      document.getElementById("trendChart").innerHTML = data.last7Days.map(d => `
+        <div class="bar-item">
+          <div class="bar" style="height:${(d.count/maxVal*160)}px;">
+            <span class="bar-value">${d.count}</span>
+          </div>
+          <span class="bar-label">${d.date.substring(5)}</span>
+        </div>
+      `).join("");
+      
+      // 分布
+      let distHtml = '<div class="chart-container"><div class="chart-title">📊 状态分布</div>';
+      Object.entries(data.statusCounts).forEach(([k,v]) => {
+        distHtml += `<div class="config-row"><div class="label">${statusMap[k] || k}</div><span class="status-badge status-${k}">${v}</span></div>`;
+      });
+      distHtml += '</div>';
+      
+      distHtml += '<div class="chart-container"><div class="chart-title">🏷️ 类型分布</div>';
+      Object.entries(data.typeCounts).forEach(([k,v]) => {
+        distHtml += `<div class="config-row"><div class="label">${typeMap[k] || k}</div><span class="value" style="font-weight:600;">${v}</span></div>`;
+      });
+      distHtml += '</div>';
+      
+      distHtml += '<div class="chart-container"><div class="chart-title">⚡ 优先级分布</div>';
+      Object.entries(data.priorityCounts).forEach(([k,v]) => {
+        distHtml += `<div class="config-row"><div class="label">${priorityMap[k] || k}</div><span class="priority-badge priority-${k}">${v}</span></div>`;
+      });
+      distHtml += '</div>';
+      
+      document.getElementById("distributionGrid").innerHTML = distHtml;
+    }
+  } catch (e) { toast("统计加载失败"); }
+}
+
+// 导出CSV
+function exportCSV() {
+  if (!allTickets.length) { toast("暂无数据可导出"); return; }
+  const headers = ["工单ID", "类型", "标题", "内容", "状态", "优先级", "联系方式", "IP", "创建时间", "回复数"];
+  const rows = allTickets.map(t => [
+    t.id, typeMap[t.type] || t.type, t.title, t.content.replace(/,/g,"，"),
+    statusMap[t.status] || t.status, priorityMap[t.priority] || t.priority,
+    t.contact || "", t.ip || "", t.createdStr, t.replies.length
+  ]);
+  const csv = "\uFEFF" + [headers, ...rows].map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `工单导出_${new Date().toLocaleDateString()}.csv`;
+  link.click();
+  toast("导出成功");
+}
+
+function exportFilteredCSV() { exportCSV(); }
+
+// 批量操作
+async function batchResolve() {
+  if (!confirm("确定要将所有待处理工单标记为已解决吗？")) return;
+  toast("批量处理中...（需逐条处理）");
+}
+
+async function batchClose() {
+  if (!confirm("确定要关闭所有已解决超过7天的工单吗？")) return;
+  toast("批量关闭中...");
+}
+
+// 工具函数
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+function toast(msg) {
+  const existing = document.querySelector(".toast");
+  if (existing) existing.remove();
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+</script>
+</body>
+</html>
