@@ -57,7 +57,7 @@ export default class GeneratePage extends React.Component {
       error: "",
       history: [] as HistoryItem[],
       showHistory: false,
-      filterType: 0, // 0=全部
+      filterType: -1, // -1=全部
       checking: false, // 是否正在从云端查询状态
       adminPassword: "", // 管理密码（用于调用Worker生成接口）
       generating: false, // 是否正在生成
@@ -354,7 +354,7 @@ export default class GeneratePage extends React.Component {
   exportHistory = () => {
     const { history, filterType } = this.state;
     // 按当前筛选导出
-    const filtered = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    const filtered = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     if (filtered.length === 0) {
       alert("没有可导出的记录");
       return;
@@ -378,7 +378,7 @@ export default class GeneratePage extends React.Component {
       }
       text += "\n";
     }
-    const typeLabel = filterType === 0 ? "全部" : TYPE_NAMES[filterType];
+    const typeLabel = filterType === -1 ? "全部" : TYPE_NAMES[filterType];
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -391,7 +391,7 @@ export default class GeneratePage extends React.Component {
   // 批量复制当前筛选的所有未使用激活码
   copyAllUnused = () => {
     const { history, filterType } = this.state;
-    const filtered = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    const filtered = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     const unused = filtered.filter((h) => !h.used);
     if (unused.length === 0) {
       alert("没有未使用的激活码");
@@ -721,7 +721,7 @@ export default class GeneratePage extends React.Component {
       { value: 4, label: "年卡", desc: "365天" },
     ];
 
-    let filteredHistory = filterType === 0 ? history : history.filter((h) => h.type === filterType);
+    let filteredHistory = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     // 按状态筛选
     if (statusFilter === 1) {
       filteredHistory = filteredHistory.filter((h) => !h.used && !h.disabled);
@@ -835,7 +835,7 @@ export default class GeneratePage extends React.Component {
                     {syncing ? "⏳ 同步中..." : "☁️ 云端同步"}
                   </button>
                   <button onClick={this.copyAllUnused} className="rounded-full border border-green-400/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-300 hover:bg-green-500/20 transition">复制未使用</button>
-                  <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === 0 ? "全部" : TYPE_NAMES[filterType]}</button>
+                  <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === -1 ? "全部" : TYPE_NAMES[filterType]}</button>
                   <button onClick={this.clearCloud} className="rounded-full border border-red-500/50 bg-red-500/20 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/30 transition">☁️ 清空云端</button>
                   <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空本地</button>
                 </div>
@@ -889,7 +889,7 @@ export default class GeneratePage extends React.Component {
               <div className="mb-3">
                 <div className="text-xs text-white/40 mb-2">卡类型</div>
                 <div className="flex gap-2 flex-wrap">
-                  <button onClick={() => this.setState({ filterType: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === 0 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
+                  <button onClick={() => this.setState({ filterType: -1 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === -1 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
                   {typeOptions.map((opt) => (
                     <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>{opt.label}</button>
                   ))}
