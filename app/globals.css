@@ -79,7 +79,7 @@ input, textarea, select {
 
 /* 按钮通用样式 */
 .btn-primary {
-  @apply w-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/30 transition hover:shadow-pink-500/50 active:scale-98;
+  @apply w-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/30 transition hover:shadow-pink-500/50 active:scale-95;
 }
 
 /* 卡片类型选择 */
