@@ -432,7 +432,6 @@ export default class GeneratePage extends React.Component {
     try {
       const res = await fetch(`${API_BASE_URL}/check?code=${encodeURIComponent(code)}`, {
         signal: AbortSignal.timeout(5000),
-        signal: AbortSignal.timeout(5000),
       });
       if (res.ok) {
         const data = await res.json();
