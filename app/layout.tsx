@@ -4,8 +4,21 @@ import type { ReactNode } from 'react'
 import AntiDebugProvider from '../components/AntiDebugProvider'
 
 export const metadata: Metadata = {
-  title: '工具',
-  description: '系统工具',
+  title: '激活码生成器',
+  description: '卡密生成与管理系统',
+  viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover',
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: '卡密管理',
+  },
+  other: {
+    'format-detection': 'telephone=no',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+  },
 }
 
 export default function RootLayout({
@@ -15,6 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
+      <head>
+        <link rel="preconnect" href="https://api.ttla.top" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://api.ttla.top" />
+      </head>
       <body>
         <AntiDebugProvider>
           {children}

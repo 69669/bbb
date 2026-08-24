@@ -7,6 +7,7 @@ const API_BASE_URL = "https://api.ttla.top";
 
 // 卡类型名称
 const TYPE_NAMES: Record<number, string> = {
+  0: "天卡",
   1: "周卡",
   2: "月卡",
   3: "季卡",
@@ -47,7 +48,7 @@ export default class GeneratePage extends React.Component {
   constructor(props: {}) {
     super(props);
     this.state = {
-      type: 5,
+      type: 0,
       count: 1,
       codes: [] as string[],
       copied: false,
@@ -109,7 +110,7 @@ export default class GeneratePage extends React.Component {
       if (auth === "1") {
         this.setState({ authenticated: true });
         // 登录后自动从云端同步生成记录
-        setTimeout(() => this.syncFromCloud(), 500);
+        setTimeout(() => this.syncFromCloud(), 300);
         // 启动自动刷新定时器（每60秒刷新一次云端状态）
         this.startAutoRefresh();
       }
@@ -128,7 +129,7 @@ export default class GeneratePage extends React.Component {
     this.autoRefreshTimer = setInterval(() => {
       // 静默刷新（不显示loading，不弹窗提示）
       this.silentRefreshStatus();
-    }, 60000); // 每60秒刷新一次
+    }, 30000); // 每30秒刷新一次
   };
 
   // 静默刷新云端状态（不弹窗）
@@ -138,7 +139,7 @@ export default class GeneratePage extends React.Component {
     try {
       const newHistory = [...history];
       // 并发检测，每批20个
-      const BATCH_SIZE = 20;
+      const BATCH_SIZE = 30;
       for (let i = 0; i < newHistory.length; i += BATCH_SIZE) {
         const batch = newHistory.slice(i, i + BATCH_SIZE);
         const results = await Promise.all(
@@ -179,7 +180,7 @@ export default class GeneratePage extends React.Component {
       localStorage.setItem("lg_admin_hash", String(simpleHash(password)));
       this.setState({ authenticated: true, password: "", error: "", adminPassword: password });
       // 登录成功后启动自动刷新
-      setTimeout(() => this.startAutoRefresh(), 1000);
+      setTimeout(() => this.startAutoRefresh(), 500);
     } else {
       this.setState({ error: "密码错误，请重试" });
     }
@@ -430,6 +431,7 @@ export default class GeneratePage extends React.Component {
   checkCodeFromCloud = async (code: string): Promise<boolean | null> => {
     try {
       const res = await fetch(`${API_BASE_URL}/check?code=${encodeURIComponent(code)}`, {
+        signal: AbortSignal.timeout(5000),
         signal: AbortSignal.timeout(5000),
       });
       if (res.ok) {
@@ -712,6 +714,7 @@ export default class GeneratePage extends React.Component {
     }
 
     const typeOptions = [
+      { value: 0, label: "天卡", desc: "1天" },
       { value: 5, label: "测试卡", desc: "5分钟" },
       { value: 1, label: "周卡", desc: "7天" },
       { value: 2, label: "月卡", desc: "30天" },
@@ -761,7 +764,7 @@ export default class GeneratePage extends React.Component {
               <div className="text-center mb-6">
                 <h1 className="game-title">激活码生成器</h1>
                 <div className="game-title-underline" />
-                <p className="mt-3 text-sm text-white/60">生成测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
+                <p className="mt-3 text-sm text-white/60">生成天卡 / 测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
               </div>
 
               <div className="mb-6">

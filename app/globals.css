@@ -2,39 +2,137 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-black text-zinc-100 antialiased;
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-black text-zinc-100 antialiased;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 输入框聚焦时禁止放大 */
+input, textarea, select {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: none;
+}
+
+/* 动态背景 */
 .bg-aurora {
   position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background: #000;
+  background: #0a0a0f;
 }
 .bg-aurora::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 40% at 15% 30%, rgba(236, 72, 153, 0.08), transparent),
-    radial-gradient(ellipse 50% 30% at 85% 20%, rgba(139, 92, 246, 0.06), transparent);
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(236, 72, 153, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 30%, rgba(139, 92, 246, 0.12), transparent),
+    radial-gradient(ellipse 70% 50% at 50% 80%, rgba(59, 130, 246, 0.08), transparent);
+  animation: aurora-shift 15s ease-in-out infinite;
+}
+@keyframes aurora-shift {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.1) rotate(2deg); opacity: 0.8; }
 }
 
+/* 卡片容器 */
 .game-container {
-  @apply relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 p-4 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-8;
+  @apply relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 p-4 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-6;
+  animation: fade-in-up 0.5s ease-out;
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* 标题 */
 .game-title {
-  @apply text-center text-3xl font-bold tracking-tight text-white sm:text-5xl;
+  @apply text-center text-2xl font-bold tracking-tight text-white sm:text-3xl;
   text-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(236,72,153,0.2);
 }
-
 .game-title-underline {
-  @apply mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-pink-500 to-red-500;
+  @apply mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500;
+  animation: underline-glow 2s ease-in-out infinite;
 }
+@keyframes underline-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(236,72,153,0.5); }
+  50% { box-shadow: 0 0 20px rgba(139,92,246,0.8); }
+}
+
+/* 返回按钮 */
 .back-btn {
-  @apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-900/80 px-4 py-2 text-sm text-white/80 backdrop-blur transition hover:border-white/25 hover:bg-zinc-800/80 hover:text-white;
+  @apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-zinc-900/80 px-4 py-2 text-sm text-white/80 backdrop-blur transition hover:border-white/25 hover:bg-zinc-800/80 hover:text-white active:scale-95;
+}
+
+/* 按钮通用样式 */
+.btn-primary {
+  @apply w-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/30 transition hover:shadow-pink-500/50 active:scale-98;
+}
+
+/* 卡片类型选择 */
+.card-type-btn {
+  @apply rounded-xl border p-3 text-center transition-all duration-200 active:scale-95;
+}
+.card-type-btn.active {
+  @apply border-pink-400/60 bg-pink-500/20 ring-2 ring-pink-400/30;
+}
+.card-type-btn:not(.active) {
+  @apply border-white/10 bg-white/5 hover:border-white/20;
+}
+
+/* 表格行悬停 */
+.table-row {
+  @apply transition-colors hover:bg-white/5;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Toast提示 */
+.toast {
+  @apply fixed bottom-8 left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/90 px-6 py-3 text-sm text-white shadow-lg backdrop-blur-sm;
+  animation: toast-in 0.3s ease-out;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* 加载动画 */
+.spinner {
+  @apply inline-block h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white;
+}
+
+/* 安全区域适配 */
+.safe-bottom {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+.safe-top {
+  padding-top: max(16px, env(safe-area-inset-top));
 }
