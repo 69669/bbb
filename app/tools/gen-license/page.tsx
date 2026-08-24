@@ -747,7 +747,7 @@ export default class GeneratePage extends React.Component {
         <div className="bg-aurora" />
         <div className="relative z-10 mx-auto min-h-screen w-full max-w-2xl px-4 py-8">
           <div className="mb-6 flex items-center justify-between">
-            <Link href="/" className="back-btn inline-flex">← 返回首页</Link>
+            <Link href="/admin" className="back-btn inline-flex">← 后台管理</Link>
             <div className="flex gap-2">
               <button onClick={() => this.setState({ showHistory: !showHistory })} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/70 hover:bg-white/10 transition">
                 {showHistory ? "返回生成" : `📋 记录(${history.length})`}
