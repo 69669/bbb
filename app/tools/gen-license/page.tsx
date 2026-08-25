@@ -443,33 +443,51 @@ export default class GeneratePage extends React.Component {
     }
   };
 
-  // 从云端刷新所有历史记录的使用状态
+  // 从云端刷新所有历史记录的使用状态（批量查询，快速）
   refreshAllStatus = async () => {
     const { history } = this.state;
     if (history.length === 0) {
-      alert("暂无记录可查询");
+      this.showToast("暂无记录可查询");
       return;
     }
     this.setState({ checking: true });
     try {
       const newHistory = [...history];
       let updated = 0;
-      for (let i = 0; i < newHistory.length; i++) {
-        const cloudUsed = await this.checkCodeFromCloud(cleanCode(newHistory[i].code));
-        if (cloudUsed !== null && cloudUsed !== newHistory[i].used) {
-          newHistory[i] = { ...newHistory[i], used: cloudUsed };
-          updated++;
-        }
+      let failed = 0;
+      // 批量查询，每批20个，用Promise.all并发
+      const batchSize = 20;
+      for (let i = 0; i < newHistory.length; i += batchSize) {
+        const batch = newHistory.slice(i, i + batchSize);
+        const results = await Promise.all(
+          batch.map((item) => this.checkCodeFromCloud(cleanCode(item.code)))
+        );
+        results.forEach((cloudUsed, idx) => {
+          const globalIdx = i + idx;
+          if (cloudUsed === null) {
+            failed++;
+          } else if (cloudUsed !== newHistory[globalIdx].used) {
+            newHistory[globalIdx] = { ...newHistory[globalIdx], used: cloudUsed };
+            updated++;
+          }
+        });
       }
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
-      this.setState({ history: newHistory });
-      if (updated > 0) {
-        this.showToast(`✓ 已同步 ${updated} 条`);
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+      this.setState({ history: newHistory, lastRefresh: timeStr });
+      // 明确的成功/失败提示
+      if (failed > 0 && updated > 0) {
+        this.showToast(`✓ 同步${updated}条，${failed}条查询失败`);
+      } else if (failed > 0) {
+        this.showToast(`⚠️ ${failed}条查询失败，请检查网络`);
+      } else if (updated > 0) {
+        this.showToast(`✓ 刷新成功，已同步${updated}条状态`);
       } else {
-        this.showToast("✓ 已是最新");
+        this.showToast("✓ 刷新成功，已是最新状态");
       }
     } catch (e) {
-      this.showToast("查询失败，请重试");
+      this.showToast("❌ 刷新失败，请检查网络后重试");
     } finally {
       this.setState({ checking: false });
     }
