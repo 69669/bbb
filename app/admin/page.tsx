@@ -49,6 +49,15 @@ export default function AdminHome() {
       bgColor: "bg-purple-500/10",
       borderColor: "border-purple-500/30",
     },
+    {
+      icon: "📜",
+      title: "更新历史",
+      desc: "查看项目版本更新记录",
+      path: "/update-history.html",
+      color: "from-amber-500 to-orange-500",
+      bgColor: "bg-amber-500/10",
+      borderColor: "border-amber-500/30",
+    },
   ];
 
   return (
@@ -74,7 +83,13 @@ export default function AdminHome() {
           {menuItems.map((item) => (
             <button
               key={item.path}
-              onClick={() => router.push(item.path)}
+              onClick={() => {
+                if (item.path.endsWith('.html')) {
+                  window.open(item.path, '_blank');
+                } else {
+                  router.push(item.path);
+                }
+              }}
               className={`group relative overflow-hidden rounded-2xl border ${item.borderColor} ${item.bgColor} p-6 text-left transition-all hover:scale-[1.02] hover:shadow-xl`}
             >
               <div className={`absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br ${item.color} opacity-20 blur-xl transition group-hover:opacity-40`} />
@@ -93,7 +108,7 @@ export default function AdminHome() {
         {/* 统计信息 */}
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
-            <div className="text-2xl font-bold text-white">2</div>
+            <div className="text-2xl font-bold text-white">3</div>
             <div className="mt-1 text-xs text-white/50">功能模块</div>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
