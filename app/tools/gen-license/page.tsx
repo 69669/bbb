@@ -106,13 +106,21 @@ export default class GeneratePage extends React.Component {
 
   componentDidMount() {
     if (typeof window !== "undefined") {
-      const auth = localStorage.getItem("lg_admin_auth");
-      if (auth === "1") {
-        this.setState({ authenticated: true });
-        // 登录后自动从云端同步生成记录
+      // 统一登录：检查bbb后台登录状态
+      const bbbAuthed = localStorage.getItem("bbb_admin_authed");
+      if (bbbAuthed === "true") {
+        this.setState({ authenticated: true, adminPassword: "" });
+        // 兼容旧的lg_admin_auth
+        localStorage.setItem("lg_admin_auth", "1");
+        if (!localStorage.getItem("lg_admin_hash")) {
+          localStorage.setItem("lg_admin_hash", "535441809");
+        }
         setTimeout(() => this.syncFromCloud(), 300);
-        // 启动自动刷新定时器（每60秒刷新一次云端状态）
         this.startAutoRefresh();
+      } else {
+        // 未登录，跳回登录页
+        window.location.href = "/";
+        return;
       }
       const historyData = localStorage.getItem("lg_gen_history");
       if (historyData) {
@@ -189,12 +197,9 @@ export default class GeneratePage extends React.Component {
   handleLogout = () => {
     localStorage.removeItem("lg_admin_auth");
     localStorage.removeItem("lg_admin_hash");
-    this.setState({ authenticated: false });
-    // 退出时清除自动刷新定时器
-    if (this.autoRefreshTimer) {
-      clearInterval(this.autoRefreshTimer);
-      this.autoRefreshTimer = null;
-    }
+    localStorage.removeItem("bbb_admin_authed");
+    localStorage.removeItem("bbb_admin_hash");
+    window.location.href = "/";
   };
 
   handleGenerate = async () => {

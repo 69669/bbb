@@ -812,15 +812,7 @@ tr:hover td {
 <body>
 
 <!-- 登录页 -->
-<div class="login-page" id="loginPage">
-  <div class="login-box">
-    <h1>🎫 工单管理系统</h1>
-    <p>Ticket Management System</p>
-    <input type="password" id="loginPassword" placeholder="请输入管理密码" onkeypress="if(event.key==='Enter')doLogin()">
-    <button onclick="doLogin()">登录</button>
-    <div class="login-error" id="loginError" style="display:none;"></div>
-  </div>
-</div>
+
 
 <!-- 主应用 -->
 <div class="app" id="app" style="display:none;">
@@ -1047,28 +1039,15 @@ function simpleHash(str) {
 
 // 登录
 function doLogin() {
-  const pwd = document.getElementById("loginPassword").value;
-  if (!pwd) return;
-  adminHash = String(simpleHash(pwd));
-  // 验证
-  fetch(API_BASE + "/ticket/list", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ passwordHash: adminHash, page: 1, pageSize: 1 })
-  }).then(r => r.json()).then(data => {
-    if (data.success) {
-      localStorage.setItem("ticket_admin_hash", adminHash);
-      document.getElementById("loginPage").style.display = "none";
-      document.getElementById("app").style.display = "flex";
-      loadDashboard();
-    } else {
-      document.getElementById("loginError").textContent = data.message || "密码错误";
-      document.getElementById("loginError").style.display = "block";
-    }
-  }).catch(() => {
-    document.getElementById("loginError").textContent = "网络错误，请检查API地址";
-    document.getElementById("loginError").style.display = "block";
-  });
+  // 从localStorage读取登录状态（统一登录）
+  if (localStorage.getItem("bbb_admin_authed") !== "true") {
+    window.location.href = "/";
+    return;
+  }
+  adminHash = localStorage.getItem("bbb_admin_hash") || "535441809";
+  document.getElementById("loginPage")?.remove();
+  loadTickets();
+  startAutoRefresh();
 }
 
 // 检查登录状态
@@ -1509,5 +1488,5 @@ function toast(msg) {
   setTimeout(() => t.remove(), 2500);
 }
 </script>
-</body>
+<script>doLogin();</script></body>
 </html>
