@@ -2,17 +2,60 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const API_BASE = "https://api.ttla.top";
+const ADMIN_HASH = 535441809;
+
 export default function AdminHome() {
   const router = useRouter();
   const [authed, setAuthed] = useState(false);
+  const [freeMode, setFreeMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("bbb_admin_authed") !== "true") {
       router.replace("/");
     } else {
       setAuthed(true);
+      fetchFreeMode();
     }
   }, [router]);
+
+  const fetchFreeMode = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/config/free-mode`);
+      const data = await res.json();
+      setFreeMode(!!data.freeMode);
+    } catch (e) {
+      console.error("获取免费模式状态失败", e);
+    }
+  };
+
+  const toggleFreeMode = async () => {
+    setLoading(true);
+    setStatusMsg("");
+    try {
+      const res = await fetch(`${API_BASE}/config/free-mode`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          passwordHash: ADMIN_HASH,
+          enabled: !freeMode,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFreeMode(data.freeMode);
+        setStatusMsg(data.freeMode ? "✅ 已开启限时免费，所有游戏免费玩" : "✅ 已关闭免费模式，恢复付费");
+      } else {
+        setStatusMsg("❌ " + (data.message || "操作失败"));
+      }
+    } catch (e) {
+      setStatusMsg("❌ 网络错误，请重试");
+    }
+    setLoading(false);
+    setTimeout(() => setStatusMsg(""), 3000);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("bbb_admin_authed");
@@ -78,6 +121,48 @@ export default function AdminHome() {
           </button>
         </div>
 
+        {/* 全局免费模式开关 */}
+        <div
+          className={`mb-8 rounded-2xl border p-6 transition-all ${
+            freeMode
+              ? "border-green-500/40 bg-green-500/10"
+              : "border-white/10 bg-white/5"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🎁</span>
+                <h2 className="text-lg font-bold text-white">全局限时免费</h2>
+                {freeMode && (
+                  <span className="rounded-full bg-green-500 px-2 py-0.5 text-xs font-bold text-white">
+                    已开启
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-sm text-white/50">
+                开启后所有游戏免费玩，首页显示「限时免费」标签；关闭后恢复付费激活
+              </p>
+            </div>
+            <button
+              onClick={toggleFreeMode}
+              disabled={loading}
+              className={`relative h-8 w-16 rounded-full transition-colors ${
+                freeMode ? "bg-green-500" : "bg-white/20"
+              } ${loading ? "opacity-50" : ""}`}
+            >
+              <span
+                className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                  freeMode ? "translate-x-9" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+          {statusMsg && (
+            <div className="mt-3 text-sm text-white/70">{statusMsg}</div>
+          )}
+        </div>
+
         {/* 功能卡片 */}
         <div className="grid gap-4 sm:grid-cols-2">
           {menuItems.map((item) => (
@@ -120,8 +205,10 @@ export default function AdminHome() {
             <div className="mt-1 text-xs text-white/50">工单模块</div>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">✓</div>
-            <div className="mt-1 text-xs text-white/50">已登录</div>
+            <div className={`text-2xl font-bold ${freeMode ? "text-green-400" : "text-white/40"}`}>
+              {freeMode ? "FREE" : "✓"}
+            </div>
+            <div className="mt-1 text-xs text-white/50">{freeMode ? "免费中" : "已登录"}</div>
           </div>
         </div>
       </div>
