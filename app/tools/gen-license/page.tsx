@@ -765,42 +765,46 @@ export default class GeneratePage extends React.Component {
     const usedCount = history.filter((h) => h.used).length;
     const disabledCount = history.filter((h) => h.disabled).length;
 
+    const sidebar = (
+      <aside className="sidebar">
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <span className="sidebar-logo-text">管理控制台</span>
+        </div>
+        <nav className="sidebar-nav">
+          <div className="nav-item" onClick={() => window.location.href="/admin"}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            控制台
+          </div>
+          <div className="nav-item active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+            激活码管理
+          </div>
+          <div className="nav-item" onClick={() => window.open("/ticket-admin.html","_blank")}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            工单管理
+          </div>
+          <div className="nav-item" onClick={() => window.open("/update-history.html","_blank")}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            更新历史
+          </div>
+        </nav>
+        <div className="sidebar-footer">
+          <div className="nav-item w-full" style={{color:"#f87171"}} onClick={() => { localStorage.clear(); window.location.href="/"; }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            退出登录
+          </div>
+        </div>
+      </aside>
+    );
+
     return (
-      <>
+      <div>
       <div className="app-bg" />
       <div className="layout">
-        <aside className="sidebar">
-          <div className="sidebar-logo">
-            <div className="sidebar-logo-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            </div>
-            <span className="sidebar-logo-text">管理控制台</span>
-          </div>
-          <nav className="sidebar-nav">
-            <div className="nav-item" onClick={() => window.location.href="/admin"}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-              控制台
-            </div>
-            <div className="nav-item active">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-              激活码管理
-            </div>
-            <div className="nav-item" onClick={() => window.open("/ticket-admin.html","_blank")}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-              工单管理
-            </div>
-            <div className="nav-item" onClick={() => window.open("/update-history.html","_blank")}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              更新历史
-            </div>
-          </nav>
-          <div className="sidebar-footer">
-            <div className="nav-item w-full" style={{color:"#f87171"}} onClick={() => { localStorage.clear(); window.location.href="/"; }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              退出登录
-            </div>
-          </div>
-        </aside>
+        {sidebar}
         <div className="main-content">
           <header className="topbar">
             <h1 className="topbar-title">激活码管理</h1>
@@ -1049,14 +1053,13 @@ export default class GeneratePage extends React.Component {
               )}
             </div>
           )}
-        </div>
         {toast && (
           <div className="toast">{toast}</div>
         )}
           </main>
         </div>
       </div>
-      </>
+      </div>
     );
   }
 }
