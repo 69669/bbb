@@ -84,9 +84,9 @@ export default function Home() {
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
                     placeholder="输入密码以继续"
-                    className="input-field pl-11"
+                    className="input-field"
+                    style={{ fontSize: "16px", paddingLeft: "48px" }}
                     autoFocus
-                    style={{ fontSize: "16px" }}
                   />
                   <svg
                     className="absolute left-3.5 top-1/2 -translate-y-1/2"

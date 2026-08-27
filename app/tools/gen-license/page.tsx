@@ -768,18 +768,19 @@ export default class GeneratePage extends React.Component {
     return (
       <>
         <div className="bg-aurora" />
-        <div className="relative z-10 mx-auto min-h-screen w-full max-w-2xl px-4 py-8">
+        <div className="relative z-10 mx-auto min-h-screen w-full max-w-2xl px-5 py-8 sm:px-6 sm:py-10">
           <div className="mb-6 flex items-center justify-between">
-            <Link href="/admin" className="back-btn inline-flex">← 后台管理</Link>
-            <div className="flex gap-2">
-              <button onClick={() => this.setState({ showHistory: !showHistory })} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/70 hover:bg-white/10 transition">
-                {showHistory ? "返回生成" : `📋 记录(${history.length})`}
-              </button>
-              <button onClick={() => window.location.href = "/ticket-admin.html"} className="rounded-full border border-pink-400/30 bg-pink-500/10 px-4 py-2 text-sm text-pink-300 hover:bg-pink-500/20 transition">
-                🎫 工单
-              </button>
-              <button onClick={this.handleLogout} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/60 hover:bg-white/10 transition">
-                退出
+            <Link href="/admin" className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/3 px-3.5 py-2 text-xs text-white/70 backdrop-blur transition hover:border-white/20 hover:bg-white/5 hover:text-white">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              返回
+            </Link>
+            <div className="flex items-center gap-2">
+              <span className="badge badge-primary">共 {history.length} 条</span>
+              <button onClick={() => this.setState({ showHistory: !showHistory })} className="btn-ghost text-xs !py-1.5 !px-3">
+                {showHistory ? "生成器" : "查看记录"}
               </button>
             </div>
           </div>

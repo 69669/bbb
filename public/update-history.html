@@ -397,6 +397,12 @@ tr:hover td {
 
 <div class="container">
   <header class="header">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <a href="/admin" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.7);font-size:12px;text-decoration:none;backdrop-filter:blur(10px);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.7)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        返回
+      </a>
+    </div>
     <div class="header-tag">CHANGELOG</div>
     <h1>项目更新历史</h1>
     <p>三个项目独立展示，记录每一次版本迭代与功能优化的完整历程</p>
@@ -643,10 +649,47 @@ tr:hover td {
         <div class="project-name">BBB 激活码生成器</div>
         <div class="project-desc">激活码管理后台 · 生成/封禁/统计</div>
       </div>
-      <span class="project-count count-bbb">13 次更新</span>
+      <span class="project-count count-bbb">14 次更新</span>
     </div>
     <div class="timeline tl-bbb">
       
+        <div class="tl-item" data-index="0">
+          <div class="tl-dot dot-major"></div>
+          <div class="tl-card">
+            <div class="tl-head">
+              <span class="ver v-major">v5.0 整体UI大改版</span>
+              <span class="idx">#00</span>
+              <span class="date">2026-08-28</span>
+            </div>
+            <div class="tl-body">
+              <p><strong>🎨 视觉全面升级</strong></p>
+              <ul>
+                <li>全新高级感设计语言：深空黑背景 + 蓝紫光晕 + 玻璃拟态卡片</li>
+                <li>靛蓝→紫色渐变主色调，替代原粉紫配色，更沉稳商务</li>
+                <li>16px精致圆角，克制的微交互动画，统一设计系统</li>
+                <li>SVG线性图标替代emoji，更专业</li>
+              </ul>
+              <p><strong>🔐 登录体系简化</strong></p>
+              <ul>
+                <li>只保留登录页一层密码，激活码管理和工单管理不再重复输入</li>
+                <li>统一登录状态，退出即清除所有登录信息</li>
+              </ul>
+              <p><strong>🧭 导航统一</strong></p>
+              <ul>
+                <li>所有子页面左上角统一带框返回按钮，回到控制台</li>
+                <li>去掉各子页面的退出按钮和工单入口跳转</li>
+                <li>激活码记录数量改用徽章展示，更简洁</li>
+              </ul>
+              <p><strong>📱 体验优化</strong></p>
+              <ul>
+                <li>修复登录页锁图标与密码输入重叠问题</li>
+                <li>修复工单管理页面加载逻辑，直接进入无需二次验证</li>
+                <li>调整页面边距，避免内容贴边</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <div class="tl-item" data-index="1">
           <div class="tl-dot dot-feature"></div>
           <div class="tl-card">
