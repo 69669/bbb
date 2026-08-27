@@ -385,6 +385,19 @@ tr:hover td {
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 </style></head>
 <body>
+<div style="position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:rgba(10,10,15,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="/admin" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.7);font-size:13px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.7)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      返回控制台
+    </a>
+    <span style="font-size:15px;font-weight:600;color:#f1f5f9;">更新历史</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="font-size:12px;color:#94a3b8;">v5.0 最新</span>
+  </div>
+</div>
+<div style="max-width:900px;margin:0 auto;padding:24px;">
 <div class="bg-wrap">
   <div class="bg-flow"></div>
   <div class="bg-orb orb-1"></div>
@@ -397,12 +410,6 @@ tr:hover td {
 
 <div class="container">
   <header class="header">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <a href="/admin" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.7);font-size:12px;text-decoration:none;backdrop-filter:blur(10px);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.7)'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        返回
-      </a>
-    </div>
     <div class="header-tag">CHANGELOG</div>
     <h1>项目更新历史</h1>
     <p>三个项目独立展示，记录每一次版本迭代与功能优化的完整历程</p>
@@ -941,5 +948,5 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.06 });
 document.querySelectorAll('.tl-item').forEach(el => observer.observe(el));
 </script>
-</body>
+</div></body>
 </html>
