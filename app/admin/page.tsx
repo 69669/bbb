@@ -147,14 +147,33 @@ export default function AdminHome() {
             <button
               onClick={toggleFreeMode}
               disabled={loading}
-              className={`relative h-8 w-16 rounded-full transition-colors ${
-                freeMode ? "bg-green-500" : "bg-white/20"
-              } ${loading ? "opacity-50" : ""}`}
+              style={{
+                position: 'relative',
+                width: '64px',
+                height: '32px',
+                borderRadius: '9999px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                background: freeMode ? '#22c55e' : 'rgba(255,255,255,0.2)',
+                transition: 'background 0.3s',
+                opacity: loading ? 0.5 : 1,
+                padding: 0,
+                flexShrink: 0,
+              }}
             >
               <span
-                className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                  freeMode ? "translate-x-9" : "translate-x-1"
-                }`}
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  left: '4px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '9999px',
+                  background: '#fff',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  transition: 'transform 0.3s',
+                  transform: freeMode ? 'translateX(32px)' : 'translateX(0)',
+                }}
               />
             </button>
           </div>
