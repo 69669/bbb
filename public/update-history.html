@@ -301,7 +301,89 @@ body {
   .tl-title { font-size: 0.92rem; }
 }
 </style>
-</head>
+<style>
+/* ============ 高级感样式覆盖 ============ */
+body {
+  background: #07070b !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  letter-spacing: -0.01em;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 15%, rgba(99, 102, 241, 0.1), transparent),
+    radial-gradient(ellipse 50% 35% at 85% 25%, rgba(168, 85, 247, 0.07), transparent),
+    radial-gradient(ellipse 55% 45% at 50% 90%, rgba(59, 130, 246, 0.05), transparent);
+  animation: aurora-shift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes aurora-shift {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.08) rotate(1deg); opacity: 0.85; }
+}
+/* 玻璃卡片 */
+.container, .main-container, .card, .panel {
+  background: rgba(255, 255, 255, 0.025) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+/* 主按钮 */
+button.primary, .btn-primary, input[type="submit"].primary, .btn-generate {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3) !important;
+  transition: all 0.25s ease !important;
+}
+button.primary:hover, .btn-primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 28px rgba(99, 102, 241, 0.45) !important;
+}
+/* 输入框 */
+input, select, textarea {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  color: white !important;
+  transition: all 0.2s ease !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  background: rgba(99, 102, 241, 0.05) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  outline: none !important;
+}
+/* 表格 */
+table {
+  border-collapse: collapse !important;
+}
+th {
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: rgba(255,255,255,0.4) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+td {
+  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+}
+tr:hover td {
+  background: rgba(255,255,255,0.02) !important;
+}
+/* 滚动条 */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+</style></head>
 <body>
 <div class="bg-wrap">
   <div class="bg-flow"></div>

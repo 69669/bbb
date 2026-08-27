@@ -694,7 +694,7 @@ export default class GeneratePage extends React.Component {
         <>
           <div className="bg-aurora" />
           <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center px-4 py-8">
-            <div className="game-container">
+            <div className="glass-card">
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🔐</div>
                 <h1 className="text-xl font-bold text-white">验证身份</h1>
@@ -706,7 +706,7 @@ export default class GeneratePage extends React.Component {
                   value={password}
                   onChange={(e) => this.setState({ password: e.target.value, error: "" })}
                   placeholder="输入密码"
-                  className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-center text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  className="input-field text-center"
                   autoFocus
                 />
                 {error && (
@@ -780,9 +780,9 @@ export default class GeneratePage extends React.Component {
           </div>
 
           {!showHistory ? (
-            <div className="game-container">
+            <div className="glass-card">
               <div className="text-center mb-6">
-                <h1 className="game-title">激活码生成器</h1>
+                <h1 className="gradient-text text-center text-xl font-bold tracking-tight sm:text-2xl">激活码生成器</h1>
                 <div className="game-title-underline" />
                 <p className="mt-3 text-sm text-white/60">生成天卡 / 测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
               </div>
@@ -845,7 +845,7 @@ export default class GeneratePage extends React.Component {
               )}
             </div>
           ) : (
-            <div className="game-container">
+            <div className="glass-card">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">📋 生成记录</h2>
                 <div className="flex gap-2 flex-wrap">

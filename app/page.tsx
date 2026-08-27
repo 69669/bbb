@@ -18,9 +18,9 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    // 已登录则跳转到后台管理
     if (localStorage.getItem("bbb_admin_authed") === "true") {
       router.replace("/admin");
     }
@@ -43,43 +43,100 @@ export default function Home() {
         setError("密码错误，请重试");
         setLoading(false);
       }
-    }, 300);
+    }, 400);
   };
 
   return (
     <>
       <div className="bg-aurora" />
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center px-4 py-8">
-        <div className="game-container">
-          <div className="text-center mb-8">
-            <div className="text-5xl mb-4">🎛️</div>
-            <h1 className="text-2xl font-bold text-white">后台管理系统</h1>
-            <p className="mt-3 text-sm text-white/50">激活码管理 · 工单管理</p>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="请输入管理密码"
-              className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-center text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
-              autoFocus
-              style={{ fontSize: "16px" }}
-            />
-            {error && (
-              <div className="rounded-lg bg-red-500/10 p-2 text-center text-sm text-red-300">{error}</div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:shadow-pink-500/60 transition disabled:opacity-50"
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-md fade-in-up">
+          {/* Logo区域 */}
+          <div className="mb-8 text-center">
+            <div
+              className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+              style={{
+                background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
+                boxShadow: "0 8px 32px rgba(99, 102, 241, 0.4)",
+              }}
             >
-              {loading ? "验证中..." : "登 录"}
-            </button>
-          </form>
-        </div>
-        <div className="mt-6 text-center text-xs text-white/30">
-          © 后台管理系统
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h1 className="gradient-text text-2xl font-bold tracking-tight">管理控制台</h1>
+            <p className="mt-2 text-sm text-white/40">Admin Console · 安全登录</p>
+          </div>
+
+          {/* 登录卡片 */}
+          <div className="glass-card p-7">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-white/40">
+                  管理密码
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
+                    placeholder="输入密码以继续"
+                    className="input-field pl-11"
+                    autoFocus
+                    style={{ fontSize: "16px" }}
+                  />
+                  <svg
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                    width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke={focused ? "#a5b4fc" : "rgba(255,255,255,0.3)"}
+                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner" />
+                    <span>验证中</span>
+                  </>
+                ) : (
+                  <>
+                    <span>登 录</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-6 text-center text-xs text-white/25">
+            受保护区域 · 仅限授权管理员访问
+          </div>
         </div>
       </div>
     </>
