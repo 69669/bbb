@@ -16,9 +16,13 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ total: 0, online: 0, pending: 0 });
 
   useEffect(() => {
-    if (localStorage.getItem("bbb_admin_authed") !== "true") {
+    const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+    const expired = Date.now() - loginTime > 15 * 60 * 1000;
+    if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+      localStorage.clear();
       router.replace("/");
     } else {
+      localStorage.setItem("bbb_login_time", String(Date.now()));
       setAuthed(true);
       fetchData();
       const timer = setInterval(fetchData, 15000);
@@ -123,7 +127,7 @@ export default function AdminDashboard() {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
           </div>
           <div>
-            <div className="sidebar-title">BBB Console</div>
+            <div className="sidebar-title">后台管理</div>
             <div className="sidebar-subtitle">管理控制台 v9.0</div>
           </div>
         </div>

@@ -37,6 +37,7 @@ export default function LoginPage() {
         localStorage.setItem("bbb_admin_hash", String(simpleHash(password)));
         localStorage.setItem("lg_admin_auth", "1");
         localStorage.setItem("lg_admin_hash", String(simpleHash(password)));
+        localStorage.setItem("bbb_login_time", String(Date.now()));
         router.replace("/admin");
       } else {
         setError("密码错误，请重试");
@@ -60,7 +61,7 @@ export default function LoginPage() {
           <div style={{ width: "56px", height: "56px", background: "rgba(255,255,255,0.2)", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "28px" }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
           </div>
-          <h1 style={{ fontSize: "36px", fontWeight: 800, color: "white", marginBottom: "16px", lineHeight: 1.2 }}>BBB 管理控制台</h1>
+          <h1 style={{ fontSize: "36px", fontWeight: 800, color: "white", marginBottom: "16px", lineHeight: 1.2 }}>后台管理</h1>
           <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.8)", lineHeight: 1.7, marginBottom: "40px" }}>激活码管理 · 工单系统 · 数据统计<br />一站式后台管理平台</p>
           <div style={{ display: "flex", gap: "32px" }}>
             <div><div style={{ fontSize: "28px", fontWeight: 700, color: "white" }}>3+</div><div style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>功能模块</div></div>

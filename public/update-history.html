@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>更新历史 · Update History</title>
+<title>后台管理 · 更新历史</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -143,7 +143,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   <aside class="app-sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-      <div><div class="sidebar-title">BBB Console</div><div class="sidebar-subtitle">管理控制台 v9.0</div></div>
+      <div><div class="sidebar-title">后台管理</div><div class="sidebar-subtitle">管理控制台 v9.0</div></div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -196,7 +196,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
       </div>
 
       <!-- 版本时间线 -->
-<section class="project-section">
+<section class="project-section" data-project="game">
     <div class="project-header">
       <div class="project-icon icon-game">🎮</div>
       <div class="project-info">
@@ -432,7 +432,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   </section>
 
   <!-- BBB 项目 -->
-  <section class="project-section">
+  <section class="project-section" data-project="bbb">
     <div class="project-header">
       <div class="project-icon icon-bbb">🔑</div>
       <div class="project-info">
@@ -654,7 +654,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   </section>
 
   <!-- Worker 项目 -->
-  <section class="project-section">
+  <section class="project-section" data-project="worker">
     <div class="project-header">
       <div class="project-icon icon-worker">⚡</div>
       <div class="project-info">
@@ -745,6 +745,17 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 </div>
 <div id="toastContainer"></div>
 <script>
+// 检查登录状态和15分钟失效
+(function() {
+  const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+  const expired = Date.now() - loginTime > 15 * 60 * 1000;
+  if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+    localStorage.clear();
+    window.location.href = "/";
+    return;
+  }
+  localStorage.setItem("bbb_login_time", String(Date.now()));
+})();
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {

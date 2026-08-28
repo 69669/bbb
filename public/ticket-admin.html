@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>工单管理系统 · Ticket Admin</title>
+<title>后台管理 · 工单管理</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -163,7 +163,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
   <aside class="app-sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
-      <div><div class="sidebar-title">BBB Console</div><div class="sidebar-subtitle">管理控制台 v9.0</div></div>
+      <div><div class="sidebar-title">后台管理</div><div class="sidebar-subtitle">管理控制台 v9.0</div></div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -265,11 +265,15 @@ function simpleHash(str) {
 
 // 登录
 function doLogin() {
-  // 统一登录：检查bbb后台登录状态
-  if (localStorage.getItem("bbb_admin_authed") !== "true") {
+  // 统一登录：检查bbb后台登录状态和15分钟失效
+  const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+  const expired = Date.now() - loginTime > 15 * 60 * 1000;
+  if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+    localStorage.clear();
     window.location.href = "/";
     return;
   }
+  localStorage.setItem("bbb_login_time", String(Date.now()));
   adminHash = localStorage.getItem("bbb_admin_hash") || "535441809";
   // 显示主应用
   var appEl = document.getElementById("app");
@@ -332,10 +336,13 @@ function renderStatsCards(stats) {
     { label: "处理中", value: stats.processing, cls: "processing" },
     { label: "已解决", value: stats.resolved, cls: "resolved" },
   ];
+  const colors = { total: "#6366f1", pending: "#f59e0b", processing: "#3b82f6", resolved: "#10b981" };
+  const icons = { total: "📊", pending: "⏳", processing: "🔧", resolved: "✅" };
   document.getElementById("statsCards").innerHTML = cards.map(c => `
     <div class="stat-card">
-      <div class="label">${c.label}</div>
-      <div class="value ${c.cls}">${c.value}</div>
+      <div class="stat-icon" style="background:${colors[c.cls]}15;color:${colors[c.cls]}">${icons[c.cls]}</div>
+      <div class="stat-value" style="color:${colors[c.cls]}">${c.value}</div>
+      <div class="stat-label">${c.label}</div>
     </div>
   `).join("");
 }
@@ -363,8 +370,9 @@ function renderTicketList(tickets, containerId = "ticketList") {
     html += '<td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHtml(t.title)+'</td>';
     html += '<td class="text-xs text-slate-500">'+(t.createdStr || '-')+'</td>';
     html += '<td class="text-xs text-slate-500">'+(t.contact ? escapeHtml(t.contact) : '-')+'</td>';
-    html += '<td class="action-col"><div style="display:flex;gap:4px;justify-content:flex-end;">';
-    html += '<button onclick="event.stopPropagation();openTicket(\''+t.id+'\')" class="px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 rounded transition">查看</button>';
+    html += '<td class="action-col"><div style="display:flex;gap:6px;justify-content:flex-end;">';
+    html += '<button onclick="event.stopPropagation();openTicket(\''+t.id+'\')" class="btn btn-primary btn-sm">查看详情</button>';
+    if (t.status === 'pending') html += '<button onclick="event.stopPropagation();quickResolve(\''+t.id+'\')" class="btn btn-success btn-sm">标记已处理</button>';
     html += '<button onclick="event.stopPropagation();quickResolve(\''+t.id+'\')" class="px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded transition">处理</button>';
     html += '</div></td>';
     html += '</tr>';
@@ -519,72 +527,92 @@ function showDetail() {
   document.querySelectorAll(".page").forEach(p => p.style.display = "none");
   document.getElementById("page-detail").style.display = "block";
   const t = currentTicket;
+  const statusColors = { pending: "#f59e0b", processing: "#3b82f6", resolved: "#10b981", closed: "#64748b" };
+  const priorityColors = { low: "#64748b", normal: "#3b82f6", high: "#f59e0b", urgent: "#ef4444" };
   document.getElementById("detailContent").innerHTML = `
-    <div class="detail-header">
-      <div>
-        <div class="detail-title">${escapeHtml(t.title)}</div>
-        <div class="detail-meta">
-          <span class="id">${t.id}</span>
-          <span>${typeMap[t.type] || t.type}</span>
-          <span class="priority-badge priority-${t.priority}">${priorityMap[t.priority] || t.priority}</span>
-          <span class="status-badge status-${t.status}">${statusMap[t.status] || t.status}</span>
-          <span>📅 ${t.createdStr}</span>
-        </div>
-      </div>
-    </div>
-    <div class="detail-content">${escapeHtml(t.content)}</div>
-    <div class="detail-info-grid">
-      <div class="info-box"><div class="label">联系方式</div><div class="value">${escapeHtml(t.contact || "未提供")}</div></div>
-      <div class="info-box"><div class="label">IP地址</div><div class="value">${t.ip || "未知"}</div></div>
-      <div class="info-box"><div class="label">标签</div><div class="value">${t.tags.length ? t.tags.map(tag => `<span class="priority-badge priority-normal" style="margin-right:4px;">${tag}</span>`).join("") : "无"}</div></div>
-      <div class="info-box"><div class="label">分配给</div><div class="value">${t.assignee || "未分配"}</div></div>
-    </div>
-    ${t.deviceInfo ? `
-    <div class="info-box" style="margin-bottom:16px;">
-      <div class="label">设备信息</div>
-      <div class="value" style="font-size:0.8rem;line-height:1.6;">
-        ${t.deviceInfo.platform ? `平台: ${escapeHtml(t.deviceInfo.platform)}<br>` : ""}
-        ${t.deviceInfo.language ? `语言: ${escapeHtml(t.deviceInfo.language)}<br>` : ""}
-        ${t.deviceInfo.screen ? `屏幕: ${escapeHtml(t.deviceInfo.screen)}<br>` : ""}
-        ${t.deviceInfo.timezone ? `时区: ${escapeHtml(t.deviceInfo.timezone)}<br>` : ""}
-        ${t.deviceInfo.userAgent ? `UA: ${escapeHtml(t.deviceInfo.userAgent.substring(0,150))}` : ""}
-      </div>
-    </div>` : ""}
-    ${t.screenshots && t.screenshots.length ? `
-    <div class="info-box" style="margin-bottom:16px;">
-      <div class="label">截图 (${t.screenshots.length})</div>
-      <div class="value" style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${t.screenshots.map((s,i) => s.startsWith("data:") ? `<img src="${s}" style="max-width:120px;border-radius:8px;cursor:pointer;" onclick="window.open('${s}')">` : `<a href="${s}" target="_blank" style="color:var(--primary);">截图${i+1}</a>`).join("")}
-      </div>
-    </div>` : ""}
-    <div class="reply-section">
-      <h3 style="margin-bottom:12px;font-size:1rem;">💬 回复记录 (${t.replies.length})</h3>
-      <div class="reply-list">
-        ${t.replies.length ? t.replies.map(r => `
-          <div class="reply-item ${r.isAdmin ? "admin" : ""}">
-            <div class="reply-header">
-              <span class="reply-author">${r.isAdmin ? "👨‍💼 " + (r.adminName || "管理员") : "👤 用户"}</span>
-              <span class="reply-time">${r.timeStr}</span>
+    <div class="card">
+      <div class="card-body" style="padding:24px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+          <div style="flex:1;min-width:200px;">
+            <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin-bottom:10px;">${escapeHtml(t.title)}</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <span class="code-text" style="font-size:12px;">${t.id}</span>
+              <span class="badge badge-secondary">${typeMap[t.type] || t.type}</span>
+              <span class="badge" style="background:${priorityColors[t.priority]||"#64748b"}15;color:${priorityColors[t.priority]||"#64748b"}">${priorityMap[t.priority] || t.priority}</span>
+              <span class="badge" style="background:${statusColors[t.status]||"#64748b"}15;color:${statusColors[t.status]||"#64748b"}">${statusMap[t.status] || t.status}</span>
+              <span style="font-size:12px;color:#94a3b8;">📅 ${t.createdStr}</span>
             </div>
-            <div class="reply-content">${escapeHtml(r.content)}</div>
           </div>
-        `).join("") : '<div style="color:var(--muted);text-align:center;padding:20px;">暂无回复</div>'}
+          <div style="display:flex;gap:8px;">
+            ${t.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="quickResolve('${t.id}')">✅ 标记已处理</button>` : ''}
+            ${t.status !== 'closed' ? `<button class="btn btn-secondary btn-sm" onclick="document.getElementById('replyContent').focus()">💬 回复</button>` : ''}
+          </div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:20px;">
+          <div style="font-size:14px;color:#334155;line-height:1.7;white-space:pre-wrap;">${escapeHtml(t.content)}</div>
+        </div>
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">📞 联系方式</div>
+            <div style="font-size:14px;color:#1e293b;font-weight:500;">${escapeHtml(t.contact || "未提供")}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">🌐 IP地址</div>
+            <div style="font-size:14px;color:#1e293b;font-weight:500;">${t.ip || "未知"}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">🏷️ 标签</div>
+            <div style="font-size:14px;color:#1e293b;">${t.tags.length ? t.tags.map(tag => `<span class="badge badge-secondary" style="margin-right:4px;">${tag}</span>`).join("") : "无"}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">👤 分配给</div>
+            <div style="font-size:14px;color:#1e293b;font-weight:500;">${t.assignee || "未分配"}</div>
+          </div>
+        </div>
+        ${t.deviceInfo ? `
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">📱 设备信息</div>
+          <div style="font-size:13px;color:#475569;line-height:1.8;">
+            ${t.deviceInfo.platform ? `平台: <b>${escapeHtml(t.deviceInfo.platform)}</b>　` : ""}
+            ${t.deviceInfo.language ? `语言: <b>${escapeHtml(t.deviceInfo.language)}</b>　` : ""}
+            ${t.deviceInfo.screen ? `屏幕: <b>${escapeHtml(t.deviceInfo.screen)}</b>　` : ""}
+            ${t.deviceInfo.timezone ? `时区: <b>${escapeHtml(t.deviceInfo.timezone)}</b>` : ""}
+            ${t.deviceInfo.userAgent ? `<br><span style="color:#94a3b8;font-size:11px;">UA: ${escapeHtml(t.deviceInfo.userAgent.substring(0,120))}</span>` : ""}
+          </div>
+        </div>` : ""}
       </div>
-      <div class="reply-form">
-        <textarea id="replyContent" placeholder="输入回复内容..."></textarea>
-        <div class="reply-actions">
-          <select id="replyStatus">
-            <option value="">不改变状态</option>
-            <option value="processing">标记为处理中</option>
-            <option value="resolved">标记为已解决</option>
-            <option value="closed">标记为已关闭</option>
-            <option value="pending">标记为待处理</option>
-          </select>
-          <button class="btn btn-primary" onclick="submitReply()">📤 提交回复</button>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <div class="card-title">💬 回复记录 (${t.replies.length})</div>
+      </div>
+      <div class="card-body">
+        ${t.replies.length ? t.replies.map(r => `
+          <div style="background:${r.isAdmin ? '#eef2ff' : '#f8fafc'};border-radius:10px;padding:14px;margin-bottom:12px;border-left:3px solid ${r.isAdmin ? '#6366f1' : '#e2e8f0'};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:13px;font-weight:600;color:${r.isAdmin ? '#4f46e5' : '#334155'};">${r.isAdmin ? "👨‍💼 " + (r.adminName || "管理员") : "👤 用户"}</span>
+              <span style="font-size:11px;color:#94a3b8;">${r.timeStr}</span>
+            </div>
+            <div style="font-size:13.5px;color:#334155;line-height:1.6;">${escapeHtml(r.content)}</div>
+          </div>
+        `).join("") : '<div class="empty-state" style="padding:32px;"><div class="empty-state-title">暂无回复</div><div class="empty-state-desc">在下方输入框中回复用户</div></div>'}
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f1f5f9;">
+          <textarea id="replyContent" placeholder="输入回复内容..." style="width:100%;min-height:80px;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;resize:vertical;margin-bottom:12px;outline:none;" onfocus="this.style.borderColor='#6366f1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'" onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'"></textarea>
+          <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;">
+            <select id="replyStatus" style="width:auto;min-width:160px;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:white;cursor:pointer;outline:none;">
+              <option value="">不改变状态</option>
+              <option value="processing">标记为处理中</option>
+              <option value="resolved">标记为已解决</option>
+              <option value="closed">标记为已关闭</option>
+              <option value="pending">标记为待处理</option>
+            </select>
+            <button class="btn btn-primary" onclick="submitReply()">📤 提交回复</button>
+          </div>
         </div>
       </div>
     </div>
   `;
+  window.scrollTo(0, 0);
 }
 
 async function submitReply() {
