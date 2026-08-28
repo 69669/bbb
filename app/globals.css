@@ -185,7 +185,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 .card-footer { padding: 14px 18px; border-top: 1px solid var(--border-light); }
 
 /* ===== Button ===== */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-size: var(--font-base); font-weight: var(--weight-normal); cursor: pointer; border: 1px solid transparent; transition: all var(--transition-fast); white-space: nowrap; user-select: none; line-height: 1.4; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-size: 13.5px; font-weight: 400; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; white-space: nowrap; user-select: none; }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
 .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 1px 3px rgba(99,102,241,.3); }
 .btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-primary); }
@@ -199,7 +199,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 .btn-danger:hover:not(:disabled) { background: #fee2e2; }
 .btn-gradient { background: var(--brand-gradient); color: #fff; box-shadow: var(--shadow-primary); }
 .btn-gradient:hover:not(:disabled) { background: var(--brand-gradient-hover); transform: translateY(-1px); }
-.btn-sm { padding: 0 12px; height: 28px; line-height: 1; font-size: var(--font-sm); border-radius: var(--radius-sm); box-sizing: border-box; }
+.btn-sm { padding: 0 12px; height: 28px; line-height: 1; font-size: 12px; border-radius: 6px; box-sizing: border-box; }
 .btn-lg { padding: 11px 24px; font-size: var(--font-md); }
 .btn-block { width: 100%; }
 
