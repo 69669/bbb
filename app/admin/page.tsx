@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [stats, setStats] = useState({ total: 0, online: 0, pending: 0 });
-  const [lastUpdate, setLastUpdate] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("bbb_admin_authed") !== "true") {
