@@ -358,6 +358,12 @@ export default class GeneratePage extends React.Component {
 
   exportHistory = () => {
     const { history, filterType } = this.state;
+    const exportData = filterType === -1 ? history : history.filter((h) => h.type === filterType);
+    if (exportData.length === 0) {
+      this.setState({ toast: "暂无数据可导出" });
+      setTimeout(() => this.setState({ toast: "" }), 2000);
+      return;
+    }
     // 按当前筛选导出
     const filtered = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     if (filtered.length === 0) {
@@ -842,7 +848,7 @@ export default class GeneratePage extends React.Component {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {typeOptions.map((opt) => (
                     <button key={opt.value} onClick={() => this.setState({ type: opt.value })}
-                      className={`rounded-xl border p-3 text-center transition ${type === opt.value ? "border-indigo-400 bg-indigo-50 ring-2 ring-indigo-200" : "border-slate-200 bg-slate-50 hover:border-slate-300"}`}>
+                      className={`rounded-lg border p-3 text-center transition ${type === opt.value ? "border-indigo-400 bg-indigo-50/60" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
                       <div className="text-base font-semibold">{opt.label}</div>
                       <div className="text-xs text-slate-500 mt-1">{opt.desc}</div>
                     </button>
@@ -851,7 +857,23 @@ export default class GeneratePage extends React.Component {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm text-slate-700 mb-2">生成数量：{count} 个</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm text-slate-700 font-medium">生成数量</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={count}
+                      onChange={(e) => {
+                        const v = parseInt(e.target.value) || 1;
+                        this.setState({ count: Math.max(1, Math.min(50, v)) });
+                      }}
+                      className="w-16 px-2 py-1 text-center text-sm border border-slate-200 rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none"
+                    />
+                    <span className="text-sm text-slate-500">个</span>
+                  </div>
+                </div>
                 <input type="range" min="1" max="50" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-indigo-500" />
                 <div className="flex justify-between text-xs text-slate-400 mt-1"><span>1</span><span>50</span></div>
               </div>
@@ -869,9 +891,13 @@ export default class GeneratePage extends React.Component {
               )}
 
               {codes.length > 0 && (
-                <div className="space-y-4">
+                <div className="space-y-4 mt-6 pt-6 border-t border-slate-100">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-700">已生成 {codes.length} 个{TYPE_NAMES[type]}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600 text-xs">✓</span>
+                      <span className="text-sm font-semibold text-slate-700">生成结果预览</span>
+                      <span className="text-xs text-slate-400">({codes.length} 个{TYPE_NAMES[type]})</span>
+                    </div>
                     <div className="flex gap-2">
                       <button onClick={this.handleCopy} className="rounded-full border border-slate-300 bg-slate-50 px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition">
                         {copied ? "✓ 已复制" : "复制全部"}
@@ -981,7 +1007,7 @@ export default class GeneratePage extends React.Component {
                     value={search}
                     onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
                     placeholder="搜索激活码..."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-pink-400/50"
+                    className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
                   />
                   {search && (
                     <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">✕</button>
@@ -990,45 +1016,109 @@ export default class GeneratePage extends React.Component {
               </div>
 
               {filteredHistory.length === 0 ? (
-                <div className="text-center py-12 text-slate-400">{search ? "未找到匹配的激活码" : "暂无记录"}</div>
+                <div className="empty-state">
+                  <div className="empty-state-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                  </div>
+                  <div className="empty-state-title">{search ? "未找到匹配的激活码" : "暂无激活码数据"}</div>
+                  <div className="empty-state-desc">点击上方"生成器"生成新的激活码</div>
+                </div>
               ) : (
-                <div className="space-y-2 max-h-[65vh] overflow-y-auto pr-1">
-                  {pagedHistory.map((item, i) => (
-                    <div key={i} className={`rounded-xl border p-3 transition-all ${item.disabled ? "border-red-300 bg-red-50 opacity-70" : item.used ? "border-green-400/20 bg-green-500/5" : "border-slate-200 bg-slate-50 hover:border-slate-300"}`}>
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm text-indigo-600 truncate">{item.code}</span>
-                            {item.disabled && <span className="shrink-0 rounded bg-red-500/30 px-1.5 py-0.5 text-[10px] text-red-600">已禁用</span>}
-                          </div>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 flex-wrap">
-                            <span className="rounded bg-slate-100 px-1.5 py-0.5">{TYPE_NAMES[item.type]}</span>
-                            <span>生成: {this.formatDate(item.createdAt)}</span>
-                            {item.used && <span className="text-green-600">✓ 已激活</span>}
-                          </div>
-                          {item.used && (
-                            <div className="mt-1.5 grid grid-cols-2 gap-1 text-[11px] text-slate-400">
-                              <div>🕐 {this.formatFullDate(item.usedAt)}</div>
-                              <div>🌐 {this.formatIp(item.usedIp)}</div>
+                <div className="overflow-x-auto">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th className="checkbox-col">
+                          <input type="checkbox" className="batch-checkbox"
+                            checked={this.state.selectedCodes.length === pagedHistory.length && pagedHistory.length > 0}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                this.setState({ selectedCodes: pagedHistory.map((_, idx) => idx) });
+                              } else {
+                                this.setState({ selectedCodes: [] });
+                              }
+                            }}
+                          />
+                        </th>
+                        <th>激活码</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>生成时间</th>
+                        <th>激活时间</th>
+                        <th>使用IP</th>
+                        <th className="action-col">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pagedHistory.map((item, i) => (
+                        <tr key={i} style={{ opacity: item.disabled ? 0.6 : 1 }}>
+                          <td className="checkbox-col">
+                            <input type="checkbox" className="batch-checkbox"
+                              checked={this.state.selectedCodes.includes(i)}
+                              onChange={(e) => {
+                                const selected = [...this.state.selectedCodes];
+                                if (e.target.checked) {
+                                  selected.push(i);
+                                } else {
+                                  const idx = selected.indexOf(i);
+                                  if (idx > -1) selected.splice(idx, 1);
+                                }
+                                this.setState({ selectedCodes: selected });
+                              }}
+                            />
+                          </td>
+                          <td><span className="code-text">{item.code}</span></td>
+                          <td><span className="badge badge-secondary">{TYPE_NAMES[item.type]}</span></td>
+                          <td>
+                            {item.disabled ? (
+                              <span className="badge badge-danger">已禁用</span>
+                            ) : item.used ? (
+                              <span className="badge badge-success">已激活</span>
+                            ) : (
+                              <span className="badge badge-warning">未使用</span>
+                            )}
+                          </td>
+                          <td className="text-xs text-slate-500">{this.formatDate(item.createdAt)}</td>
+                          <td className="text-xs text-slate-500">{item.used ? this.formatFullDate(item.usedAt) : '-'}</td>
+                          <td className="text-xs text-slate-500">{item.used ? this.formatIp(item.usedIp) : '-'}</td>
+                          <td className="action-col">
+                            <div className="flex items-center gap-1 justify-end">
+                              {!item.disabled ? (
+                                <button onClick={() => this.disableCode(i)} disabled={disabling} className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition disabled:opacity-50">封禁</button>
+                              ) : (
+                                <button onClick={() => this.enableCode(i)} disabled={disabling} className="px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50">解封</button>
+                              )}
+                              <button onClick={() => this.handleCopyCode(item.code)} className="px-2 py-1 text-xs text-slate-600 hover:bg-slate-100 rounded transition">复制</button>
+                              <button onClick={() => this.deleteHistory(i)} className="px-2 py-1 text-xs text-red-500 hover:bg-red-50 rounded transition">删除</button>
                             </div>
-                          )}
-                          {item.disabled && item.disabledReason && (
-                            <div className="mt-1 text-[11px] text-red-600/70">原因: {item.disabledReason}</div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
-                        {!item.disabled && (
-                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-600 hover:bg-red-500/25 transition disabled:opacity-50">封禁</button>
-                        )}
-                        {item.disabled && (
-                          <button onClick={() => this.enableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-green-500/15 px-2 py-1 text-[11px] text-green-300 hover:bg-green-500/25 transition disabled:opacity-50">解封</button>
-                        )}
-                        <button onClick={() => this.handleCopyCode(item.code)} className="flex-1 rounded-full bg-slate-50 px-2 py-1 text-[11px] text-slate-600 hover:bg-slate-100 transition">复制</button>
-                        <button onClick={() => this.deleteHistory(i)} className="flex-1 rounded-full bg-red-50 px-2 py-1 text-[11px] text-red-600/70 hover:bg-red-100 transition">删除</button>
-                      </div>
-                    </div>
-                  ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {/* 批量操作栏 */}
+              {this.state.selectedCodes.length > 0 && (
+                <div className="batch-bar">
+                  <span>已选择 <span className="selected-count">{this.state.selectedCodes.length}</span> 项</span>
+                  <button onClick={() => {
+                    if (confirm(`确定要封禁选中的 ${this.state.selectedCodes.length} 个激活码吗？`)) {
+                      this.state.selectedCodes.forEach(idx => this.disableCode(idx));
+                      this.setState({ selectedCodes: [] });
+                    }
+                  }} className="px-3 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded transition">批量封禁</button>
+                  <button onClick={() => {
+                    if (confirm(`确定要删除选中的 ${this.state.selectedCodes.length} 个激活码吗？此操作不可恢复。`)) {
+                      this.state.selectedCodes.sort((a,b) => b-a).forEach(idx => this.deleteHistory(idx));
+                      this.setState({ selectedCodes: [] });
+                    }
+                  }} className="px-3 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded transition">批量删除</button>
+                  <button onClick={() => this.setState({ selectedCodes: [] })} className="px-3 py-1 text-xs text-slate-500 hover:bg-slate-100 rounded transition ml-auto">取消选择</button>
                 </div>
               )}
               {/* 分页控件 */}

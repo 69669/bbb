@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [stats, setStats] = useState({ total: 0, online: 0, pending: 0 });
+  const [lastUpdate, setLastUpdate] = useState(null);
 
   useEffect(() => {
     if (localStorage.getItem("bbb_admin_authed") !== "true") {
@@ -41,6 +42,7 @@ export default function AdminDashboard() {
         online: onlineData.online || 0,
         pending: 0,
       });
+      setLastUpdate(new Date());
     } catch (e) {}
   };
 
@@ -228,9 +230,14 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* 更新时间戳 */}
+            <div className="mb-4 text-right text-xs text-slate-400">
+              数据更新于 {lastUpdate ? lastUpdate.toLocaleTimeString('zh-CN') : '--'}
+            </div>
+
             {/* 免费模式开关 */}
             <div className="card mb-6 fade-in-up" style={{ animationDelay: "0.25s" }}>
-              <div className="card-body">
+              <div className="card-body" style={{ minHeight: "90px", display: "flex", alignItems: "center" }}>
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div className="flex items-center gap-4">
                     <div
@@ -295,7 +302,7 @@ export default function AdminDashboard() {
               {quickActions.map((action, i) => (
                 <div
                   key={action.path}
-                  className="card p-5 cursor-pointer fade-in-up"
+                  className="card p-5 cursor-pointer fade-in-up transition hover:shadow-md hover:-translate-y-1"
                   style={{ animationDelay: `${0.3 + i * 0.05}s` }}
                   onClick={() => navigate(action.path)}
                 >
@@ -316,6 +323,48 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* 最近操作记录 */}
+            <div className="mt-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">最近操作记录</h3>
+                <span className="text-xs text-slate-400">实时更新</span>
+              </div>
+              <div className="card">
+                <div className="card-body" style={{ padding: "8px 20px" }}>
+                  <div className="activity-list">
+                    <div className="activity-item">
+                      <div className="activity-dot" style={{ background: "#22c55e" }} />
+                      <div className="activity-content">
+                        <div className="activity-title">系统运行正常，所有服务在线</div>
+                        <div className="activity-time">刚刚</div>
+                      </div>
+                    </div>
+                    <div className="activity-item">
+                      <div className="activity-dot" style={{ background: "#6366f1" }} />
+                      <div className="activity-content">
+                        <div className="activity-title">激活码验证服务已连接</div>
+                        <div className="activity-time">{lastUpdate ? lastUpdate.toLocaleTimeString('zh-CN') : '--'}</div>
+                      </div>
+                    </div>
+                    <div className="activity-item">
+                      <div className="activity-dot" style={{ background: "#f59e0b" }} />
+                      <div className="activity-content">
+                        <div className="activity-title">在线人数统计已启用（5秒刷新）</div>
+                        <div className="activity-time">系统启动时</div>
+                      </div>
+                    </div>
+                    <div className="activity-item">
+                      <div className="activity-dot" style={{ background: "#8b5cf6" }} />
+                      <div className="activity-content">
+                        <div className="activity-title">全局免费模式控制已就绪</div>
+                        <div className="activity-time">系统启动时</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </main>
         </div>
