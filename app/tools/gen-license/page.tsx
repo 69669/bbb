@@ -213,24 +213,24 @@ export default class GeneratePage extends React.Component {
         });
 
         if (res.status === 404) {
-          alert("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker");
+          this.showToast("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker");
           this.setState({ generating: false });
           return;
         }
         if (res.status === 403) {
-          alert("生成失败：管理密码错误，请退出重新登录");
+          this.showToast("生成失败：管理密码错误，请退出重新登录");
           this.setState({ generating: false });
           return;
         }
         if (!res.ok) {
-          alert(`生成失败：Worker返回错误 HTTP ${res.status}`);
+          this.showToast(`生成失败：Worker返回错误 HTTP ${res.status}`);
           this.setState({ generating: false });
           return;
         }
 
         const data = await res.json();
         if (!data.success) {
-          alert(data.message || "生成失败");
+          this.showToast(data.message || "生成失败");
           this.setState({ generating: false });
           return;
         }
@@ -256,9 +256,9 @@ export default class GeneratePage extends React.Component {
       this.setState({ codes: allCodes, copied: false, generating: false, progress: 0, totalCount: 0 });
     } catch (e: any) {
       if (e?.name === "TimeoutError") {
-        alert(`生成失败：请求超时，已生成 ${completed}/${count} 个。已生成的码已保存，请减少数量重试。`);
+        this.showToast(`生成失败：请求超时，已生成 ${completed}/${count} 个。已生成的码已保存，请减少数量重试。`);
       } else {
-        alert(`生成失败：网络错误 - ${e?.message || String(e)}。已生成 ${completed}/${count} 个，已生成的码已保存。`);
+        this.showToast(`生成失败：网络错误 - ${e?.message || String(e)}。已生成 ${completed}/${count} 个，已生成的码已保存。`);
       }
       // 即使失败，也保存已生成的码
       if (allCodes.length > 0) {
@@ -351,7 +351,7 @@ export default class GeneratePage extends React.Component {
     // 按当前筛选导出
     const filtered = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     if (filtered.length === 0) {
-      alert("没有可导出的记录");
+      this.showToast("没有可导出的记录");
       return;
     }
     // 按类型分组
@@ -389,7 +389,7 @@ export default class GeneratePage extends React.Component {
     const filtered = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     const unused = filtered.filter((h) => !h.used);
     if (unused.length === 0) {
-      alert("没有未使用的激活码");
+      this.showToast("没有未使用的激活码");
       return;
     }
     const text = unused.map((h) => h.code).join("\n");
@@ -515,23 +515,23 @@ export default class GeneratePage extends React.Component {
         signal: AbortSignal.timeout(30000),
       });
       if (res.status === 403) {
-        alert("同步失败：管理密码错误，请退出重新登录");
+        this.showToast("同步失败：管理密码错误，请退出重新登录");
         this.setState({ syncing: false });
         return;
       }
       if (!res.ok) {
-        alert(`同步失败：Worker返回错误 HTTP ${res.status}`);
+        this.showToast(`同步失败：Worker返回错误 HTTP ${res.status}`);
         this.setState({ syncing: false });
         return;
       }
       const data = await res.json();
       if (!data.success) {
-        alert("同步失败：" + (data.message || "未知错误"));
+        this.showToast("同步失败：" + (data.message || "未知错误"));
         this.setState({ syncing: false });
         return;
       }
       if (!data.codes || data.codes.length === 0) {
-        alert("云端暂无激活码记录（之前生成的码可能未成功存入云端）");
+        this.showToast("云端暂无激活码记录（之前生成的码可能未成功存入云端）");
         this.setState({ syncing: false });
         return;
       }
@@ -578,9 +578,9 @@ export default class GeneratePage extends React.Component {
       newHistory.sort((a, b) => b.createdAt - a.createdAt);
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
       this.setState({ history: newHistory, syncing: false });
-      alert(`云端同步完成：新增 ${added} 条，更新 ${updated} 条，当前共 ${newHistory.length} 条`);
+      this.showToast(`云端同步完成：新增 ${added} 条，更新 ${updated} 条，当前共 ${newHistory.length} 条`);
     } catch (e: any) {
-      alert("同步失败：" + (e?.message || String(e)) + "\n请检查网络连接或Worker是否正常运行");
+      this.showToast("同步失败：" + (e?.message || String(e)) + "\n请检查网络连接或Worker是否正常运行");
       this.setState({ syncing: false });
     }
   }
@@ -683,16 +683,16 @@ export default class GeneratePage extends React.Component {
       if (data.success) {
         localStorage.removeItem("lg_gen_history");
         this.setState({ history: [] });
-        alert(`云端记录已清空，共删除 ${data.deleted} 条激活码`);
+        this.showToast(`云端记录已清空，共删除 ${data.deleted} 条激活码`);
       } else {
-        alert("清空失败：" + (data.message || "未知错误"));
+        this.showToast("清空失败：" + (data.message || "未知错误"));
       }
     } catch (e: any) {
       let msg = e?.message || String(e);
       if (msg === "Failed to fetch" || msg.includes("NetworkError")) {
         msg = "网络请求失败，请检查：\n1. Worker是否已部署最新版本（含/codes/clear接口）\n2. api.ttla.top是否可正常访问\n3. 网络连接是否正常";
       }
-      alert("清空失败：" + msg);
+      this.showToast("清空失败：" + msg);
     }
   };
 

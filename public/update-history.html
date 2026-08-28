@@ -754,6 +754,15 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 </div>
 <div id="toastContainer"></div>
 <script>
+function showToast(msg){
+  var c=document.getElementById("toastContainer");
+  if(!c)return;
+  var t=document.createElement("div");
+  t.className="toast";
+  t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(function(){t.remove();},2500);
+}
 // 检查登录状态和15分钟失效
 (function() {
   const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
@@ -839,7 +848,7 @@ function copyVersion(btn) {
       btn.style.color = '';
     }, 1500);
   }).catch(() => {
-    alert('复制失败，请手动复制');
+    showToast('复制失败，请手动复制');
   });
 }
 
