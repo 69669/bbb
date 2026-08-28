@@ -173,7 +173,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 .topbar-title { font-size: 17px; font-weight: 600; color: var(--text-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .content { flex: 1; padding: 24px; max-width: 100%; }
 
-.menu-btn { display: none; background: none; border: none; color: var(--text-700); cursor: pointer; padding: 6px; border-radius: var(--radius); align-items: center; justify-content: center; }
+.menu-btn { display: none; background: none; border: none; color: var(--text-700); cursor: pointer; padding: 6px; border-radius: var(--radius); align-items: center; justify-content: center; position: relative; z-index: 101; }
 .menu-btn:hover { background: var(--bg-hover); }
 .overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 99; backdrop-filter: blur(2px); }
 .overlay.show { display: block; }
