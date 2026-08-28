@@ -21,9 +21,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("bbb_admin_authed") === "true") {
-      router.replace("/admin");
-    }
+    // 不自动登录，每次打开都需要输入密码
   }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,11 +31,11 @@ export default function LoginPage() {
     setError("");
     setTimeout(() => {
       if (simpleHash(password) === ADMIN_PASSWORD_HASH) {
-        localStorage.setItem("bbb_admin_authed", "true");
-        localStorage.setItem("bbb_admin_hash", String(simpleHash(password)));
-        localStorage.setItem("lg_admin_auth", "1");
-        localStorage.setItem("lg_admin_hash", String(simpleHash(password)));
-        localStorage.setItem("bbb_login_time", String(Date.now()));
+        sessionStorage.setItem("bbb_admin_authed", "true");
+        sessionStorage.setItem("bbb_admin_hash", String(simpleHash(password)));
+        sessionStorage.setItem("lg_admin_auth", "1");
+        sessionStorage.setItem("lg_admin_hash", String(simpleHash(password)));
+        sessionStorage.setItem("bbb_login_time", String(Date.now()));
         router.replace("/admin");
       } else {
         setError("密码错误，请重试");
@@ -88,6 +86,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="输入密码"
                   autoFocus
+                  style={{ fontSize: "16px" }}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-400)", padding: "4px" }}>
                   {showPassword ? (

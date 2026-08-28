@@ -16,13 +16,13 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ total: 0, online: 0, pending: 0 });
 
   useEffect(() => {
-    const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+    const loginTime = parseInt(sessionStorage.getItem("bbb_login_time") || "0");
     const expired = Date.now() - loginTime > 15 * 60 * 1000;
-    if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
-      localStorage.clear();
+    if (sessionStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+      sessionStorage.clear();
       router.replace("/");
     } else {
-      localStorage.setItem("bbb_login_time", String(Date.now()));
+      sessionStorage.setItem("bbb_login_time", String(Date.now()));
       setAuthed(true);
       fetchData();
       const timer = setInterval(fetchData, 15000);
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    sessionStorage.clear();
     router.replace("/");
   };
 

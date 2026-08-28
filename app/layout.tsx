@@ -6,7 +6,7 @@ import AntiDebugProvider from '../components/AntiDebugProvider'
 export const metadata: Metadata = {
   title: '后台管理',
   description: '后台管理系统',
-  viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover',
+  viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover',
   themeColor: '#000000',
   appleWebApp: {
     capable: true,

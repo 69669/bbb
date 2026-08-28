@@ -107,15 +107,15 @@ export default class GeneratePage extends React.Component {
   componentDidMount() {
     if (typeof window !== "undefined") {
       // 统一登录验证（和控制台、工单管理一致）
-      const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+      const loginTime = parseInt(sessionStorage.getItem("bbb_login_time") || "0");
       const expired = Date.now() - loginTime > 15 * 60 * 1000;
-      if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
-        localStorage.clear();
+      if (sessionStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+        sessionStorage.clear();
         location.href = "/";
         return;
       }
       // 刷新登录时间
-      localStorage.setItem("bbb_login_time", String(Date.now()));
+      sessionStorage.setItem("bbb_login_time", String(Date.now()));
       this.setState({ authenticated: true });
       // 登录后自动从云端同步生成记录
       setTimeout(() => this.syncFromCloud(), 300);
@@ -178,8 +178,8 @@ export default class GeneratePage extends React.Component {
     e.preventDefault();
     const { password } = this.state;
     if (simpleHash(password) === ADMIN_PASSWORD_HASH) {
-      localStorage.setItem("bbb_admin_authed", "1");
-      localStorage.setItem("bbb_admin_hash", String(simpleHash(password)));
+      sessionStorage.setItem("bbb_admin_authed", "1");
+      sessionStorage.setItem("bbb_admin_hash", String(simpleHash(password)));
       this.setState({ authenticated: true, password: "", error: "", adminPassword: password });
       // 登录成功后启动自动刷新
       setTimeout(() => this.startAutoRefresh(), 500);
