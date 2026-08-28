@@ -424,7 +424,7 @@ const priorityMap = { low: "低", normal: "普通", high: "高", urgent: "紧急
 function renderTicketList(tickets, containerId = "ticketList") {
   const container = document.getElementById(containerId);
   if (!tickets.length) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-state-title">暂无工单数据</div><div class="empty-state-desc">当前筛选条件下没有工单</div></div>';
+    container.innerHTML = '<div class="empty"><div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-title">暂无工单数据</div><div class="empty-desc">当前筛选条件下没有工单</div></div>';
     return;
   }
   let html = '<div style="overflow-x:auto;"><table class="data-table"><thead><tr>';
@@ -665,7 +665,7 @@ function showDetail() {
             </div>
             <div style="font-size:13.5px;color:#334155;line-height:1.6;">${escapeHtml(r.content)}</div>
           </div>
-        `).join("") : '<div class="empty-state" style="padding:32px;"><div class="empty-state-title">暂无回复</div><div class="empty-state-desc">在下方输入框中回复用户</div></div>'}
+        `).join("") : '<div class="empty" style="padding:32px;"><div class="empty-title">暂无回复</div><div class="empty-desc">在下方输入框中回复用户</div></div>'}
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f1f5f9;">
           <textarea id="replyContent" placeholder="输入回复内容..." style="width:100%;min-height:80px;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;resize:vertical;margin-bottom:12px;outline:none;" onfocus="this.style.borderColor='#6366f1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'" onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'"></textarea>
           <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;">

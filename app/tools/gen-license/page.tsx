@@ -769,15 +769,15 @@ export default class GeneratePage extends React.Component {
     return (
       <div className="layout">
         {sidebar}
-        <div className="app-main">
-          <header className="app-topbar">
+        <div className="main">
+          <header className="topbar">
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <button className="btn btn-ghost btn-sm" onClick={() => window.location.href = "/admin"}>返回</button>
               <h1 className="topbar-title">激活码管理</h1>
             </div>
-            <div className="topbar-actions"><span className="badge badge-primary">共 {history.length} 条</span></div>
+            <div className="topbar-right"><span className="badge badge-primary">共 {history.length} 条</span></div>
           </header>
-          <main className="app-content">
+          <main className="content">
             <div style={{ display: "flex", gap: "4px", marginBottom: "20px", padding: "4px", background: "#f1f5f9", borderRadius: "10px", width: "fit-content" }}>
               <button onClick={() => this.setState({ showHistory: false })} style={{ padding: "8px 20px", borderRadius: "8px", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", background: !showHistory ? "white" : "transparent", color: !showHistory ? "#0f172a" : "#64748b", boxShadow: !showHistory ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>生成器</button>
               <button onClick={() => this.setState({ showHistory: true })} style={{ padding: "8px 20px", borderRadius: "8px", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", background: showHistory ? "white" : "transparent", color: showHistory ? "#0f172a" : "#64748b", boxShadow: showHistory ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>生成记录 ({history.length})</button>
@@ -792,7 +792,7 @@ export default class GeneratePage extends React.Component {
                   </div>
                   <div style={{ marginBottom: "24px" }}>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#334155", marginBottom: "10px" }}>选择卡类型</label>
-                    <div className="grid-4">
+                    <div className="stats-grid">
                       {typeOptions.map((opt: any) => (
                         <button key={opt.value} onClick={() => this.setState({ type: opt.value })}
                           style={{ padding: "14px", borderRadius: "10px", border: `2px solid ${type === opt.value ? "#6366f1" : "#e2e8f0"}`, background: type === opt.value ? "#eef2ff" : "white", cursor: "pointer", textAlign: "center" }}>
@@ -895,15 +895,15 @@ export default class GeneratePage extends React.Component {
                   </div>
                 </div>
                 {filteredHistory.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-state-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                    <div className="empty-state-title">{search ? "未找到匹配的激活码" : "暂无激活码数据"}</div>
-                    <div className="empty-state-desc">点击上方"生成器"生成新的激活码</div>
+                  <div className="empty">
+                    <div className="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div className="empty-title">{search ? "未找到匹配的激活码" : "暂无激活码数据"}</div>
+                    <div className="empty-desc">点击上方"生成器"生成新的激活码</div>
                   </div>
                 ) : (
                   <div style={{ overflowX: "auto" }}>
                     <table className="data-table">
-                      <thead><tr><th>激活码</th><th>类型</th><th>状态</th><th>生成时间</th><th>激活时间</th><th>使用IP</th><th className="action-col">操作</th></tr></thead>
+                      <thead><tr><th>激活码</th><th>类型</th><th>状态</th><th>生成时间</th><th>激活时间</th><th>使用IP</th><th className="col-actions">操作</th></tr></thead>
                       <tbody>
                         {pagedHistory.map((item: any, i: number) => (
                           <tr key={i} style={{ opacity: item.disabled ? 0.6 : 1 }}>
@@ -913,7 +913,7 @@ export default class GeneratePage extends React.Component {
                             <td style={{ fontSize: "12px", color: "#64748b" }}>{this.formatDate(item.createdAt)}</td>
                             <td style={{ fontSize: "12px", color: "#64748b" }}>{item.used ? this.formatFullDate(item.usedAt) : "-"}</td>
                             <td style={{ fontSize: "12px", color: "#64748b" }}>{item.used ? this.formatIp(item.usedIp) : "-"}</td>
-                            <td className="action-col">
+                            <td className="col-actions">
                               <div style={{ display: "flex", gap: "4px", justifyContent: "flex-end" }}>
                                 {item.used && !item.disabled ? <button onClick={() => this.disableCode(i)} disabled={disabling} className="btn btn-danger btn-sm">封禁</button> : item.disabled ? <button onClick={() => this.enableCode(i)} disabled={disabling} className="btn btn-success btn-sm">解封</button> : null}
                                 <button onClick={() => this.handleCopyCode(item.code)} className="btn btn-ghost btn-sm">复制</button>
@@ -930,9 +930,9 @@ export default class GeneratePage extends React.Component {
                   <div className="pagination">
                     <div className="pagination-info">共 {filteredHistory.length} 条，第 {safePage}/{totalPages} 页</div>
                     <div className="pagination-controls">
-                      <button className="pagination-btn" onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })} disabled={safePage <= 1}>上一页</button>
-                      <button className="pagination-btn active">{safePage}</button>
-                      <button className="pagination-btn" onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })} disabled={safePage >= totalPages}>下一页</button>
+                      <button className="page-btn" onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })} disabled={safePage <= 1}>上一页</button>
+                      <button className="page-btn active">{safePage}</button>
+                      <button className="page-btn" onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })} disabled={safePage >= totalPages}>下一页</button>
                     </div>
                   </div>
                 )}
