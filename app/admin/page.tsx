@@ -83,7 +83,7 @@ export default function AdminDashboard() {
 
   if (!authed) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: "#0a0a0f" }}>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "#f0f2f8" }}>
         <div className="spinner" />
       </div>
     );

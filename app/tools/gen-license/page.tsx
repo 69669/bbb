@@ -702,8 +702,8 @@ export default class GeneratePage extends React.Component {
             <div className="glass-card">
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🔐</div>
-                <h1 className="text-xl font-bold text-white">验证身份</h1>
-                <p className="mt-2 text-sm text-white/50">请输入管理密码</p>
+                <h1 className="text-xl font-bold text-slate-800">验证身份</h1>
+                <p className="mt-2 text-sm text-slate-500">请输入管理密码</p>
               </div>
               <form onSubmit={this.handlePasswordSubmit} className="space-y-4">
                 <input
@@ -715,19 +715,19 @@ export default class GeneratePage extends React.Component {
                   autoFocus
                 />
                 {error && (
-                  <div className="rounded-lg bg-red-500/10 p-2 text-center text-sm text-red-300">{error}</div>
+                  <div className="rounded-lg bg-red-50 p-2 text-center text-sm text-red-600">{error}</div>
                 )}
-                <button type="submit" className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition">
+                <button type="submit" className="w-full rounded-full bg-indigo-500 py-3 text-base font-semibold text-slate-800 shadow-lg shadow-indigo-500/30 hover:bg-indigo-400 transition">
                   验证
                 </button>
               </form>
               <div className="mt-6 text-center">
-                <Link href="/" className="text-xs text-white/40 hover:text-white/60">返回首页</Link>
+                <Link href="/" className="text-xs text-slate-400 hover:text-slate-600">返回首页</Link>
               </div>
             </div>
           </div>
           {toast && (
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 rounded-full bg-black/80 px-6 py-3 text-sm text-white shadow-lg backdrop-blur-sm animate-fade-in">
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 rounded-full bg-black/80 px-6 py-3 text-sm text-slate-800 shadow-lg backdrop-blur-sm animate-fade-in">
               {toast}
             </div>
           )}
@@ -814,7 +814,7 @@ export default class GeneratePage extends React.Component {
           </header>
           <main className="page-content" style={{maxWidth:"800px"}}>
           <div className="mb-6 flex items-center justify-between">
-            <Link href="/admin" className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/3 px-3.5 py-2 text-xs text-white/70 backdrop-blur transition hover:border-white/20 hover:bg-white/5 hover:text-white">
+            <Link href="/admin" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/3 px-3.5 py-2 text-xs text-slate-700 backdrop-blur transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12" />
                 <polyline points="12 19 5 12 12 5" />
@@ -834,59 +834,59 @@ export default class GeneratePage extends React.Component {
               <div className="text-center mb-6">
                 <h1 className="gradient-text text-center text-xl font-bold tracking-tight sm:text-2xl">激活码生成器</h1>
                 <div className="game-title-underline" />
-                <p className="mt-3 text-sm text-white/60">生成天卡 / 测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
+                <p className="mt-3 text-sm text-slate-600">生成天卡 / 测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm text-white/70 mb-3">选择卡类型</label>
+                <label className="block text-sm text-slate-700 mb-3">选择卡类型</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {typeOptions.map((opt) => (
                     <button key={opt.value} onClick={() => this.setState({ type: opt.value })}
-                      className={`rounded-xl border p-3 text-center transition ${type === opt.value ? "border-pink-400/60 bg-pink-500/20 ring-2 ring-pink-400/30" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
+                      className={`rounded-xl border p-3 text-center transition ${type === opt.value ? "border-indigo-400 bg-indigo-50 ring-2 ring-indigo-200" : "border-slate-200 bg-slate-50 hover:border-slate-300"}`}>
                       <div className="text-base font-semibold">{opt.label}</div>
-                      <div className="text-xs text-white/50 mt-1">{opt.desc}</div>
+                      <div className="text-xs text-slate-500 mt-1">{opt.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm text-white/70 mb-2">生成数量：{count} 个</label>
-                <input type="range" min="1" max="50" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-pink-500" />
-                <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>50</span></div>
+                <label className="block text-sm text-slate-700 mb-2">生成数量：{count} 个</label>
+                <input type="range" min="1" max="50" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-indigo-500" />
+                <div className="flex justify-between text-xs text-slate-400 mt-1"><span>1</span><span>50</span></div>
               </div>
 
-              <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-indigo-500 py-3 text-base font-semibold text-slate-800 shadow-lg shadow-indigo-500/30 hover:bg-indigo-400 transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 {generating ? `⏳ 生成中... ${progress}/${totalCount}` : "🎫 生成激活码"}
               </button>
               {generating && totalCount > 0 && (
                 <div className="mb-6">
-                  <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300" style={{ width: `${(progress / totalCount) * 100}%` }} />
+                  <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300" style={{ width: `${(progress / totalCount) * 100}%` }} />
                   </div>
-                  <p className="text-center text-xs text-white/40 mt-1">每批生成10个，避免超时，请耐心等待</p>
+                  <p className="text-center text-xs text-slate-400 mt-1">每批生成10个，避免超时，请耐心等待</p>
                 </div>
               )}
 
               {codes.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">已生成 {codes.length} 个{TYPE_NAMES[type]}</span>
+                    <span className="text-sm text-slate-700">已生成 {codes.length} 个{TYPE_NAMES[type]}</span>
                     <div className="flex gap-2">
-                      <button onClick={this.handleCopy} className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">
+                      <button onClick={this.handleCopy} className="rounded-full border border-slate-300 bg-slate-50 px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition">
                         {copied ? "✓ 已复制" : "复制全部"}
                       </button>
-                      <button onClick={this.handleDownload} className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">
+                      <button onClick={this.handleDownload} className="rounded-full border border-slate-300 bg-slate-50 px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition">
                         下载TXT
                       </button>
                     </div>
                   </div>
-                  <div className="max-h-64 overflow-y-auto rounded-xl border border-white/10 bg-black/30 p-3">
+                  <div className="max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3">
                     <div className="space-y-2">
                       {codes.map((code, i) => (
-                        <div key={i} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2">
-                          <span className="font-mono text-sm text-pink-200">{code}</span>
-                          <button onClick={() => this.handleCopyCode(code)} className="text-xs text-white/40 hover:text-white/70">复制</button>
+                        <div key={i} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
+                          <span className="font-mono text-sm text-indigo-600">{code}</span>
+                          <button onClick={() => this.handleCopyCode(code)} className="text-xs text-slate-400 hover:text-slate-700">复制</button>
                         </div>
                       ))}
                     </div>
@@ -897,24 +897,24 @@ export default class GeneratePage extends React.Component {
           ) : (
             <div className="glass-card">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">📋 生成记录</h2>
+                <h2 className="text-xl font-bold text-slate-800">📋 生成记录</h2>
                 <div className="flex gap-2 flex-wrap">
-                  <button onClick={this.syncFromCloud} disabled={syncing} className="rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50">
+                  <button onClick={this.syncFromCloud} disabled={syncing} className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs text-blue-600 hover:bg-blue-100 transition disabled:opacity-50">
                     {syncing ? "⏳ 同步中..." : "☁️ 云端同步"}
                   </button>
-                  <button onClick={this.copyAllUnused} className="rounded-full border border-green-400/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-300 hover:bg-green-500/20 transition">复制未使用</button>
-                  <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === -1 ? "全部" : TYPE_NAMES[filterType]}</button>
-                  <button onClick={this.clearCloud} className="rounded-full border border-red-500/50 bg-red-500/20 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/30 transition">☁️ 清空云端</button>
-                  <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空本地</button>
+                  <button onClick={this.copyAllUnused} className="rounded-full border border-green-300 bg-green-50 px-3 py-1.5 text-xs text-green-300 hover:bg-green-100 transition">复制未使用</button>
+                  <button onClick={this.exportHistory} className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition">导出{filterType === -1 ? "全部" : TYPE_NAMES[filterType]}</button>
+                  <button onClick={this.clearCloud} className="rounded-full border border-red-300 bg-red-50 px-3 py-1.5 text-xs text-red-600 hover:bg-red-500/30 transition">☁️ 清空云端</button>
+                  <button onClick={this.clearHistory} className="rounded-full border border-red-300 bg-red-50 px-3 py-1.5 text-xs text-red-600 hover:bg-red-100 transition">清空本地</button>
                 </div>
               </div>
 
               <div className="mb-4">
                 <div className="flex items-center gap-3 text-sm mb-3 flex-wrap">
-                  <span className="text-white/60">共 {history.length} 条</span>
-                  <span className="text-green-400">已用 {usedCount}</span>
-                  <span className="text-yellow-400">未用 {history.length - usedCount - disabledCount}</span>
-                  <span className="text-red-400">已禁用 {disabledCount}</span>
+                  <span className="text-slate-600">共 {history.length} 条</span>
+                  <span className="text-green-600">已用 {usedCount}</span>
+                  <span className="text-amber-600">未用 {history.length - usedCount - disabledCount}</span>
+                  <span className="text-red-600">已禁用 {disabledCount}</span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[1, 2, 3, 4].map((type) => {
@@ -922,14 +922,14 @@ export default class GeneratePage extends React.Component {
                     const typeUsed = typeHistory.filter((h) => h.used).length;
                     const typeUnused = typeHistory.length - typeUsed;
                     return (
-                      <div key={type} className="rounded-lg border border-white/10 bg-white/5 p-2 text-center">
-                        <div className="text-sm font-semibold text-white">{TYPE_NAMES[type]}</div>
+                      <div key={type} className="rounded-lg border border-slate-200 bg-slate-50 p-2 text-center">
+                        <div className="text-sm font-semibold text-slate-800">{TYPE_NAMES[type]}</div>
                         <div className="text-xs mt-1">
-                          <span className="text-green-400">已用 {typeUsed}</span>
-                          <span className="text-white/30 mx-1">/</span>
-                          <span className="text-yellow-400">未用 {typeUnused}</span>
+                          <span className="text-green-600">已用 {typeUsed}</span>
+                          <span className="text-slate-300 mx-1">/</span>
+                          <span className="text-amber-600">未用 {typeUnused}</span>
                         </div>
-                        <div className="text-xs text-white/40 mt-0.5">共 {typeHistory.length}</div>
+                        <div className="text-xs text-slate-400 mt-0.5">共 {typeHistory.length}</div>
                       </div>
                     );
                   })}
@@ -941,7 +941,7 @@ export default class GeneratePage extends React.Component {
                 <button
                   onClick={this.refreshAllStatus}
                   disabled={checking}
-                  className="shrink-0 inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50 whitespace-nowrap"
+                  className="shrink-0 inline-flex items-center gap-1 rounded-full border border-blue-300 bg-blue-50 px-4 py-2 text-xs text-blue-600 hover:bg-blue-100 transition disabled:opacity-50 whitespace-nowrap"
                 >
                   {checking ? (
                     <>
@@ -955,77 +955,77 @@ export default class GeneratePage extends React.Component {
               </div>
 
               <div className="mb-3">
-                <div className="text-xs text-white/40 mb-2">卡类型</div>
+                <div className="text-xs text-slate-400 mb-2">卡类型</div>
                 <div className="flex gap-2 flex-wrap">
-                  <button onClick={() => this.setState({ filterType: -1 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === -1 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
+                  <button onClick={() => this.setState({ filterType: -1 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === -1 ? "bg-indigo-500 text-slate-800" : "bg-slate-50 text-slate-600"}`}>全部</button>
                   {typeOptions.map((opt) => (
-                    <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>{opt.label}</button>
+                    <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-indigo-500 text-slate-800" : "bg-slate-50 text-slate-600"}`}>{opt.label}</button>
                   ))}
                 </div>
               </div>
               <div className="mb-4">
-                <div className="text-xs text-white/40 mb-2">激活状态</div>
+                <div className="text-xs text-slate-400 mb-2">激活状态</div>
                 <div className="flex gap-2 flex-wrap">
-                  <button onClick={() => this.setState({ statusFilter: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 0 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
-                  <button onClick={() => this.setState({ statusFilter: 1 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 1 ? "bg-yellow-500 text-black" : "bg-white/5 text-white/60"}`}>未激活 ({history.filter(h => !h.used && !h.disabled).length})</button>
-                  <button onClick={() => this.setState({ statusFilter: 2 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 2 ? "bg-green-500 text-white" : "bg-white/5 text-white/60"}`}>已激活 ({history.filter(h => h.used).length})</button>
-                  <button onClick={() => this.setState({ statusFilter: 3 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 3 ? "bg-red-500 text-white" : "bg-white/5 text-white/60"}`}>已禁用 ({history.filter(h => h.disabled).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 0 ? "bg-indigo-500 text-slate-800" : "bg-slate-50 text-slate-600"}`}>全部</button>
+                  <button onClick={() => this.setState({ statusFilter: 1 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 1 ? "bg-yellow-500 text-black" : "bg-slate-50 text-slate-600"}`}>未激活 ({history.filter(h => !h.used && !h.disabled).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 2 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 2 ? "bg-green-500 text-slate-800" : "bg-slate-50 text-slate-600"}`}>已激活 ({history.filter(h => h.used).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 3 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 3 ? "bg-red-500 text-slate-800" : "bg-slate-50 text-slate-600"}`}>已禁用 ({history.filter(h => h.disabled).length})</button>
                 </div>
               </div>
               {/* 搜索框 */}
               <div className="mb-4">
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
                     placeholder="搜索激活码..."
-                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-pink-400/50"
                   />
                   {search && (
-                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">✕</button>
                   )}
                 </div>
               </div>
 
               {filteredHistory.length === 0 ? (
-                <div className="text-center py-12 text-white/40">{search ? "未找到匹配的激活码" : "暂无记录"}</div>
+                <div className="text-center py-12 text-slate-400">{search ? "未找到匹配的激活码" : "暂无记录"}</div>
               ) : (
                 <div className="space-y-2 max-h-[65vh] overflow-y-auto pr-1">
                   {pagedHistory.map((item, i) => (
-                    <div key={i} className={`rounded-xl border p-3 transition-all ${item.disabled ? "border-red-400/30 bg-red-500/10 opacity-70" : item.used ? "border-green-400/20 bg-green-500/5" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
+                    <div key={i} className={`rounded-xl border p-3 transition-all ${item.disabled ? "border-red-300 bg-red-50 opacity-70" : item.used ? "border-green-400/20 bg-green-500/5" : "border-slate-200 bg-slate-50 hover:border-slate-300"}`}>
                       <div className="flex items-center gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm text-pink-200 truncate">{item.code}</span>
-                            {item.disabled && <span className="shrink-0 rounded bg-red-500/30 px-1.5 py-0.5 text-[10px] text-red-200">已禁用</span>}
+                            <span className="font-mono text-sm text-indigo-600 truncate">{item.code}</span>
+                            {item.disabled && <span className="shrink-0 rounded bg-red-500/30 px-1.5 py-0.5 text-[10px] text-red-600">已禁用</span>}
                           </div>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-white/50 flex-wrap">
-                            <span className="rounded bg-white/10 px-1.5 py-0.5">{TYPE_NAMES[item.type]}</span>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 flex-wrap">
+                            <span className="rounded bg-slate-100 px-1.5 py-0.5">{TYPE_NAMES[item.type]}</span>
                             <span>生成: {this.formatDate(item.createdAt)}</span>
-                            {item.used && <span className="text-green-400">✓ 已激活</span>}
+                            {item.used && <span className="text-green-600">✓ 已激活</span>}
                           </div>
                           {item.used && (
-                            <div className="mt-1.5 grid grid-cols-2 gap-1 text-[11px] text-white/40">
+                            <div className="mt-1.5 grid grid-cols-2 gap-1 text-[11px] text-slate-400">
                               <div>🕐 {this.formatFullDate(item.usedAt)}</div>
                               <div>🌐 {this.formatIp(item.usedIp)}</div>
                             </div>
                           )}
                           {item.disabled && item.disabledReason && (
-                            <div className="mt-1 text-[11px] text-red-300/70">原因: {item.disabledReason}</div>
+                            <div className="mt-1 text-[11px] text-red-600/70">原因: {item.disabledReason}</div>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
                         {!item.disabled && (
-                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-300 hover:bg-red-500/25 transition disabled:opacity-50">封禁</button>
+                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-600 hover:bg-red-500/25 transition disabled:opacity-50">封禁</button>
                         )}
                         {item.disabled && (
                           <button onClick={() => this.enableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-green-500/15 px-2 py-1 text-[11px] text-green-300 hover:bg-green-500/25 transition disabled:opacity-50">解封</button>
                         )}
-                        <button onClick={() => this.handleCopyCode(item.code)} className="flex-1 rounded-full bg-white/5 px-2 py-1 text-[11px] text-white/60 hover:bg-white/10 transition">复制</button>
-                        <button onClick={() => this.deleteHistory(i)} className="flex-1 rounded-full bg-red-500/10 px-2 py-1 text-[11px] text-red-400/70 hover:bg-red-500/20 transition">删除</button>
+                        <button onClick={() => this.handleCopyCode(item.code)} className="flex-1 rounded-full bg-slate-50 px-2 py-1 text-[11px] text-slate-600 hover:bg-slate-100 transition">复制</button>
+                        <button onClick={() => this.deleteHistory(i)} className="flex-1 rounded-full bg-red-50 px-2 py-1 text-[11px] text-red-600/70 hover:bg-red-100 transition">删除</button>
                       </div>
                     </div>
                   ))}
@@ -1034,19 +1034,19 @@ export default class GeneratePage extends React.Component {
               {/* 分页控件 */}
               {filteredHistory.length > pageSize && (
                 <div className="mt-4 flex items-center justify-between">
-                  <div className="text-xs text-white/40">
+                  <div className="text-xs text-slate-400">
                     共 {filteredHistory.length} 条，第 {safePage}/{totalPages} 页
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })}
                       disabled={safePage <= 1}
-                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="rounded-full bg-slate-50 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >上一页</button>
                     <button
                       onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })}
                       disabled={safePage >= totalPages}
-                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="rounded-full bg-slate-50 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >下一页</button>
                   </div>
                 </div>
