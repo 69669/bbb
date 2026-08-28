@@ -4,14 +4,14 @@ import type { ReactNode } from 'react'
 import AntiDebugProvider from '../components/AntiDebugProvider'
 
 export const metadata: Metadata = {
-  title: '激活码生成器',
-  description: '卡密生成与管理系统',
+  title: '后台管理',
+  description: '后台管理系统',
   viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover',
   themeColor: '#000000',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: '卡密管理',
+    title: '后台管理',
   },
   other: {
     'format-detection': 'telephone=no',
