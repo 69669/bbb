@@ -875,11 +875,11 @@ export default class GeneratePage extends React.Component {
                   <button onClick={() => this.setState({ statusFilter: 2 })} className={`btn btn-sm ${statusFilter === 2 ? "btn-success" : "btn-ghost"}`}>已激活</button>
                   <button onClick={() => this.setState({ statusFilter: 3 })} className={`btn btn-sm ${statusFilter === 3 ? "btn-danger" : "btn-ghost"}`}>已禁用</button>
                 </div>
-                <div style={{ padding: "0 16px 10px" }}>
-                  <div style={{ position: "relative", maxWidth: "400px" }}>
+                <div style={{ padding: "0 20px 14px" }}>
+                  <div style={{ position: "relative", maxWidth: "500px" }}>
                     <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }}>🔍</span>
                     <input type="text" value={search} onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }} placeholder="搜索激活码..."
-                      style={{ width: "100%", padding: "9px 12px 9px 36px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "13.5px", outline: "none", background: "#f8fafc" }}
+                      style={{ width: "100%", padding: "7px 12px 7px 36px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "13px", outline: "none", background: "#f8fafc" }}
                       onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.background = "white"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; }}
                       onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; }} />
                   </div>
