@@ -300,6 +300,23 @@ body {
   .tl-card { padding: 14px 15px; }
   .tl-title { font-size: 0.92rem; }
 }
+
+.date {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+.tl-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 </style>
 <style>
 /* ============ 高级感样式覆盖 ============ */
@@ -448,6 +465,7 @@ tr:hover td {
               <span class="ver v-major">v1.0 初始版本</span>
               <span class="idx">#01</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-01</span></div>
             <h4 class="tl-title">🚀 项目启动 - 6个基础游戏</h4>
             <p class="tl-desc">搭建Next.js项目框架，实现6个情侣互动小游戏</p>
             <div class="tl-tags"><span class="tag">情侣飞行棋</span><span class="tag">午夜大富翁</span><span class="tag">火辣暗兽棋</span><span class="tag">情趣骰子</span><span class="tag">桃色老虎机</span><span class="tag">真心话大冒险</span></div>
@@ -460,6 +478,7 @@ tr:hover td {
               <span class="ver v-major">v2.0 飞行棋Pro</span>
               <span class="idx">#02</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-05</span></div>
             <h4 class="tl-title">✈️ 新增飞行棋Pro（第7个游戏）</h4>
             <p class="tl-desc">深度复刻原版飞行棋，5种游戏模式，海量题库，开发中临时密码529</p>
             <div class="tl-tags"><span class="tag">飞行棋模式</span><span class="tag">抽卡模式</span><span class="tag">扫雷模式</span><span class="tag">亲密骰子模式</span><span class="tag">姿势模式</span><span class="tag">121张姿势图</span></div>
@@ -472,6 +491,7 @@ tr:hover td {
               <span class="ver v-feature">v2.1 题库扩充</span>
               <span class="idx">#03</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-08</span></div>
             <h4 class="tl-title">📚 所有题库各加50条</h4>
             <p class="tl-desc">10个主题题库，每个添加50条性生活相关题目，内容健康合规</p>
             <div class="tl-tags"><span class="tag">甜蜜日常</span><span class="tag">暧昧升温</span><span class="tag">情侣互动</span><span class="tag">亲密接触</span><span class="tag">灵肉合一</span><span class="tag">+5个主题</span></div>
@@ -484,6 +504,7 @@ tr:hover td {
               <span class="ver v-major">v3.0 姿势大全</span>
               <span class="idx">#04</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-12</span></div>
             <h4 class="tl-title">🧘 新增姿势大全（第8个游戏）</h4>
             <p class="tl-desc">第8个游戏上线，姿势卡片展示，开发中临时密码529</p>
             <div class="tl-tags"><span class="tag">姿势卡片</span><span class="tag">滑动浏览</span><span class="tag">详情弹窗</span><span class="tag">为什么说明</span></div>
@@ -496,6 +517,7 @@ tr:hover td {
               <span class="ver v-fix">v3.1 UI深度优化</span>
               <span class="idx">#05</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-15</span></div>
             <h4 class="tl-title">🎨 全站UI美化与交互优化</h4>
             <p class="tl-desc">飞行棋Pro界面深度迭代，主题库弹窗、真实骰子、全站免责声明、禁止缩放</p>
             <div class="tl-tags"><span class="tag">主题库弹窗</span><span class="tag">真实骰子音效</span><span class="tag">卡片翻转</span><span class="tag">禁止缩放</span><span class="tag">免责声明</span></div>
@@ -508,6 +530,7 @@ tr:hover td {
               <span class="ver v-major">v4.0 封禁同步系统</span>
               <span class="idx">#06</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-18</span></div>
             <h4 class="tl-title">🚫 封禁快速同步与实时拦截</h4>
             <p class="tl-desc">30秒定时检查激活码状态，被封禁后立即踢下线，显示封禁提示并阻止游戏</p>
             <div class="tl-tags"><span class="tag">30秒定时检查</span><span class="tag">实时踢下线</span><span class="tag">封禁提示页</span><span class="tag">联系客服</span></div>
@@ -520,6 +543,7 @@ tr:hover td {
               <span class="ver v-feature">v1.1 云端同步</span>
               <span class="idx">#07</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-22</span></div>
             <h4 class="tl-title">☁️ 手机电脑云端同步</h4>
             <p class="tl-desc">接入Worker，生成记录云端存储，手机电脑多端同步，自动刷新</p>
             <div class="tl-tags"><span class="tag">云端存储</span><span class="tag">多端同步</span><span class="tag">60秒自动刷新</span></div>
@@ -532,6 +556,7 @@ tr:hover td {
               <span class="ver v-major">v2.0 封禁管理系统</span>
               <span class="idx">#08</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-25</span></div>
             <h4 class="tl-title">🚫 激活码封禁/启用功能</h4>
             <p class="tl-desc">支持封禁任意激活码，添加封禁原因，客户端显示"激活码被封禁，请联系客服"</p>
             <div class="tl-tags"><span class="tag">一键封禁</span><span class="tag">封禁原因</span><span class="tag">一键解封</span><span class="tag">客户端提示</span></div>
@@ -544,6 +569,7 @@ tr:hover td {
               <span class="ver v-feature">v1.1 管理接口</span>
               <span class="idx">#09</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-28</span></div>
             <h4 class="tl-title">📋 激活码列表与管理</h4>
             <p class="tl-desc">添加激活码列表接口，支持列出所有激活码，返回使用状态、生成时间等信息</p>
             <div class="tl-tags"><span class="tag">列表接口</span><span class="tag">状态查询</span><span class="tag">批量读取</span></div>
@@ -556,6 +582,7 @@ tr:hover td {
               <span class="ver v-fix">v2.1 列表查询修复</span>
               <span class="idx">#10</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-02</span></div>
             <h4 class="tl-title">🐛 修复激活码列表返回0条</h4>
             <p class="tl-desc">修复前缀过滤问题，从只查LG开头改成正则匹配7位字母数字，正确返回所有激活码</p>
             <div class="tl-tags"><span class="tag">正则匹配</span><span class="tag">过滤系统key</span><span class="tag">正确返回</span></div>
@@ -568,6 +595,7 @@ tr:hover td {
               <span class="ver v-feature">v2.3 提示统一</span>
               <span class="idx">#11</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-05</span></div>
             <h4 class="tl-title">💬 封禁提示统一为客服</h4>
             <p class="tl-desc">检查和激活接口禁用时统一返回"激活码被封禁，请联系客服"</p>
             <div class="tl-tags"><span class="tag">提示统一</span><span class="tag">联系客服</span></div>
@@ -580,6 +608,7 @@ tr:hover td {
               <span class="ver v-major">v3.0 IP绑定与续用</span>
               <span class="idx">#12</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-08</span></div>
             <h4 class="tl-title">🔗 已激活码可续用 + IP绑定</h4>
             <p class="tl-desc">已使用但没到期的激活码可以继续使用，日期从第一次激活算；IP不一致返回"已绑定其他设备"</p>
             <div class="tl-tags"><span class="tag">已激活可续用</span><span class="tag">日期从首次算</span><span class="tag">IP绑定检查</span><span class="tag">换设备拦截</span></div>
@@ -592,6 +621,7 @@ tr:hover td {
               <span class="ver v-major">v3.2 封禁管理系统</span>
               <span class="idx">#13</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-12</span></div>
             <h4 class="tl-title">🚫 激活码封禁与解封</h4>
             <p class="tl-desc">添加封禁和解封接口，支持所有卡密封禁（含已使用），封禁后客户端显示"激活码被封禁，请联系客服"</p>
             <div class="tl-tags"><span class="tag">封禁/解封</span><span class="tag">已使用可封禁</span><span class="tag">封禁提示</span><span class="tag">持续拦截</span></div>
@@ -604,6 +634,7 @@ tr:hover td {
               <span class="ver v-fix">v3.5 访问速度优化</span>
               <span class="idx">#14</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-15</span></div>
             <h4 class="tl-title">⚡ 全站性能优化</h4>
             <p class="tl-desc">121张姿势图从9.6M压缩到4.4M（减少54%），启用Gzip压缩，静态资源缓存1年，移除X-Powered-By头，打包从8.4M降到4.1M</p>
             <div class="tl-tags"><span class="tag">图片压缩54%</span><span class="tag">Gzip压缩</span><span class="tag">1年缓存</span><span class="tag">体积减半</span></div>
@@ -616,6 +647,7 @@ tr:hover td {
               <span class="ver v-feature">v3.6 实时在线人数</span>
               <span class="idx">#15</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-18</span></div>
             <h4 class="tl-title">🔄 在线人数10秒实时刷新</h4>
             <p class="tl-desc">game网站和Worker首页在线人数从30秒改成10秒刷新，页面不可见时暂停，切回前台立即刷新，数字变化有缩放动画</p>
             <div class="tl-tags"><span class="tag">10秒刷新</span><span class="tag">后台暂停</span><span class="tag">切回即刷</span><span class="tag">变化动画</span></div>
@@ -628,6 +660,7 @@ tr:hover td {
               <span class="ver v-major">v3.7 Worker首页美化</span>
               <span class="idx">#16</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-22</span></div>
             <h4 class="tl-title">✨ API服务首页高大上设计</h4>
             <p class="tl-desc">Worker首页从JSON改成HTML页面，动态渐变背景+3个浮动光晕+网格背景+玻璃拟态卡片+渐变光带+图标光晕+渐变文字，API接口双列展示</p>
             <div class="tl-tags"><span class="tag">动态渐变</span><span class="tag">浮动光晕</span><span class="tag">玻璃拟态</span><span class="tag">渐变文字</span></div>
@@ -640,6 +673,7 @@ tr:hover td {
               <span class="ver v-feature">v3.8 game背景动态渐变</span>
               <span class="idx">#17</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-25</span></div>
             <h4 class="tl-title">🌌 全站背景动态光晕</h4>
             <p class="tl-desc">game网站背景添加5个彩色光晕（粉/紫/蓝/橙/绿），15秒循环缓慢漂浮移动，平移+旋转+缩放+色相旋转动画，暗角效果增强层次感</p>
             <div class="tl-tags"><span class="tag">5色光晕</span><span class="tag">15秒循环</span><span class="tag">色相旋转</span><span class="tag">暗角效果</span></div>
@@ -668,6 +702,7 @@ tr:hover td {
               <span class="idx">#00</span>
               <span class="date">2026-08-28</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-08-28</span></div>
             <div class="tl-body">
               <p><strong>🎨 视觉全面升级</strong></p>
               <ul>
@@ -704,6 +739,7 @@ tr:hover td {
               <span class="ver v-feature">v4.1 激活码展示</span>
               <span class="idx">#01</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-20</span></div>
             <h4 class="tl-title">📄 激活码显示在激活页面</h4>
             <p class="tl-desc">移除右上角指示器，激活码完整显示在激活页面的已激活状态框里</p>
             <div class="tl-tags"><span class="tag">激活码展示</span><span class="tag">剩余时间</span><span class="tag">过期日期</span></div>
@@ -716,6 +752,7 @@ tr:hover td {
               <span class="ver v-major">v4.2 IP绑定系统</span>
               <span class="idx">#02</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-15</span></div>
             <h4 class="tl-title">🔗 激活码IP绑定与续用机制</h4>
             <p class="tl-desc">已激活的码可以继续使用（没到期），日期从第一次激活算，绑定IP不可换设备</p>
             <div class="tl-tags"><span class="tag">已激活可续用</span><span class="tag">日期从首次算</span><span class="tag">IP绑定</span><span class="tag">换设备拦截</span></div>
@@ -728,6 +765,7 @@ tr:hover td {
               <span class="ver v-major">v1.0 初始版本</span>
               <span class="idx">#03</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-10</span></div>
             <h4 class="tl-title">🎫 激活码生成器上线</h4>
             <p class="tl-desc">管理后台，支持生成测试卡/周卡/月卡/季卡/年卡，本地记录存储</p>
             <div class="tl-tags"><span class="tag">5种卡类型</span><span class="tag">批量生成</span><span class="tag">本地记录</span><span class="tag">复制导出</span></div>
@@ -740,6 +778,7 @@ tr:hover td {
               <span class="ver v-feature">v1.2 搜索与分页</span>
               <span class="idx">#04</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-15</span></div>
             <h4 class="tl-title">🔍 搜索功能 + 每页50条分页</h4>
             <p class="tl-desc">添加激活码搜索框，记录列表分页显示，每页50条，上一页/下一页</p>
             <div class="tl-tags"><span class="tag">实时搜索</span><span class="tag">每页50条</span><span class="tag">分页导航</span></div>
@@ -752,6 +791,7 @@ tr:hover td {
               <span class="ver v-feature">v2.1 激活信息记录</span>
               <span class="idx">#05</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-20</span></div>
             <h4 class="tl-title">📊 激活者IP与激活时间记录</h4>
             <p class="tl-desc">记录每个激活码的激活者IP、激活时间、生成IP，统计已激活/未激活/已禁用数量</p>
             <div class="tl-tags"><span class="tag">激活者IP</span><span class="tag">激活时间</span><span class="tag">生成IP</span><span class="tag">状态统计</span></div>
@@ -764,6 +804,7 @@ tr:hover td {
               <span class="ver v-fix">v2.2 格式统一与去重</span>
               <span class="idx">#06</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-25</span></div>
             <h4 class="tl-title">🧹 去掉横线 + 同步去重</h4>
             <p class="tl-desc">统一激活码格式为7位无横线，同步时自动去重，修复重复展示问题</p>
             <div class="tl-tags"><span class="tag">无横线格式</span><span class="tag">自动去重</span><span class="tag">格式统一</span></div>
@@ -776,6 +817,7 @@ tr:hover td {
               <span class="ver v-fix">v2.3 并发刷新提速</span>
               <span class="idx">#07</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-30</span></div>
             <h4 class="tl-title">⚡ 刷新状态速度提升20倍</h4>
             <p class="tl-desc">从串行一个一个检测改成并发检测，每批同时检测20个，大幅提升刷新速度</p>
             <div class="tl-tags"><span class="tag">并发检测</span><span class="tag">每批20个</span><span class="tag">速度提升20倍</span></div>
@@ -788,6 +830,7 @@ tr:hover td {
               <span class="ver v-fix">v2.4 交互优化</span>
               <span class="idx">#08</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-05</span></div>
             <h4 class="tl-title">✨ Toast提示 + 删除即删云端</h4>
             <p class="tl-desc">复制/删除/封禁操作改用Toast底部提示，删除时同步删除云端记录，不会再回来</p>
             <div class="tl-tags"><span class="tag">Toast提示</span><span class="tag">删除同步云端</span><span class="tag">立即消失</span></div>
@@ -800,6 +843,7 @@ tr:hover td {
               <span class="ver v-major">v3.0 全功能完善</span>
               <span class="idx">#09</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-10</span></div>
             <h4 class="tl-title">🎯 所有卡密可封禁 + 状态分类</h4>
             <p class="tl-desc">所有未禁用的卡密都能封禁（包括已使用的），按卡类型和激活状态双重筛选</p>
             <div class="tl-tags"><span class="tag">全部可封禁</span><span class="tag">类型筛选</span><span class="tag">状态筛选</span><span class="tag">数量统计</span></div>
@@ -812,6 +856,7 @@ tr:hover td {
               <span class="ver v-major">v1.0 基础API</span>
               <span class="idx">#10</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-05</span></div>
             <h4 class="tl-title">🔧 激活码核心API</h4>
             <p class="tl-desc">实现激活码生成、验证、查询、统计，KV存储，管理密码验证</p>
             <div class="tl-tags"><span class="tag">/generate</span><span class="tag">激活接口</span><span class="tag">/check</span><span class="tag">/stats</span><span class="tag">/ip-check</span></div>
@@ -824,6 +869,7 @@ tr:hover td {
               <span class="ver v-major">v2.0 封禁系统</span>
               <span class="idx">#11</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-10</span></div>
             <h4 class="tl-title">🚫 封禁/启用/删除接口</h4>
             <p class="tl-desc">添加封禁、解封、删除接口，支持封禁原因记录</p>
             <div class="tl-tags"><span class="tag">封禁接口</span><span class="tag">解封接口</span><span class="tag">删除接口</span><span class="tag">封禁原因</span></div>
@@ -836,6 +882,7 @@ tr:hover td {
               <span class="ver v-feature">v3.3 搜索与分页</span>
               <span class="idx">#12</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-15</span></div>
             <h4 class="tl-title">🔍 激活码搜索与分页管理</h4>
             <p class="tl-desc">添加搜索框、每页50条分页、已激活/未激活/已禁用分类筛选，激活码统一7位无横线格式</p>
             <div class="tl-tags"><span class="tag">搜索功能</span><span class="tag">50条/页</span><span class="tag">分类筛选</span><span class="tag">7位格式</span></div>
@@ -848,6 +895,7 @@ tr:hover td {
               <span class="ver v-fix">v3.9 删除功能修复</span>
               <span class="idx">#13</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-20</span></div>
             <h4 class="tl-title">🗑️ 修复删除后又出来的bug</h4>
             <p class="tl-desc">删除逻辑从"先删本地再异步删云端"改成"先删云端成功后再删本地"，删除时显示加载状态，失败时显示具体错误，防止云端删除失败导致同步后记录又回来</p>
             <div class="tl-tags"><span class="tag">先删云端</span><span class="tag">成功再删本地</span><span class="tag">加载状态</span><span class="tag">错误提示</span></div>
@@ -875,6 +923,7 @@ tr:hover td {
               <span class="ver v-feature">v1.1 激活系统</span>
               <span class="idx">#01</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-25</span></div>
             <h4 class="tl-title">🔐 激活码系统上线</h4>
             <p class="tl-desc">接入Cloudflare Worker，实现激活码验证、一人一码、IP绑定恢复</p>
             <div class="tl-tags"><span class="tag">激活码验证</span><span class="tag">一人一码</span><span class="tag">IP恢复激活</span><span class="tag">购买链接</span></div>
@@ -887,6 +936,7 @@ tr:hover td {
               <span class="ver v-fix">v3.2 激活状态修复</span>
               <span class="idx">#02</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-06-30</span></div>
             <h4 class="tl-title">🔧 修复剩NaN天与指示器问题</h4>
             <p class="tl-desc">修复字段名不一致导致的剩余天数计算错误，优化右上角指示器显示逻辑</p>
             <div class="tl-tags"><span class="tag">expireAt兼容</span><span class="tag">空值检查</span><span class="tag">指示器优化</span></div>
@@ -899,6 +949,7 @@ tr:hover td {
               <span class="ver v-fix">v2.2 过期时间修复</span>
               <span class="idx">#03</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-05</span></div>
             <h4 class="tl-title">⏰ 生成时保存expiresAt</h4>
             <p class="tl-desc">修复生成激活码时没有保存过期时间的问题，现在生成时计算并保存expiresAt和durationMs</p>
             <div class="tl-tags"><span class="tag">expiresAt</span><span class="tag">durationMs</span><span class="tag">各类型时长</span></div>
@@ -911,6 +962,7 @@ tr:hover td {
               <span class="ver v-feature">v3.1 在线人数API</span>
               <span class="idx">#04</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-10</span></div>
             <h4 class="tl-title">👥 在线人数统计接口</h4>
             <p class="tl-desc">添加访问上报和在线统计接口，实现云端在线人数实时统计</p>
             <div class="tl-tags"><span class="tag">访问上报</span><span class="tag">在线统计</span><span class="tag">实时统计</span></div>
@@ -923,6 +975,7 @@ tr:hover td {
               <span class="ver v-major">v3.4 一人一码设备绑定</span>
               <span class="idx">#05</span>
             </div>
+            <div class="tl-meta"><span class="date">2026-07-15</span></div>
             <h4 class="tl-title">📱 设备ID绑定防共用</h4>
             <p class="tl-desc">基于浏览器指纹生成设备唯一ID，激活时绑定设备，已使用激活码只能在同一设备使用，不同设备拒绝，移除离线降级激活</p>
             <div class="tl-tags"><span class="tag">设备指纹</span><span class="tag">一人一码</span><span class="tag">一机一码</span><span class="tag">云端验证</span></div>
