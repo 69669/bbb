@@ -699,13 +699,14 @@ export default class GeneratePage extends React.Component {
               <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "6px" }}>后台管理</h1>
               <p style={{ fontSize: "14px", color: "#64748b" }}>请输入管理密码</p>
             </div>
-            <input type="password" value={password} onChange={(e) => this.setState({ password: e.target.value })} placeholder="输入密码"
-              style={{ width: "100%", padding: "12px 14px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "15px", marginBottom: "12px", outline: "none", background: "#f8fafc" }}
-              onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.background = "white"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; }}
-              onKeyDown={(e) => e.key === "Enter" && this.handleLogin()} />
-            {error && <div style={{ color: "#dc2626", fontSize: "13px", marginBottom: "12px", textAlign: "center" }}>{error}</div>}
-            <button onClick={this.handleLogin} style={{ width: "100%", padding: "12px", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, cursor: "pointer" }}>登 录</button>
+            <form onSubmit={this.handlePasswordSubmit}>
+              <input type="password" value={password} onChange={(e) => this.setState({ password: e.target.value })} placeholder="输入密码"
+                style={{ width: "100%", padding: "12px 14px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "15px", marginBottom: "12px", outline: "none", background: "#f8fafc" }}
+                onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.background = "white"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; }} />
+              {error && <div style={{ color: "#dc2626", fontSize: "13px", marginBottom: "12px", textAlign: "center" }}>{error}</div>}
+              <button type="submit" style={{ width: "100%", padding: "12px", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, cursor: "pointer" }}>登 录</button>
+            </form>
           </div>
         </div>
       );
