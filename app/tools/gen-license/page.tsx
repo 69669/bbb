@@ -129,29 +129,24 @@ export default class GeneratePage extends React.Component {
     this.autoRefreshTimer = setInterval(() => {
       // 静默刷新（不显示loading，不弹窗提示）
       this.silentRefreshStatus();
-    }, 30000); // 每30秒刷新一次
+    }, 300000); // 每5分钟刷新一次（减少KV读取消耗）
   };
 
-  // 静默刷新云端状态（不弹窗）
+  // 静默刷新云端状态（不弹窗）- 用批量接口，只消耗1次KV操作
   silentRefreshStatus = async () => {
     const { history } = this.state;
     if (history.length === 0) return;
     try {
-      const newHistory = [...history];
-      // 并发检测，每批20个
-      const BATCH_SIZE = 30;
-      for (let i = 0; i < newHistory.length; i += BATCH_SIZE) {
-        const batch = newHistory.slice(i, i + BATCH_SIZE);
-        const results = await Promise.all(
-          batch.map((item) => this.checkCodeFromCloud(cleanCode(item.code)))
-        );
-        results.forEach((cloudUsed, idx) => {
-          const globalIdx = i + idx;
-          if (cloudUsed !== null && cloudUsed !== newHistory[globalIdx].used) {
-            newHistory[globalIdx] = { ...newHistory[globalIdx], used: cloudUsed };
-          }
-        });
-      }
+      const statusMap = await this.fetchAllCodesFromCloud();
+      if (!statusMap) return;
+      const newHistory = history.map(item => {
+        const clean = cleanCode(item.code);
+        const cloudUsed = statusMap.get(clean);
+        if (cloudUsed !== undefined && cloudUsed !== item.used) {
+          return { ...item, used: cloudUsed };
+        }
+        return item;
+      });
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
@@ -444,6 +439,30 @@ export default class GeneratePage extends React.Component {
   };
 
   // 从云端刷新所有历史记录的使用状态（批量查询，快速）
+  // 从云端批量获取所有激活码状态（只消耗1次KV操作）
+  fetchAllCodesFromCloud = async (): Promise<Map<string, boolean> | null> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/list`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+        signal: AbortSignal.timeout(30000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!data.success || !data.codes) return null;
+      const statusMap = new Map<string, boolean>();
+      for (const item of data.codes) {
+        const clean = cleanCode(item.code);
+        statusMap.set(clean, item.used === true);
+      }
+      return statusMap;
+    } catch {
+      return null;
+    }
+  };
+
+
   refreshAllStatus = async () => {
     const { history } = this.state;
     if (history.length === 0) {
@@ -452,36 +471,27 @@ export default class GeneratePage extends React.Component {
     }
     this.setState({ checking: true });
     try {
-      const newHistory = [...history];
-      let updated = 0;
-      let failed = 0;
-      // 批量查询，每批20个，用Promise.all并发
-      const batchSize = 20;
-      for (let i = 0; i < newHistory.length; i += batchSize) {
-        const batch = newHistory.slice(i, i + batchSize);
-        const results = await Promise.all(
-          batch.map((item) => this.checkCodeFromCloud(cleanCode(item.code)))
-        );
-        results.forEach((cloudUsed, idx) => {
-          const globalIdx = i + idx;
-          if (cloudUsed === null) {
-            failed++;
-          } else if (cloudUsed !== newHistory[globalIdx].used) {
-            newHistory[globalIdx] = { ...newHistory[globalIdx], used: cloudUsed };
-            updated++;
-          }
-        });
+      const statusMap = await this.fetchAllCodesFromCloud();
+      if (!statusMap) {
+        this.showToast("❌ 刷新失败，请检查网络或Worker状态");
+        this.setState({ checking: false });
+        return;
       }
+      let updated = 0;
+      const newHistory = history.map(item => {
+        const clean = cleanCode(item.code);
+        const cloudUsed = statusMap.get(clean);
+        if (cloudUsed !== undefined && cloudUsed !== item.used) {
+          updated++;
+          return { ...item, used: cloudUsed };
+        }
+        return item;
+      });
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
       this.setState({ history: newHistory, lastRefresh: timeStr });
-      // 明确的成功/失败提示
-      if (failed > 0 && updated > 0) {
-        this.showToast(`✓ 同步${updated}条，${failed}条查询失败`);
-      } else if (failed > 0) {
-        this.showToast(`⚠️ ${failed}条查询失败，请检查网络`);
-      } else if (updated > 0) {
+      if (updated > 0) {
         this.showToast(`✓ 刷新成功，已同步${updated}条状态`);
       } else {
         this.showToast("✓ 刷新成功，已是最新状态");
