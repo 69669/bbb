@@ -91,7 +91,7 @@ export default function AdminDashboard() {
   }
 
   const navItems = [
-    { icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6", label: "控制台", path: "/admin", active: true },
+    { icon: "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z", label: "控制台", path: "/admin", active: true },
     { icon: "M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z", label: "激活码管理", path: "/tools/gen-license" },
     { icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2", label: "工单管理", path: "/ticket-admin.html" },
     { icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z", label: "更新历史", path: "/update-history.html" },
@@ -119,32 +119,32 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="app-layout">
+    <div className="layout">
       {/* 侧边栏 */}
-      <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-brand">
+      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-head">
           <div className="sidebar-logo">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
           </div>
           <div>
-            <div className="sidebar-title">后台管理</div>
-            <div className="sidebar-subtitle">管理控制台 v9.0</div>
+            <div className="sidebar-name">后台管理</div>
+            <div className="sidebar-sub">管理控制台</div>
           </div>
         </div>
         <nav className="sidebar-nav">
-          <div className="nav-section">
-            <div className="nav-section-title">主导航</div>
+          <div className="nav-group">
+            <div className="nav-label">主导航</div>
             {navItems.map((item) => (
               <div key={item.path} className={`nav-item ${item.active ? "active" : ""}`} onClick={() => navigate(item.path)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}/></svg>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}/></svg>
                 {item.label}
               </div>
             ))}
           </div>
         </nav>
-        <div className="sidebar-footer">
+        <div className="sidebar-foot">
           <div className="nav-item" onClick={handleLogout}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             退出登录
           </div>
         </div>
@@ -154,8 +154,8 @@ export default function AdminDashboard() {
       <div className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`} onClick={() => setSidebarOpen(false)} />
 
       {/* 主内容 */}
-      <div className="app-main">
-        <header className="app-topbar">
+      <div className="main">
+        <header className="topbar">
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>

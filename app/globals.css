@@ -88,76 +88,75 @@ html, body {
    布局系统
    ============================================ */
 
-.app-layout {
+.layout {
   display: flex;
   min-height: 100vh;
 }
 
 /* 侧边栏 */
-.app-sidebar {
+.sidebar {
   width: var(--sidebar-width);
   background: var(--bg-card);
   border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   z-index: 100;
-  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  flex-direction: column;
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 
-.sidebar-brand {
+.sidebar-head {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 10px;
+  padding: 18px 20px;
   border-bottom: 1px solid var(--border-light);
 }
 
 .sidebar-logo {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: var(--radius-md);
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+  box-shadow: 0 4px 12px rgba(99,102,241,.35);
   flex-shrink: 0;
 }
 
-.sidebar-title {
-  font-size: 16px;
+.sidebar-name {
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-900);
-  letter-spacing: -0.3px;
+  line-height: 1.2;
 }
 
-.sidebar-subtitle {
+.sidebar-sub {
   font-size: 11px;
   color: var(--text-400);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 12px 12px;
+  padding: 12px 10px;
   overflow-y: auto;
-  overflow-x: hidden;
 }
 
-.nav-section {
-  margin-bottom: 20px;
+.nav-group {
+  margin-bottom: 16px;
 }
 
-.nav-section-title {
+.nav-label {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-400);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: .8px;
   padding: 0 12px;
   margin-bottom: 6px;
 }
@@ -167,12 +166,12 @@ html, body {
   align-items: center;
   gap: 10px;
   padding: 9px 12px;
-  border-radius: var(--radius);
+  border-radius: 8px;
   font-size: 13.5px;
   font-weight: 500;
   color: var(--text-600);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all .15s;
   margin-bottom: 2px;
   user-select: none;
   position: relative;
@@ -184,7 +183,7 @@ html, body {
 }
 
 .nav-item.active {
-  background: var(--primary-bg);
+  background: var(--primary-light);
   color: var(--primary-hover);
   font-weight: 600;
 }
@@ -192,7 +191,7 @@ html, body {
 .nav-item.active::before {
   content: '';
   position: absolute;
-  left: -12px;
+  left: -10px;
   top: 50%;
   transform: translateY(-50%);
   width: 3px;
@@ -205,22 +204,22 @@ html, body {
   flex-shrink: 0;
 }
 
-.sidebar-footer {
-  padding: 12px;
+.sidebar-foot {
+  padding: 10px;
   border-top: 1px solid var(--border-light);
 }
 
-.sidebar-footer .nav-item {
+.sidebar-foot .nav-item {
   color: var(--text-500);
 }
 
-.sidebar-footer .nav-item:hover {
+.sidebar-foot .nav-item:hover {
   color: var(--danger);
   background: var(--danger-bg);
 }
 
 /* 主内容区 */
-.app-main {
+.main {
   flex: 1;
   margin-left: var(--sidebar-width);
   display: flex;
@@ -230,7 +229,7 @@ html, body {
 }
 
 /* 顶部栏 */
-.app-topbar {
+.topbar {
   height: var(--topbar-height);
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(12px);
@@ -252,7 +251,7 @@ html, body {
   letter-spacing: -0.3px;
 }
 
-.topbar-actions {
+.topbar-right {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1116,7 +1115,7 @@ html, body {
 
 .mobile-menu-btn:hover { background: var(--bg-hover); }
 
-.sidebar-overlay {
+.overlay {
   display: none;
   position: fixed;
   inset: 0;
@@ -1126,7 +1125,7 @@ html, body {
   transition: opacity 0.2s;
 }
 
-.sidebar-overlay.show {
+.overlay.show {
   display: block;
   opacity: 1;
 }
@@ -1145,10 +1144,10 @@ html, body {
     box-shadow: var(--shadow-xl);
   }
   .app-sidebar.open { transform: translateX(0); }
-  .app-main { margin-left: 0; }
+  .main { margin-left: 0; }
   .mobile-menu-btn { display: flex; }
   .app-content { padding: 16px; }
-  .app-topbar { padding: 0 16px; }
+  .topbar { padding: 0 16px; }
   .topbar-title { font-size: 16px; }
 
   .grid-2, .grid-3, .grid-4 {
