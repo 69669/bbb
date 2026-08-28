@@ -253,12 +253,12 @@ input,select,textarea{font-family:inherit;font-size:14px}
     <header class="topbar">
       <div class="topbar-left">
         <button class="menu-btn" onclick="toggleSidebar()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-        <button class="btn btn-ghost btn-sm" onclick="location.href='/admin'">← 返回</button>
+        <button class="btn btn-ghost btn-sm" onclick="location.href='/admin'">返回</button>
         <h1 class="topbar-title">工单管理</h1>
       </div>
       <div class="topbar-right">
         <span class="badge badge-primary" id="pendingBadge">待处理 0</span>
-        <button class="btn btn-secondary btn-sm" onclick="refreshList()">🔄 刷新</button>
+        <button class="btn btn-secondary btn-sm" onclick="refreshList()">刷新</button>
       </div>
     </header>
 
@@ -271,7 +271,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
         <div class="card">
           <div class="card-head">
             <div class="card-title">工单列表</div>
-            <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 导出CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCSV()">导出CSV</button>
           </div>
           <div class="filter-bar">
             <div class="filter-item"><span class="filter-label">状态</span><select class="select" id="filterStatus" onchange="applyFilter()"><option value="all">全部</option><option value="pending">待处理</option><option value="processing">处理中</option><option value="resolved">已解决</option><option value="closed">已关闭</option></select></div>
@@ -293,7 +293,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
       <!-- 详情页 -->
       <div class="page" id="page-detail" style="display:none">
-        <div class="detail-back"><button class="btn btn-secondary btn-sm" onclick="backToList()">← 返回列表</button></div>
+        <div class="detail-back"><button class="btn btn-secondary btn-sm" onclick="backToList()">返回列表</button></div>
         <div id="detailContent"></div>
       </div>
 
@@ -417,7 +417,7 @@ function renderStatsCards(stats) {
   `).join("");
 }
 
-const typeMap = { bug: "🐛 问题", suggestion: "💡 建议", complaint: "⚠️ 投诉", other: "📝 其他" };
+const typeMap = { bug: "🐛 问题", suggestion: "💡 建议", complaint: "投诉", other: "📝 其他" };
 const statusMap = { pending: "待处理", processing: "处理中", resolved: "已解决", closed: "已关闭" };
 const priorityMap = { low: "低", normal: "普通", high: "高", urgent: "紧急" };
 

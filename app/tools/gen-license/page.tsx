@@ -290,7 +290,7 @@ export default class GeneratePage extends React.Component {
   handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
-      this.showToast("✓ 已复制");
+      this.showToast("已复制");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -298,7 +298,7 @@ export default class GeneratePage extends React.Component {
       textarea.select();
       document.execCommand("copy");
       document.body.removeChild(textarea);
-      this.showToast("✓ 已复制");
+      this.showToast("已复制");
     }
   };
 
@@ -394,7 +394,7 @@ export default class GeneratePage extends React.Component {
     }
     const text = unused.map((h) => h.code).join("\n");
     this.copyToClipboard(text);
-    this.showToast(`✓ 已复制 ${unused.length} 个未使用激活码`);
+    this.showToast(`已复制 ${unused.length} 个未使用激活码`);
   };
 
   copyToClipboard = (text: string) => {
@@ -473,7 +473,7 @@ export default class GeneratePage extends React.Component {
     try {
       const statusMap = await this.fetchAllCodesFromCloud();
       if (!statusMap) {
-        this.showToast("❌ 刷新失败，请检查网络或Worker状态");
+        this.showToast("刷新失败，请检查网络或Worker状态");
         this.setState({ checking: false });
         return;
       }
@@ -492,12 +492,12 @@ export default class GeneratePage extends React.Component {
       const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
       this.setState({ history: newHistory, lastRefresh: timeStr });
       if (updated > 0) {
-        this.showToast(`✓ 刷新成功，已同步${updated}条状态`);
+        this.showToast(`刷新成功，已同步${updated}条状态`);
       } else {
-        this.showToast("✓ 刷新成功，已是最新状态");
+        this.showToast("刷新成功，已是最新状态");
       }
     } catch (e) {
-      this.showToast("❌ 刷新失败，请检查网络后重试");
+      this.showToast("刷新失败，请检查网络后重试");
     } finally {
       this.setState({ checking: false });
     }
@@ -666,7 +666,7 @@ export default class GeneratePage extends React.Component {
   };
   // 清空云端所有激活码记录
   clearCloud = async () => {
-    if (!confirm("⚠️ 确定要清空云端所有激活码记录吗？\n\n此操作不可恢复！清空后：\n1. 之前生成的所有激活码全部失效\n2. 云端记录全部删除\n3. 本地记录也会同步清空\n\n确定继续吗？")) {
+    if (!confirm("确定要清空云端所有激活码记录吗？\n\n此操作不可恢复！清空后：\n1. 之前生成的所有激活码全部失效\n2. 云端记录全部删除\n3. 本地记录也会同步清空\n\n确定继续吗？")) {
       return;
     }
     if (!confirm("再次确认：真的要清空所有激活码吗？此操作不可恢复！")) {
@@ -772,15 +772,15 @@ export default class GeneratePage extends React.Component {
         <div className="app-main">
           <header className="app-topbar">
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => window.location.href = "/admin"}>← 返回</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => window.location.href = "/admin"}>返回</button>
               <h1 className="topbar-title">激活码管理</h1>
             </div>
             <div className="topbar-actions"><span className="badge badge-primary">共 {history.length} 条</span></div>
           </header>
           <main className="app-content">
             <div style={{ display: "flex", gap: "4px", marginBottom: "20px", padding: "4px", background: "#f1f5f9", borderRadius: "10px", width: "fit-content" }}>
-              <button onClick={() => this.setState({ showHistory: false })} style={{ padding: "8px 20px", borderRadius: "8px", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", background: !showHistory ? "white" : "transparent", color: !showHistory ? "#0f172a" : "#64748b", boxShadow: !showHistory ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>🔑 生成器</button>
-              <button onClick={() => this.setState({ showHistory: true })} style={{ padding: "8px 20px", borderRadius: "8px", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", background: showHistory ? "white" : "transparent", color: showHistory ? "#0f172a" : "#64748b", boxShadow: showHistory ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>📋 生成记录 ({history.length})</button>
+              <button onClick={() => this.setState({ showHistory: false })} style={{ padding: "8px 20px", borderRadius: "8px", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", background: !showHistory ? "white" : "transparent", color: !showHistory ? "#0f172a" : "#64748b", boxShadow: !showHistory ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>生成器</button>
+              <button onClick={() => this.setState({ showHistory: true })} style={{ padding: "8px 20px", borderRadius: "8px", border: "none", fontSize: "14px", fontWeight: 600, cursor: "pointer", background: showHistory ? "white" : "transparent", color: showHistory ? "#0f172a" : "#64748b", boxShadow: showHistory ? "0 1px 3px rgba(0,0,0,0.1)" : "none" }}>生成记录 ({history.length})</button>
             </div>
 
             {!showHistory ? (
@@ -833,7 +833,7 @@ export default class GeneratePage extends React.Component {
                           <span style={{ fontSize: "12px", color: "#94a3b8" }}>({codes.length} 个{TYPE_NAMES[type]})</span>
                         </div>
                         <div style={{ display: "flex", gap: "8px" }}>
-                          <button onClick={this.handleCopy} className="btn btn-secondary btn-sm">{copied ? "✓ 已复制" : "复制全部"}</button>
+                          <button onClick={this.handleCopy} className="btn btn-secondary btn-sm">{copied ? "已复制" : "复制全部"}</button>
                           <button onClick={this.handleDownload} className="btn btn-secondary btn-sm">下载TXT</button>
                         </div>
                       </div>
@@ -857,12 +857,12 @@ export default class GeneratePage extends React.Component {
             ) : (
               <div className="card">
                 <div className="card-header">
-                  <div className="card-title">📋 生成记录</div>
+                  <div className="card-title">生成记录</div>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    <button onClick={this.syncFromCloud} disabled={syncing} className="btn btn-secondary btn-sm">{syncing ? "⏳ 同步中..." : "☁️ 云端同步"}</button>
+                    <button onClick={this.syncFromCloud} disabled={syncing} className="btn btn-secondary btn-sm">{syncing ? "同步中..." : "云端同步"}</button>
                     <button onClick={this.copyAllUnused} className="btn btn-secondary btn-sm">复制未使用</button>
                     <button onClick={this.exportHistory} className="btn btn-secondary btn-sm">导出{filterType === -1 ? "全部" : TYPE_NAMES[filterType]}</button>
-                    <button onClick={this.clearCloud} className="btn btn-danger btn-sm">☁️ 清空云端</button>
+                    <button onClick={this.clearCloud} className="btn btn-danger btn-sm">清空云端</button>
                     <button onClick={this.clearHistory} className="btn btn-danger btn-sm">清空本地</button>
                   </div>
                 </div>
@@ -872,7 +872,7 @@ export default class GeneratePage extends React.Component {
                   <span style={{ fontSize: "13px", color: "#d97706" }}>未用 <b>{history.length - usedCount - disabledCount}</b></span>
                   <span style={{ fontSize: "13px", color: "#dc2626" }}>已禁用 <b>{disabledCount}</b></span>
                   <button onClick={this.refreshAllStatus} disabled={checking} className="btn btn-secondary btn-sm" style={{ marginLeft: "auto" }}>
-                    {checking ? (<><span style={{ display: "inline-block", width: "14px", height: "14px", border: "2px solid #e2e8f0", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.6s linear infinite", verticalAlign: "middle", marginRight: "6px" }} />查询中...</>) : "🔄 刷新状态"}
+                    {checking ? (<><span style={{ display: "inline-block", width: "14px", height: "14px", border: "2px solid #e2e8f0", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.6s linear infinite", verticalAlign: "middle", marginRight: "6px" }} />查询中...</>) : "刷新状态"}
                   </button>
                 </div>
                 <div className="filter-bar">
