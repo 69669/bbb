@@ -749,12 +749,12 @@ export default class GeneratePage extends React.Component {
           <div className="nav-item" onClick={this.handleLogout}><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</div>
         </div>
       </aside>
-      <div className="overlay" id="overlay" onClick={() => document.getElementById("sidebar").classList.remove("open")}></div>
     );
 
     return (
       <div className="layout">
         {sidebar}
+        <div className="overlay" id="overlay" onClick={() => document.getElementById("sidebar").classList.remove("open")}></div>
         <div className="main">
           <header className="topbar">
             <div className="topbar-left">
