@@ -754,11 +754,11 @@ export default class GeneratePage extends React.Component {
     return (
       <div className="layout">
         {sidebar}
-        <div className="overlay" id="overlay" onClick={() => document.getElementById("sidebar").classList.remove("open")}></div>
+        <div className="overlay" id="overlay" onClick={() => document.getElementById("sidebar")?.classList.remove("open")}></div>
         <div className="main">
           <header className="topbar">
             <div className="topbar-left">
-              <button className="menu-btn" onClick={() => document.getElementById("sidebar").classList.toggle("open")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+              <button className="menu-btn" onClick={() => document.getElementById("sidebar")?.classList.toggle("open")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
               <button className="btn btn-ghost btn-sm" onClick={() => window.location.href = "/admin"}>返回</button>
               <h1 className="topbar-title">激活码管理</h1>
             </div>
