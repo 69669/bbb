@@ -946,7 +946,7 @@ export default class GeneratePage extends React.Component {
                   <span style={{ fontSize: "13px", color: "#d97706" }}>未用 <b>{history.length - usedCount - disabledCount}</b></span>
                   <span style={{ fontSize: "13px", color: "#dc2626" }}>已禁用 <b>{disabledCount}</b></span>
                   <button onClick={this.refreshAllStatus} disabled={checking} className="btn btn-secondary btn-sm" style={{ marginLeft: "auto" }}>
-                    {checking ? (<><span className="spinner" style={{ borderTopColor: "#6366f1", border: "2px solid #e2e8f0", borderTopColor: "#6366f1" }} />查询中...</>) : "🔄 刷新状态"}
+                    {checking ? (<><span style={{ display: "inline-block", width: "14px", height: "14px", border: "2px solid #e2e8f0", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.6s linear infinite", verticalAlign: "middle", marginRight: "6px" }} />查询中...</>) : "🔄 刷新状态"}
                   </button>
                 </div>
 
