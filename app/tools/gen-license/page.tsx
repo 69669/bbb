@@ -67,6 +67,7 @@ export default class GeneratePage extends React.Component {
       lastRefresh: "", // 最后刷新时间
       disabling: false, // 是否正在禁用/启用
       showDetail: null as number | null, // 当前查看详情的索引
+      selectedCodes: [], // 批量选中的索引
       toast: "", // 提示信息
       statusFilter: 0, // 0=全部, 1=未激活, 2=已激活, 3=已禁用
       search: "", // 搜索关键词
@@ -96,6 +97,7 @@ export default class GeneratePage extends React.Component {
     lastRefresh: string;
     disabling: boolean;
     showDetail: number | null;
+  selectedCodes: number[];
     toast: string;
     statusFilter: number;
     search: string;
