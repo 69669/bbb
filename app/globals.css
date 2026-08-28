@@ -60,12 +60,12 @@
   --radius-sm: 6px;
   --radius: 8px;
   --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
 
   /* 布局 */
-  --sidebar-width: 260px;
-  --topbar-height: 64px;
+  --sidebar-width: 240px;
+  --topbar-height: 60px;
 
   /* 字体 */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -239,7 +239,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -261,7 +261,7 @@ html, body {
 /* 页面内容 */
 .app-content {
   flex: 1;
-  padding: 28px;
+  padding: 24px;
   max-width: 100%;
 }
 
@@ -951,7 +951,7 @@ html, body {
 
 .timeline {
   position: relative;
-  padding-left: 28px;
+  padding-left: 24px;
 }
 
 .timeline::before {
@@ -1136,7 +1136,7 @@ html, body {
    ============================================ */
 
 @media (max-width: 1024px) {
-  :root { --sidebar-width: 220px; }
+  :root { --sidebar-width: 240px; }
 }
 
 @media (max-width: 768px) {
