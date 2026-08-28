@@ -7,1058 +7,243 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg: #0f0f1a;
-  --sidebar: #151528;
-  --card: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.08);
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --primary: #6366f1;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
+  --primary: #6366f1; --primary-hover: #4f46e5; --primary-bg: #eef2ff; --primary-border: #c7d2fe;
+  --success: #10b981; --success-bg: #ecfdf5; --success-border: #a7f3d0;
+  --warning: #f59e0b; --warning-bg: #fffbeb; --warning-border: #fde68a;
+  --danger: #ef4444; --danger-bg: #fef2f2; --danger-border: #fecaca;
+  --info: #3b82f6; --info-bg: #eff6ff; --info-border: #bfdbfe;
+  --text-900: #0f172a; --text-800: #1e293b; --text-700: #334155; --text-600: #475569; --text-500: #64748b; --text-400: #94a3b8; --text-300: #cbd5e1;
+  --bg-page: #f8fafc; --bg-card: #ffffff; --bg-hover: #f1f5f9; --bg-active: #e2e8f0; --bg-input: #f8fafc;
+  --border: #e2e8f0; --border-light: #f1f5f9;
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04); --shadow-sm: 0 1px 3px rgba(15,23,42,0.06); --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.08); --shadow-lg: 0 10px 15px -3px rgba(15,23,42,0.08);
+  --radius: 8px; --radius-md: 10px; --radius-lg: 12px; --radius-xl: 16px;
+  --sidebar-width: 260px; --topbar-height: 64px;
 }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-/* 登录页 */
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0f0f1a, #1a1a3a);
-  padding: 20px;
-}
-.login-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px;
-  width: 100%;
-  max-width: 380px;
-  backdrop-filter: blur(20px);
-}
-.login-box h1 {
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #fff, var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.login-box p { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
-.login-box input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.04);
-  color: #fff;
-  font-size: 0.95rem;
-  margin-bottom: 16px;
-  outline: none;
-}
-.login-box input:focus { border-color: var(--primary); }
-.login-box button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, var(--primary), #8b5cf6);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.login-box button:hover { opacity: 0.9; transform: translateY(-1px); }
-.login-error { color: var(--danger); font-size: 0.85rem; text-align: center; margin-top: 12px; }
+body { background: var(--bg-page); color: var(--text-800); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
-/* 主布局 */
-.app { display: flex; min-height: 100vh; }
-.sidebar { display:none !important;
-  width: 220px;
-  background: var(--sidebar);
-  border-right: 1px solid var(--border);
-  padding: 20px 0;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  overflow-y: auto;
-  z-index: 100;
-}
-.sidebar-logo {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-.sidebar-logo h2 {
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #fff, var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.sidebar-logo p { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 20px;
-  color: var(--muted);
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
-}
-.nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
-.nav-item.active {
-  background: rgba(99,102,241,0.1);
-  color: #fff;
-  border-left-color: var(--primary);
-}
-.nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
-.nav-badge {
-  margin-left: auto;
-  background: var(--danger);
-  color: #fff;
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-}
-.main { margin-left:0 !important; width:100% !important;
-  flex: 1;
-  margin-left: 220px;
-  padding: 24px;
-  min-height: 100vh;
-}
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.page-header h1 { font-size: 1.4rem; font-weight: 700; }
-.page-header .actions { display: flex; gap: 10px; }
-.btn {
-  padding: 9px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
-.btn-primary { background: linear-gradient(135deg, var(--primary), #8b5cf6); border: none; color: #fff; }
-.btn-primary:hover { opacity: 0.9; }
-.btn-danger { color: var(--danger); border-color: rgba(239,68,68,0.3); }
-.btn-danger:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
-.btn-success { color: var(--success); border-color: rgba(16,185,129,0.3); }
-.btn-success:hover { background: rgba(16,185,129,0.1); border-color: var(--success); }
+/* 布局 */
+.app-layout { display: flex; min-height: 100vh; }
+.app-sidebar { width: var(--sidebar-width); background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.25s; }
+.sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
+.sidebar-logo { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(99,102,241,0.35); flex-shrink: 0; }
+.sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-900); }
+.sidebar-subtitle { font-size: 11px; color: var(--text-400); margin-top: 1px; }
+.sidebar-nav { flex: 1; padding: 12px; overflow-y: auto; }
+.nav-section { margin-bottom: 20px; }
+.nav-section-title { font-size: 11px; font-weight: 600; color: var(--text-400); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 12px; margin-bottom: 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); font-size: 13.5px; font-weight: 500; color: var(--text-600); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; user-select: none; position: relative; }
+.nav-item:hover { background: var(--bg-hover); color: var(--text-800); }
+.nav-item.active { background: var(--primary-bg); color: var(--primary-hover); font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--primary); border-radius: 0 3px 3px 0; }
+.sidebar-footer { padding: 12px; border-top: 1px solid var(--border-light); }
+.sidebar-footer .nav-item:hover { color: var(--danger); background: var(--danger-bg); }
+
+.app-main { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; min-width: 0; }
+.app-topbar { height: var(--topbar-height); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 50; }
+.topbar-title { font-size: 18px; font-weight: 700; color: var(--text-900); }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.app-content { flex: 1; padding: 28px; max-width: 100%; }
+
+/* 卡片 */
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); overflow: hidden; }
+.card-header { padding: 18px 22px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-size: 15px; font-weight: 600; color: var(--text-900); }
+.card-body { padding: 22px; }
+
+/* 按钮 */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-size: 13.5px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; white-space: nowrap; user-select: none; }
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 1px 3px rgba(99,102,241,0.3); }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-secondary { background: var(--bg-card); color: var(--text-700); border-color: var(--border); }
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--text-300); }
+.btn-ghost { background: transparent; color: var(--text-600); border-color: var(--border); }
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-800); }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+.btn-warning { background: var(--warning-bg); color: #b45309; border-color: var(--warning-border); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+/* 输入框 */
+input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13.5px; color: var(--text-800); background: var(--bg-input); transition: all 0.15s; outline: none; font-family: inherit; }
+input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); background: white; }
+
+/* 徽章 */
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.badge-primary { background: var(--primary-bg); color: var(--primary-hover); }
+.badge-success { background: var(--success-bg); color: #047857; }
+.badge-warning { background: var(--warning-bg); color: #b45309; }
+.badge-danger { background: var(--danger-bg); color: #dc2626; }
+.badge-info { background: var(--info-bg); color: #2563eb; }
+.badge-secondary { background: var(--bg-hover); color: var(--text-600); }
 
 /* 统计卡片 */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.stat-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.2s;
-}
-.stat-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-.stat-card .label { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
-.stat-card .value { font-size: 1.8rem; font-weight: 700; }
-.stat-card .value.pending { color: var(--warning); }
-.stat-card .value.processing { color: var(--info); }
-.stat-card .value.resolved { color: var(--success); }
-.stat-card .value.closed { color: var(--muted); }
-.stat-card .value.total { color: var(--primary); }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; position: relative; overflow: hidden; box-shadow: var(--shadow-xs); transition: all 0.2s; }
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--primary-border); }
+.stat-value { font-size: 30px; font-weight: 800; color: var(--text-900); line-height: 1.1; margin-bottom: 6px; }
+.stat-label { font-size: 13px; color: var(--text-500); font-weight: 500; }
+.stat-icon { position: absolute; top: 18px; right: 18px; width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; }
 
-/* 筛选栏 */
-.filter-bar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.filter-bar select, .filter-bar input {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: #1e1e2e !important;
-  color: #fff !important;
-  font-size: 1rem;
-  font-weight: 500;
-  outline: none;
-  min-width: 120px;
-}
-.filter-bar select option {
-  background: #1e1e2e !important;
-  color: #fff !important;
-  font-size: 1rem;
-  padding: 10px;
-}
-.filter-bar select option:checked {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-  color: #fff !important;
-}
-.filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); }
-.filter-bar input { flex: 1; min-width: 200px; }
-
-/* 工单列表 */
-.ticket-list { display: flex; flex-direction: column; gap: 10px; }
-.ticket-item {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.ticket-item:hover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
-.ticket-item .id { font-family: monospace; font-size: 0.8rem; color: var(--muted); min-width: 100px; }
-.ticket-item .info { flex: 1; min-width: 0; }
-.ticket-item .title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ticket-item .meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
-.status-badge {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.status-pending { background: rgba(245,158,11,0.15); color: var(--warning); }
-.status-processing { background: rgba(59,130,246,0.15); color: var(--info); }
-.status-resolved { background: rgba(16,185,129,0.15); color: var(--success); }
-.status-closed { background: rgba(148,163,184,0.15); color: var(--muted); }
-.priority-badge {
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.68rem;
-  font-weight: 600;
-}
-.priority-low { background: rgba(148,163,184,0.15); color: var(--muted); }
-.priority-normal { background: rgba(59,130,246,0.15); color: var(--info); }
-.priority-high { background: rgba(245,158,11,0.15); color: var(--warning); }
-.priority-urgent { background: rgba(239,68,68,0.15); color: var(--danger); }
+/* 表格 */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.data-table thead th { background: var(--bg-page); color: var(--text-500); font-weight: 600; font-size: 12px; text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--border); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
+.data-table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border-light); color: var(--text-700); vertical-align: middle; }
+.data-table tbody tr { transition: background 0.1s; cursor: pointer; }
+.data-table tbody tr:hover { background: var(--bg-page); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table .checkbox-col { width: 44px; text-align: center; }
+.data-table .action-col { white-space: nowrap; text-align: right; }
+.data-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
 
 /* 分页 */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-}
-.pagination button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-.pagination button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
-.pagination span { color: var(--muted); font-size: 0.82rem; }
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
+.pagination-info { font-size: 13px; color: var(--text-500); }
+.pagination-controls { display: flex; align-items: center; gap: 4px; }
+.pagination-btn { min-width: 32px; height: 32px; padding: 0 10px; border: 1px solid var(--border); background: white; color: var(--text-600); border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; }
+.pagination-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-bg); }
+.pagination-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* 工单详情 */
-.detail-view { display: none; }
-.detail-view.active { display: block; }
-.list-view.hidden { display: none; }
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.detail-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
-.detail-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--muted); }
-.detail-content {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
-  white-space: pre-wrap;
-  line-height: 1.7;
-  font-size: 0.92rem;
-}
-.detail-info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.info-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
-}
-.info-box .label { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
-.info-box .value { font-size: 0.88rem; word-break: break-all; }
+/* 空状态 */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 56px 20px; text-align: center; }
+.empty-state-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--bg-page); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--text-400); }
+.empty-state-title { font-size: 15px; font-weight: 600; color: var(--text-700); margin-bottom: 6px; }
+.empty-state-desc { font-size: 13px; color: var(--text-400); max-width: 300px; }
 
-/* 回复区 */
-.reply-section { margin-top: 20px; }
-.reply-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-.reply-item {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-}
-.reply-item.admin { border-left: 3px solid var(--primary); }
-.reply-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.78rem; }
-.reply-author { font-weight: 600; color: var(--primary); }
-.reply-time { color: var(--muted); }
-.reply-content { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
-.reply-form { display: flex; flex-direction: column; gap: 10px; }
-.reply-form textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: #fff;
-  font-size: 0.9rem;
-  resize: vertical;
-  outline: none;
-  font-family: inherit;
-  min-height: 100px;
-}
-.reply-form textarea:focus { border-color: var(--primary); }
-.reply-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.reply-actions select {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: #1e1e2e !important;
-  color: #fff !important;
-  font-size: 1rem;
-  font-weight: 500;
-  outline: none;
-}
-.reply-actions select option {
-  background: #1e1e2e !important;
-  color: #fff !important;
-  font-size: 1rem;
-  padding: 10px;
-}
-.reply-actions select option:checked {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-  color: #fff !important;
-}
+/* 批量操作栏 */
+.batch-bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--primary-bg); border-bottom: 1px solid var(--primary-border); font-size: 13px; color: var(--text-600); }
+.batch-bar .selected-count { font-weight: 700; color: var(--primary-hover); }
 
-/* 统计页 */
-.chart-container {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-}
-.chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
-.bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 200px; padding-top: 20px; }
-.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.bar {
-  width: 100%;
-  max-width: 50px;
-  background: linear-gradient(180deg, var(--primary), #8b5cf6);
-  border-radius: 6px 6px 0 0;
-  transition: all 0.3s;
-  position: relative;
-}
-.bar:hover { opacity: 0.8; }
-.bar-value { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; font-weight: 600; }
-.bar-label { font-size: 0.7rem; color: var(--muted); }
-.distribution-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-}
-.dist-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-.dist-item .name { font-size: 0.85rem; }
-.dist-item .count { font-size: 0.9rem; font-weight: 600; }
-
-/* 配置页 */
-.config-section {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 16px;
-}
-.config-section h3 { font-size: 1rem; margin-bottom: 16px; }
-.config-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.config-row:last-child { border-bottom: none; }
-.config-row .label { font-size: 0.88rem; }
-.config-row .desc { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+/* 筛选栏 */
+.filter-bar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.filter-bar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; color: var(--text-700); background: white; cursor: pointer; outline: none; min-width: 120px; width: auto; }
+.filter-bar select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
 
 /* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.9);
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  z-index: 99999;
-  animation: toastIn 0.3s ease;
-}
-@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--text-900); color: white; padding: 11px 22px; border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; z-index: 9999; box-shadow: var(--shadow-lg); animation: toastIn 0.2s ease; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
-/* 响应式 */
+/* 模态框 */
+.modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+.modal-box { background: white; border-radius: var(--radius-xl); padding: 24px; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+.modal-title { font-size: 17px; font-weight: 700; color: var(--text-900); margin-bottom: 16px; }
+
+/* 工具类 */
+.flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; }
+.mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; }
+.w-full { width: 100%; } .text-center { text-align: center; } .text-xs { font-size: 12px; } .text-sm { font-size: 13.5px; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.online-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.mobile-menu-btn { display: none; background: none; border: none; color: var(--text-700); cursor: pointer; padding: 6px; border-radius: var(--radius); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 99; }
+.sidebar-overlay.show { display: block; }
+
 @media (max-width: 768px) {
-  .sidebar { display:none !important; transform: translateX(-100%); transition: transform 0.3s; }
-  .sidebar.open { transform: translateX(0); }
-  .main { margin-left:0 !important; width:100% !important; margin-left: 0; padding: 16px; }
-  .menu-toggle { display: block !important; }
-  .ticket-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .app-sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+  .app-sidebar.open { transform: translateX(0); }
+  .app-main { margin-left: 0; }
+  .mobile-menu-btn { display: flex; }
+  .app-content { padding: 16px; }
+  .app-topbar { padding: 0 16px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .stat-value { font-size: 24px; }
+  .data-table { font-size: 12px; }
+  .data-table thead th, .data-table tbody td { padding: 8px 10px; }
 }
-.menu-toggle { display: none; position: fixed; top: 16px; left: 16px; z-index: 200; background: var(--primary); border: none; color: #fff; width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
-.overlay.show { display: block; }
-
-/* ========== 移动端适配 ========== */
-@media (max-width: 768px) {
-  * { -webkit-tap-highlight-color: transparent; }
-  input, select, textarea { font-size: 16px !important; }
-  
-  /* 登录页 */
-  .login-page { padding: 20px; }
-  .login-box { padding: 24px 20px; }
-  .login-box h1 { font-size: 1.3rem; }
-  
-  /* 侧边栏 - 抽屉式 */
-  .sidebar { display:none !important;
-    position: fixed;
-    left: -260px;
-    top: 0;
-    bottom: 0;
-    width: 260px;
-    z-index: 1001;
-    transition: left 0.3s ease;
-    overflow-y: auto;
-  }
-  .sidebar.open { left: 0; }
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-  }
-  .overlay.show { display: block; }
-  
-  /* 主内容区 */
-  .main { margin-left:0 !important; width:100% !important;
-    margin-left: 0 !important;
-    padding: 12px !important;
-  }
-  .main-header {
-    padding: 12px !important;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .menu-btn {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 1.2rem;
-    cursor: pointer;
-  }
-  
-  /* 页面标题 */
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .page-header h1 { font-size: 1.2rem; }
-  .page-header .actions {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-  .page-header .actions button {
-    flex: 1;
-    min-width: 100px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-  }
-  
-  /* 统计卡片 - 2列 */
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-  }
-  .stat-card { padding: 12px !important; }
-  .stat-card .label { font-size: 0.7rem !important; }
-  .stat-card .value { font-size: 1.3rem !important; }
-  
-  /* 筛选栏 - 堆叠 */
-  .filter-bar {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 8px !important;
-  }
-  .filter-bar select,
-  .filter-bar input {
-    width: 100% !important;
-    padding: 12px 14px !important;
-    font-size: 1rem !important;
-    color: #fff !important;
-  }
-  
-  /* 工单列表 */
-  .ticket-list { gap: 8px !important; }
-  .ticket-card {
-    padding: 12px !important;
-  }
-  .ticket-card .ticket-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  .ticket-card .ticket-title {
-    font-size: 0.9rem !important;
-  }
-  .ticket-card .ticket-meta {
-    flex-wrap: wrap;
-    gap: 4px;
-    font-size: 0.7rem !important;
-  }
-  .ticket-card .ticket-actions {
-    width: 100%;
-    margin-top: 8px;
-  }
-  .ticket-card .ticket-actions button {
-    flex: 1;
-    padding: 6px 10px;
-    font-size: 0.75rem;
-  }
-  
-  /* 表格横向滚动 */
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  table {
-    min-width: 600px;
-    font-size: 0.8rem;
-  }
-  th, td {
-    padding: 8px 10px !important;
-    white-space: nowrap;
-  }
-  
-  /* 分页 */
-  .pagination {
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: center;
-  }
-  .pagination button {
-    min-width: 32px;
-    height: 32px;
-    font-size: 0.8rem;
-    padding: 0 8px;
-  }
-  
-  /* 弹窗 */
-  .modal {
-    padding: 12px !important;
-  }
-  .modal-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 90vh !important;
-    margin: 0 !important;
-    padding: 16px !important;
-    overflow-y: auto;
-  }
-  .modal-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .modal-header h2 { font-size: 1.1rem; }
-  .modal-body { padding: 12px 0 !important; }
-  .modal-footer {
-    flex-direction: column-reverse;
-    gap: 8px;
-  }
-  .modal-footer button {
-    width: 100%;
-    padding: 10px;
-    font-size: 0.9rem;
-  }
-  
-  /* 表单 */
-  .form-group { margin-bottom: 12px !important; }
-  .form-group label { font-size: 0.8rem !important; margin-bottom: 4px !important; }
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100% !important;
-    padding: 10px 12px !important;
-    font-size: 0.9rem !important;
-  }
-  .form-group textarea { min-height: 80px; }
-  
-  /* 配置行 */
-  .config-row {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 6px;
-    padding: 10px 0 !important;
-  }
-  .config-row .label { font-size: 0.8rem !important; }
-  
-  /* 图表 */
-  .chart-container { padding: 12px !important; }
-  .chart-title { font-size: 0.9rem !important; margin-bottom: 8px !important; }
-  .bar-item { margin: 0 2px !important; }
-  .bar { width: 24px !important; }
-  
-  /* 回复区域 */
-  .reply-box {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .reply-box textarea {
-    width: 100% !important;
-    min-height: 80px;
-  }
-  .reply-box button {
-    width: 100%;
-    padding: 10px;
-  }
-  
-  /* 时间线 */
-  .timeline-item {
-    padding-left: 20px !important;
-  }
-  .timeline-item::before {
-    left: 4px !important;
-    width: 8px !important;
-    height: 8px !important;
-  }
-  
-  /* Toast */
-  .toast {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: auto !important;
-    max-width: 90vw !important;
-    padding: 10px 20px !important;
-    font-size: 0.85rem !important;
-    bottom: 20px !important;
-  }
-  
-  /* 空状态 */
-  .empty-state {
-    padding: 40px 20px !important;
-  }
-  .empty-state .icon { font-size: 3rem !important; }
-  .empty-state h3 { font-size: 1rem !important; }
-  .empty-state p { font-size: 0.8rem !important; }
-  
-  /* 底部安全区域 */
-  .safe-bottom {
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-}
-
-/* 小屏幕优化 */
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .ticket-card .ticket-actions {
-    flex-direction: column;
-  }
-  .ticket-card .ticket-actions button {
-    width: 100%;
-  }
-}
-
 </style>
-<style>
-/* ============ 浅色主题样式覆盖 ============ */
-body {
-  background: #f0f2f8 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
-  letter-spacing: -0.01em;
-  color: #1e293b;
-}
-body::before {
-  content: '';
-  position: fixed;
-  inset: -50%;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse 60% 40% at 15% 15%, rgba(99, 102, 241, 0.06), transparent),
-    radial-gradient(ellipse 50% 35% at 85% 25%, rgba(168, 85, 247, 0.04), transparent),
-    radial-gradient(ellipse 55% 45% at 50% 90%, rgba(59, 130, 246, 0.03), transparent);
-  animation: aurora-shift 20s ease-in-out infinite;
-}
-@keyframes aurora-shift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-2%, -2%) rotate(1deg); }
-}
-/* 卡片浅色 */
-.card, .glass-card, .stat-card, .modal-content {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
-}
-/* 文字浅色 */
-h1, h2, h3, h4, .text-white, .text-white\/70, .text-white\/60 {
-  color: #1e293b !important;
-}
-/* 侧边栏浅色 */
-.sidebar, aside {
-  background: #ffffff !important;
-  border-right: 1px solid #e2e8f0 !important;
-}
-.nav-item {
-  color: #64748b !important;
-}
-.nav-item:hover {
-  background: #f1f5f9 !important;
-  color: #1e293b !important;
-}
-.nav-item.active {
-  background: rgba(99,102,241,0.1) !important;
-  color: #6366f1 !important;
-}
-/* 按钮浅色 */
-.btn-secondary, .btn-ghost {
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-  color: #475569 !important;
-}
-.btn-secondary:hover, .btn-ghost:hover {
-  background: #f1f5f9 !important;
-  color: #1e293b !important;
-}
-/* 输入框浅色 */
-input, select, textarea, .input-field, .form-input {
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-  color: #1e293b !important;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
-  background: #ffffff !important;
-}
-/* 表格浅色 */
-table, .table {
-  background: #ffffff !important;
-}
-th {
-  background: #f8fafc !important;
-  color: #64748b !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-td {
-  border-bottom: 1px solid #f1f5f9 !important;
-  color: #334155 !important;
-}
-tr:hover {
-  background: #f8fafc !important;
-}
-/* 徽章浅色 */
-.badge {
-  background: #f1f5f9 !important;
-  color: #475569 !important;
-}
-.badge-primary { background: rgba(99,102,241,0.1) !important; color: #6366f1 !important; }
-.badge-success { background: rgba(34,197,94,0.1) !important; color: #16a34a !important; }
-.badge-warning { background: rgba(245,158,11,0.1) !important; color: #d97706 !important; }
-.badge-danger { background: rgba(239,68,68,0.1) !important; color: #dc2626 !important; }
-/* 模态框浅色 */
-.modal-overlay {
-  background: rgba(0,0,0,0.4) !important;
-}
-.modal-content {
-  background: #ffffff !important;
-}
-/* 顶部栏浅色 */
-.topbar, header {
-  background: rgba(255,255,255,0.9) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  backdrop-filter: blur(12px) !important;
-}
-/* 次要文字 */
-.text-slate-400, .text-gray-400, .text-white\/40 { color: #94a3b8 !important; }
-.text-slate-500, .text-gray-500, .text-white\/50 { color: #64748b !important; }
-.text-slate-600, .text-gray-600, .text-white\/60 { color: #475569 !important; }
-</style></head>
+</head>
 <body>
-<div style="position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid #e2e8f0;">
-  <div style="display:flex;align-items:center;gap:16px;">
-    <a href="/admin" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:#475569;font-size:13px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.7)'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      返回控制台
-    </a>
-    <span style="font-size:15px;font-weight:600;color:#f1f5f9;">工单管理</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <span class="online-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;"></span>
-    <span style="font-size:12px;color:#94a3b8;">实时同步</span>
-  </div>
-</div>
-<div style="max-width:1200px;margin:0 auto;padding:24px;">
-
-<!-- 登录页 -->
-
-
-<!-- 主应用 -->
-<div class="app" id="app">
-  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-  
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <h2>🎫 工单管理</h2>
-      <p>Ticket Admin v1.0</p>
+<div class="app-layout">
+  <!-- 侧边栏 -->
+  <aside class="app-sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+      <div><div class="sidebar-title">BBB Console</div><div class="sidebar-subtitle">管理控制台 v9.0</div></div>
     </div>
-    <div class="nav-item active" data-page="list" onclick="navigate('list')">
-      <span class="icon">📋</span> 工单管理
-      <span class="nav-badge" id="pendingBadge">0</span>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">主导航</div>
+        <div class="nav-item" onclick="location.href='/admin'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>控制台</div>
+        <div class="nav-item" onclick="location.href='/tools/gen-license'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>激活码管理</div>
+        <div class="nav-item active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>工单管理</div>
+        <div class="nav-item" onclick="location.href='/update-history.html'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>更新历史</div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="localStorage.clear();location.href='/'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</div>
     </div>
-    <div class="nav-item" data-page="processing" onclick="navigate('processing')">
-      <span class="icon">⚡</span> 工单处理
-    </div>
-    <div class="nav-item" data-page="search" onclick="navigate('search')">
-      <span class="icon">🔍</span> 筛选检索
-    </div>
-    <div class="nav-item" data-page="stats" onclick="navigate('stats')">
-      <span class="icon">📊</span> 统计分析
-    </div>
-    <div class="nav-item" data-page="config" onclick="navigate('config')">
-      <span class="icon">⚙️</span> 系统配置
-    </div>
-    <div class="nav-item" data-page="permission" onclick="navigate('permission')">
-      <span class="icon">🔐</span> 权限管理
-    </div>
-    <div class="nav-item" data-page="advanced" onclick="navigate('advanced')">
-      <span class="icon">🚀</span> 高级功能
-    </div>
-
   </aside>
+  <div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open')"></div>
 
-  <main class="main">
-    <!-- 工单列表页 -->
-    <div id="page-list" class="page">
-      <div class="page-header" style="display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;">
-        <div class="actions">
-          <button class="btn" onclick="refreshList()">🔄 刷新</button>
-          <button class="btn btn-primary" onclick="exportCSV()">📥 导出CSV</button>
+  <!-- 主内容 -->
+  <div class="app-main">
+    <header class="app-topbar">
+      <div class="flex items-center" style="gap:12px">
+        <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.add('open')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <h1 class="topbar-title">工单管理</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-primary" id="pendingBadge">待处理 0</span>
+        <button class="btn btn-secondary btn-sm" onclick="loadTickets(true)">🔄 刷新</button>
+      </div>
+    </header>
+
+    <main class="app-content" id="app">
+      <!-- 统计卡片 -->
+      <div class="grid-4 mb-6" id="statsCards"></div>
+
+      <!-- 工单列表页 -->
+      <div id="page-list">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">工单列表</div>
+            <div class="flex gap-2">
+              <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 导出CSV</button>
+            </div>
+          </div>
+          <!-- 筛选栏 -->
+          <div class="filter-bar">
+            <span class="text-xs font-semibold" style="color:var(--text-500)">状态:</span>
+            <select id="filterStatus" onchange="renderTickets()"><option value="all">全部</option><option value="pending">待处理</option><option value="processing">处理中</option><option value="resolved">已解决</option><option value="closed">已关闭</option></select>
+            <span class="text-xs font-semibold" style="color:var(--text-500);margin-left:8px">类型:</span>
+            <select id="filterType" onchange="renderTickets()"><option value="all">全部</option><option value="bug">Bug反馈</option><option value="feature">功能建议</option><option value="account">账号问题</option><option value="payment">支付问题</option><option value="other">其他</option></select>
+            <div style="flex:1;min-width:200px;max-width:320px;margin-left:auto">
+              <input type="text" id="filterKeyword" placeholder="搜索工单ID/标题/内容..." oninput="renderTickets()" />
+            </div>
+          </div>
+          <!-- 表格 -->
+          <div style="overflow-x:auto">
+            <table class="data-table" id="ticketTable">
+              <thead><tr><th class="checkbox-col"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"/></th><th>工单ID</th><th>类型</th><th>状态</th><th>标题</th><th>提交时间</th><th>联系方式</th><th class="action-col">操作</th></tr></thead>
+              <tbody id="ticketList"></tbody>
+            </table>
+          </div>
+          <!-- 批量操作栏 -->
+          <div class="batch-bar" id="batchBar" style="display:none">
+            <span>已选择 <span class="selected-count" id="selectedCount">0</span> 项</span>
+            <button class="btn btn-success btn-sm" onclick="batchAction('resolved')">批量标记已处理</button>
+            <button class="btn btn-secondary btn-sm" onclick="batchAction('closed')">批量关闭</button>
+            <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearSelection()">取消选择</button>
+          </div>
+          <!-- 分页 -->
+          <div class="pagination" id="pagination"></div>
         </div>
       </div>
-      <div class="stats-grid" id="statsCards"></div>
-      <div class="filter-bar">
-        <select id="filterStatus" onchange="applyFilter()">
-          <option value="all">全部状态</option>
-          <option value="pending">待处理</option>
-          <option value="processing">处理中</option>
-          <option value="resolved">已解决</option>
-          <option value="closed">已关闭</option>
-        </select>
-        <select id="filterType" onchange="applyFilter()">
-          <option value="all">全部类型</option>
-          <option value="bug">问题反馈</option>
-          <option value="suggestion">功能建议</option>
-          <option value="complaint">投诉</option>
-          <option value="other">其他</option>
-        </select>
-        <input type="text" id="filterKeyword" placeholder="搜索工单ID/标题/内容/联系方式..." oninput="debounceFilter()">
-      </div>
-      <div class="ticket-list" id="ticketList"></div>
-      <div class="pagination" id="pagination"></div>
-    </div>
 
-    <!-- 工单详情页 -->
-    <div id="page-detail" class="page" style="display:none;">
-      <div class="page-header">
-        <h1>🔧 工单详情</h1>
-        <div class="actions">
-          <button class="btn" onclick="backToList()">← 返回列表</button>
-          <button class="btn btn-danger" onclick="deleteTicket()">🗑️ 删除</button>
-        </div>
+      <!-- 工单详情页 -->
+      <div id="page-detail" style="display:none">
+        <button class="btn btn-secondary btn-sm mb-4" onclick="showList()">← 返回列表</button>
+        <div id="detailContent"></div>
       </div>
-      <div id="detailContent"></div>
-    </div>
-
-    <!-- 工单处理页 -->
-    <div id="page-processing" class="page" style="display:none;">
-      <div class="page-header">
-        <h1>⚡ 工单处理</h1>
-        <button class="btn" onclick="refreshList()">🔄 刷新</button>
-      </div>
-      <p style="color:var(--muted);margin-bottom:16px;">显示待处理和处理中的工单，快速回复和更新状态</p>
-      <div class="filter-bar">
-        <select id="procStatus" onchange="loadProcessing()">
-          <option value="pending">待处理</option>
-          <option value="processing">处理中</option>
-          <option value="all">待处理+处理中</option>
-        </select>
-      </div>
-      <div class="ticket-list" id="processingList"></div>
-    </div>
-
-    <!-- 筛选检索页 -->
-    <div id="page-search" class="page" style="display:none;">
-      <div class="page-header"><h1>🔍 筛选检索</h1></div>
-      <div class="filter-bar" style="flex-direction:column;align-items:stretch;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <select id="searchStatus"><option value="all">全部状态</option><option value="pending">待处理</option><option value="processing">处理中</option><option value="resolved">已解决</option><option value="closed">已关闭</option></select>
-          <select id="searchPriority"><option value="all">全部优先级</option><option value="low">低</option><option value="normal">普通</option><option value="high">高</option><option value="urgent">紧急</option></select>
-          <select id="searchType"><option value="all">全部类型</option><option value="bug">问题反馈</option><option value="suggestion">功能建议</option><option value="complaint">投诉</option><option value="other">其他</option></select>
-          <input type="date" id="searchDateFrom">
-          <input type="date" id="searchDateTo">
-        </div>
-        <div style="display:flex;gap:10px;">
-          <input type="text" id="searchKeyword" placeholder="关键词搜索..." style="flex:1;">
-          <button class="btn btn-primary" onclick="doSearch()">🔍 搜索</button>
-          <button class="btn" onclick="resetSearch()">重置</button>
-        </div>
-      </div>
-      <div class="ticket-list" id="searchList"></div>
-    </div>
-
-    <!-- 统计分析页 -->
-    <div id="page-stats" class="page" style="display:none;">
-      <div class="page-header">
-        <h1>📊 统计分析</h1>
-        <button class="btn" onclick="loadStats()">🔄 刷新</button>
-      </div>
-      <div class="stats-grid" id="statsOverview"></div>
-      <div class="chart-container">
-        <div class="chart-title">📈 近7天工单趋势</div>
-        <div class="bar-chart" id="trendChart"></div>
-      </div>
-      <div class="distribution-grid" id="distributionGrid"></div>
-    </div>
-
-    <!-- 系统配置页 -->
-    <div id="page-config" class="page" style="display:none;">
-      <div class="page-header"><h1>⚙️ 系统配置</h1></div>
-      <div class="config-section">
-        <h3>工单类型配置</h3>
-        <div class="config-row"><div><div class="label">问题反馈 (bug)</div><div class="desc">用户反馈系统问题或bug</div></div><span class="status-badge status-processing">启用</span></div>
-        <div class="config-row"><div><div class="label">功能建议 (suggestion)</div><div class="desc">用户提出新功能或改进建议</div></div><span class="status-badge status-processing">启用</span></div>
-        <div class="config-row"><div><div class="label">投诉 (complaint)</div><div class="desc">用户投诉或不满</div></div><span class="status-badge status-processing">启用</span></div>
-        <div class="config-row"><div><div class="label">其他 (other)</div><div class="desc">其他类型工单</div></div><span class="status-badge status-processing">启用</span></div>
-      </div>
-      <div class="config-section">
-        <h3>优先级配置</h3>
-        <div class="config-row"><div><div class="label">低 (low)</div><div class="desc">不影响使用，可延后处理</div></div><span class="priority-badge priority-low">低</span></div>
-        <div class="config-row"><div><div class="label">普通 (normal)</div><div class="desc">正常处理优先级</div></div><span class="priority-badge priority-normal">普通</span></div>
-        <div class="config-row"><div><div class="label">高 (high)</div><div class="desc">影响部分功能，需优先处理</div></div><span class="priority-badge priority-high">高</span></div>
-        <div class="config-row"><div><div class="label">紧急 (urgent)</div><div class="desc">系统不可用，需立即处理</div></div><span class="priority-badge priority-urgent">紧急</span></div>
-      </div>
-      <div class="config-section">
-        <h3>自动回复配置</h3>
-        <div class="config-row"><div><div class="label">创建工单自动回复</div><div class="desc">用户创建工单后自动发送确认消息</div></div><span class="status-badge status-resolved">已启用</span></div>
-        <div class="config-row"><div><div class="label">解决工单自动通知</div><div class="desc">工单标记为已解决时自动通知用户</div></div><span class="status-badge status-resolved">已启用</span></div>
-      </div>
-    </div>
-
-    <!-- 权限管理页 -->
-    <div id="page-permission" class="page" style="display:none;">
-      <div class="page-header"><h1>🔐 权限管理</h1></div>
-      <div class="config-section">
-        <h3>管理员账号</h3>
-        <div class="config-row"><div><div class="label">超级管理员</div><div class="desc">拥有所有权限，管理密码登录</div></div><span class="status-badge status-resolved">在线</span></div>
-      </div>
-      <div class="config-section">
-        <h3>角色权限</h3>
-        <div class="config-row"><div><div class="label">超级管理员</div><div class="desc">查看/回复/删除/导出/配置 所有权限</div></div><span class="status-badge status-processing">全部权限</span></div>
-        <div class="config-row"><div><div class="label">客服</div><div class="desc">查看/回复工单，无法删除和配置</div></div><span class="status-badge status-closed">待添加</span></div>
-        <div class="config-row"><div><div class="label">观察员</div><div class="desc">仅查看工单，无法回复和操作</div></div><span class="status-badge status-closed">待添加</span></div>
-      </div>
-      <div class="config-section">
-        <h3>安全设置</h3>
-        <div class="config-row"><div><div class="label">密码哈希验证</div><div class="desc">管理密码采用哈希校验，不明文传输</div></div><span class="status-badge status-resolved">已启用</span></div>
-        <div class="config-row"><div><div class="label">操作日志</div><div class="desc">记录所有管理员操作行为</div></div><span class="status-badge status-processing">记录中</span></div>
-      </div>
-    </div>
-
-    <!-- 高级功能页 -->
-    <div id="page-advanced" class="page" style="display:none;">
-      <div class="page-header"><h1>🚀 高级功能</h1></div>
-      <div class="config-section">
-        <h3>数据导出</h3>
-        <div class="config-row"><div><div class="label">导出全部工单 (CSV)</div><div class="desc">导出所有工单数据为CSV格式</div></div><button class="btn btn-primary" onclick="exportCSV()">导出</button></div>
-        <div class="config-row"><div><div class="label">导出筛选结果</div><div class="desc">导出当前筛选条件下的工单</div></div><button class="btn" onclick="exportFilteredCSV()">导出</button></div>
-      </div>
-      <div class="config-section">
-        <h3>批量操作</h3>
-        <div class="config-row"><div><div class="label">批量标记已解决</div><div class="desc">将所有待处理工单标记为已解决</div></div><button class="btn btn-success" onclick="batchResolve()">批量处理</button></div>
-        <div class="config-row"><div><div class="label">批量关闭已解决工单</div><div class="desc">关闭所有已解决超过7天的工单</div></div><button class="btn" onclick="batchClose()">批量关闭</button></div>
-      </div>
-      <div class="config-section">
-        <h3>标签管理</h3>
-        <div class="config-row"><div><div class="label">系统标签</div><div class="desc">已解决/待确认/需跟进/重复工单</div></div><span class="status-badge status-processing">4个标签</span></div>
-        <div class="config-row"><div><div class="label">自定义标签</div><div class="desc">支持添加自定义标签分类工单</div></div><span class="status-badge status-closed">待添加</span></div>
-      </div>
-      <div class="config-section">
-        <h3>API接口</h3>
-        <div class="config-row"><div><div class="label">工单创建接口</div><div class="desc">/ticket/create - 公开接口</div></div><span class="status-badge status-resolved">已启用</span></div>
-        <div class="config-row"><div><div class="label">工单查询接口</div><div class="desc">/ticket/status - 玩家查询进度</div></div><span class="status-badge status-resolved">已启用</span></div>
-        <div class="config-row"><div><div class="label">管理接口</div><div class="desc">列表/详情/回复/更新/删除/统计 - 需密码</div></div><span class="status-badge status-resolved">已启用</span></div>
-      </div>
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
-
+<div id="toastContainer"></div>
 <script>
 const API_BASE = "https://api.ttla.top";
 let adminHash = localStorage.getItem("ticket_admin_hash") || "";
