@@ -44,7 +44,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;min-width:0}
 .topbar{height:var(--topbar-h);background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
 .topbar-left{display:flex;align-items:center;gap:12px;min-width:0}
-.topbar-title{font-size:17px;font-weight:700;color:var(--text-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-title{font-size:17px;font-weight:600;color:var(--text-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .content{flex:1;padding:24px;max-width:100%;display:flex;flex-direction:column;gap:0}
 
@@ -54,7 +54,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .card-title{font-size:14.5px;font-weight:600;color:var(--text-900)}
 .card-body{padding:18px}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13.5px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;user-select:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13.5px;font-weight:400;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;user-select:none}
 .btn-primary{background:var(--primary);color:#fff;box-shadow:0 1px 3px rgba(99,102,241,.3)}
 .btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.35)}
 .btn-secondary{background:var(--bg-card);color:var(--text-700);border-color:var(--border)}
@@ -293,7 +293,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
       <!-- 详情页 -->
       <div class="page" id="page-detail" style="display:none">
-        <div class="detail-back"><button class="btn btn-secondary btn-sm" onclick="backToList()">返回列表</button></div>
+        <div class="detail-back"><button class="btn btn-ghost btn-sm" onclick="backToList()">返回列表</button></div>
         <div id="detailContent"></div>
       </div>
 
