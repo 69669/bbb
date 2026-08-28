@@ -199,7 +199,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 .btn-danger:hover:not(:disabled) { background: #fee2e2; }
 .btn-gradient { background: var(--brand-gradient); color: #fff; box-shadow: var(--shadow-primary); }
 .btn-gradient:hover:not(:disabled) { background: var(--brand-gradient-hover); transform: translateY(-1px); }
-.btn-sm { padding: 0 12px; height: 28px; line-height: 1; font-size: 12px; border-radius: 6px; box-sizing: border-box; }
+.btn-sm{padding:0 12px!important;height:28px!important;line-height:1!important;font-size:12px!important;border-radius:6px!important;box-sizing:border-box!important}
 .btn-lg { padding: 11px 24px; font-size: var(--font-md); }
 .btn-block { width: 100%; }
 
