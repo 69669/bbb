@@ -218,7 +218,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 
 /* ===== Tag / Badge ===== */
 .tag, .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-full); font-size: var(--font-xs); font-weight: var(--weight-semibold); white-space: nowrap; line-height: 1.4; }
-.badge-primary { background: var(--primary-bg); color: var(--primary-hover); }
+.badge-primary { background: var(--primary-bg); color: var(--primary); }
 .badge-success { background: var(--success-bg); color: var(--success-text); }
 .badge-warning { background: var(--warning-bg); color: var(--warning-text); }
 .badge-danger { background: var(--danger-bg); color: var(--danger-text); }
