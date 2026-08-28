@@ -72,7 +72,7 @@ export default class GeneratePage extends React.Component {
       statusFilter: 0, // 0=全部, 1=未激活, 2=已激活, 3=已禁用
       search: "", // 搜索关键词
       currentPage: 1, // 当前页码
-      pageSize: 50, // 每页50条
+      pageSize: 10, // 每页10条
     };
     this.autoRefreshTimer = null as any;
   }
@@ -819,7 +819,7 @@ export default class GeneratePage extends React.Component {
         {sidebar}
         <div className="app-main">
           <header className="app-topbar">
-            <h1 className="topbar-title">激活码管理</h1>
+            <button className="btn btn-ghost btn-sm" onClick={() => window.location.href="/admin"} style={{ marginRight: "12px" }}>← 返回</button><h1 className="topbar-title">激活码管理</h1>
             <div className="topbar-actions">
               <span className="badge badge-primary">共 {history.length} 条</span>
             </div>
@@ -965,7 +965,7 @@ export default class GeneratePage extends React.Component {
                 </div>
 
                 {/* 搜索框 */}
-                <div style={{ padding: "0 16px 14px" }}>
+                <div style={{ padding: "0 16px 10px" }}>
                   <div style={{ position: "relative", maxWidth: "400px" }}>
                     <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }}>🔍</span>
                     <input type="text" value={search} onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }} placeholder="搜索激活码..."
@@ -1004,7 +1004,7 @@ export default class GeneratePage extends React.Component {
                             <td style={{ fontSize: "12px", color: "#64748b" }}>{item.used ? this.formatIp(item.usedIp) : "-"}</td>
                             <td className="action-col">
                               <div style={{ display: "flex", gap: "4px", justifyContent: "flex-end" }}>
-                                {!item.disabled ? <button onClick={() => this.disableCode(i)} disabled={disabling} className="btn btn-danger btn-sm">封禁</button> : <button onClick={() => this.enableCode(i)} disabled={disabling} className="btn btn-success btn-sm">解封</button>}
+                                {item.used && !item.disabled ? <button onClick={() => this.disableCode(i)} disabled={disabling} className="btn btn-danger btn-sm">封禁</button> : item.disabled ? <button onClick={() => this.enableCode(i)} disabled={disabling} className="btn btn-success btn-sm">解封</button> : null}
                                 <button onClick={() => this.handleCopyCode(item.code)} className="btn btn-ghost btn-sm">复制</button>
                                 <button onClick={() => this.deleteHistory(i)} className="btn btn-danger btn-sm">删除</button>
                               </div>
