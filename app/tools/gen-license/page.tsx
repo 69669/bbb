@@ -731,7 +731,7 @@ export default class GeneratePage extends React.Component {
     const disabledCount = history.filter((h) => h.disabled).length;
 
     const sidebar = (
-      <aside className="sidebar">
+      <aside className="sidebar" id="sidebar">
         <div className="sidebar-head">
           <div className="sidebar-logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
           <div><div className="sidebar-name">后台管理</div><div className="sidebar-sub">管理控制台</div></div>
@@ -749,6 +749,7 @@ export default class GeneratePage extends React.Component {
           <div className="nav-item" onClick={this.handleLogout}><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</div>
         </div>
       </aside>
+      <div className="overlay" id="overlay" onClick={() => document.getElementById("sidebar").classList.remove("open")}></div>
     );
 
     return (
@@ -757,6 +758,7 @@ export default class GeneratePage extends React.Component {
         <div className="main">
           <header className="topbar">
             <div className="topbar-left">
+              <button className="menu-btn" onClick={() => document.getElementById("sidebar").classList.toggle("open")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
               <button className="btn btn-ghost btn-sm" onClick={() => window.location.href = "/admin"}>返回</button>
               <h1 className="topbar-title">激活码管理</h1>
             </div>
