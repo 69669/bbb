@@ -756,7 +756,7 @@ export default class GeneratePage extends React.Component {
         {sidebar}
         <div className="main">
           <header className="topbar">
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div className="topbar-left">
               <button className="btn btn-ghost btn-sm" onClick={() => window.location.href = "/admin"}>返回</button>
               <h1 className="topbar-title">激活码管理</h1>
             </div>
