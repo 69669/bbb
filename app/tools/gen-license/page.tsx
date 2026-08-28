@@ -67,12 +67,11 @@ export default class GeneratePage extends React.Component {
       lastRefresh: "", // 最后刷新时间
       disabling: false, // 是否正在禁用/启用
       showDetail: null as number | null, // 当前查看详情的索引
-      selectedCodes: [], // 批量选中的索引
       toast: "", // 提示信息
       statusFilter: 0, // 0=全部, 1=未激活, 2=已激活, 3=已禁用
       search: "", // 搜索关键词
       currentPage: 1, // 当前页码
-      pageSize: 10, // 每页10条
+      pageSize: 10, // 每页50条
     };
     this.autoRefreshTimer = null as any;
   }
@@ -97,7 +96,6 @@ export default class GeneratePage extends React.Component {
     lastRefresh: string;
     disabling: boolean;
     showDetail: number | null;
-  selectedCodes: number[];
     toast: string;
     statusFilter: number;
     search: string;
@@ -108,21 +106,13 @@ export default class GeneratePage extends React.Component {
 
   componentDidMount() {
     if (typeof window !== "undefined") {
-      // 统一登录：检查bbb后台登录状态
-      const bbbAuthed = localStorage.getItem("bbb_admin_authed");
-      if (bbbAuthed === "true") {
-        this.setState({ authenticated: true, adminPassword: "" });
-        // 兼容旧的lg_admin_auth
-        localStorage.setItem("lg_admin_auth", "1");
-        if (!localStorage.getItem("lg_admin_hash")) {
-          localStorage.setItem("lg_admin_hash", "535441809");
-        }
+      const auth = localStorage.getItem("lg_admin_auth");
+      if (auth === "1") {
+        this.setState({ authenticated: true });
+        // 登录后自动从云端同步生成记录
         setTimeout(() => this.syncFromCloud(), 300);
+        // 启动自动刷新定时器（每60秒刷新一次云端状态）
         this.startAutoRefresh();
-      } else {
-        // 未登录，跳回登录页
-        window.location.href = "/";
-        return;
       }
       const historyData = localStorage.getItem("lg_gen_history");
       if (historyData) {
@@ -199,9 +189,12 @@ export default class GeneratePage extends React.Component {
   handleLogout = () => {
     localStorage.removeItem("lg_admin_auth");
     localStorage.removeItem("lg_admin_hash");
-    localStorage.removeItem("bbb_admin_authed");
-    localStorage.removeItem("bbb_admin_hash");
-    window.location.href = "/";
+    this.setState({ authenticated: false });
+    // 退出时清除自动刷新定时器
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
   };
 
   handleGenerate = async () => {
@@ -360,12 +353,6 @@ export default class GeneratePage extends React.Component {
 
   exportHistory = () => {
     const { history, filterType } = this.state;
-    const exportData = filterType === -1 ? history : history.filter((h) => h.type === filterType);
-    if (exportData.length === 0) {
-      this.setState({ toast: "暂无数据可导出" });
-      setTimeout(() => this.setState({ toast: "" }), 2000);
-      return;
-    }
     // 按当前筛选导出
     const filtered = filterType === -1 ? history : history.filter((h) => h.type === filterType);
     if (filtered.length === 0) {
@@ -538,7 +525,6 @@ export default class GeneratePage extends React.Component {
         this.setState({ syncing: false });
         return;
       }
-      // 合并云端记录到本地（去重）
       const { history } = this.state;
       const localCodes = new Set(history.map((h) => cleanCode(h.code)));
       const newHistory = [...history];
@@ -562,7 +548,6 @@ export default class GeneratePage extends React.Component {
           localCodes.add(clean);
           added++;
         } else {
-          // 更新本地记录的使用状态
           const idx = newHistory.findIndex((h) => cleanCode(h.code) === clean);
           if (idx >= 0) {
             newHistory[idx] = {
@@ -580,7 +565,6 @@ export default class GeneratePage extends React.Component {
           }
         }
       }
-      // 按生成时间倒序
       newHistory.sort((a, b) => b.createdAt - a.createdAt);
       localStorage.setItem("lg_gen_history", JSON.stringify(newHistory));
       this.setState({ history: newHistory, syncing: false });
@@ -591,4 +575,442 @@ export default class GeneratePage extends React.Component {
     }
   }
 
+  disableCode = async (index: number) => {
+    const { history } = this.state;
+    const item = history[index];
+    if (!item) return;
+    const reason = prompt("请输入封禁原因（可选）：", "管理员封禁");
+    if (reason === null) return;
+    this.setState({ disabling: true });
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/disable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: cleanCode(item.code),
+          reason: reason || "管理员封禁",
+          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const newHistory = [...history];
+        newHistory[index] = { ...newHistory[index], disabled: true, disabledAt: Date.now(), disabledReason: reason || "管理员封禁" };
+        this.saveHistory(newHistory);
+        this.showToast("✓ 已封禁");
+      } else {
+        this.showToast("封禁失败：" + (data.message || "未知错误"));
+      }
+    } catch (e: any) {
+      this.showToast("封禁失败：" + (e?.message || String(e)));
+    }
+    this.setState({ disabling: false });
+  };
+  // 启用激活码
+  enableCode = async (index: number) => {
+    const { history } = this.state;
+    const item = history[index];
+    if (!item) return;
+    if (!confirm("确定要启用此激活码吗？")) return;
+    this.setState({ disabling: true });
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/enable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: cleanCode(item.code),
+          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const newHistory = [...history];
+        newHistory[index] = { ...newHistory[index], disabled: false, disabledAt: null, disabledReason: null };
+        this.saveHistory(newHistory);
+        this.showToast("✓ 已解封");
+      } else {
+        this.showToast("解封失败：" + (data.message || "未知错误"));
+      }
+    } catch (e: any) {
+      this.showToast("解封失败：" + (e?.message || String(e)));
+    }
+    this.setState({ disabling: false });
+  };
+  // 格式化IP（显示完整）
+  formatIp = (ip: string | null | undefined): string => {
+    if (!ip || ip === "unknown") return "未知";
+    return ip;
+  };
+  // 格式化完整时间
+  formatFullDate = (timestamp: number | null | undefined): string => {
+    if (!timestamp) return "未激活";
+    const d = new Date(timestamp);
+    return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+  };
+  // 显示提示
+  showToast = (msg: string) => {
+    this.setState({ toast: msg });
+    setTimeout(() => this.setState({ toast: "" }), 2000);
+  };
+  // 清空云端所有激活码记录
+  clearCloud = async () => {
+    if (!confirm("⚠️ 确定要清空云端所有激活码记录吗？\n\n此操作不可恢复！清空后：\n1. 之前生成的所有激活码全部失效\n2. 云端记录全部删除\n3. 本地记录也会同步清空\n\n确定继续吗？")) {
+      return;
+    }
+    if (!confirm("再次确认：真的要清空所有激活码吗？此操作不可恢复！")) {
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/codes/clear`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+        signal: AbortSignal.timeout(120000),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.removeItem("lg_gen_history");
+        this.setState({ history: [] });
+        alert(`云端记录已清空，共删除 ${data.deleted} 条激活码`);
+      } else {
+        alert("清空失败：" + (data.message || "未知错误"));
+      }
+    } catch (e: any) {
+      let msg = e?.message || String(e);
+      if (msg === "Failed to fetch" || msg.includes("NetworkError")) {
+        msg = "网络请求失败，请检查：\n1. Worker是否已部署最新版本（含/codes/clear接口）\n2. api.ttla.top是否可正常访问\n3. 网络连接是否正常";
+      }
+      alert("清空失败：" + msg);
+    }
+  };
 
+  render() {
+    const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, showDetail, statusFilter, search, currentPage, pageSize } = this.state;
+
+    const { toast } = this.state;
+    if (!authenticated) {
+      return (
+        <>
+          <div className="bg-aurora" />
+          <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center px-4 py-8">
+            <div className="game-container">
+              <div className="text-center mb-6">
+                <div className="text-4xl mb-3">🔐</div>
+                <h1 className="text-xl font-bold text-white">验证身份</h1>
+                <p className="mt-2 text-sm text-white/50">请输入管理密码</p>
+              </div>
+              <form onSubmit={this.handlePasswordSubmit} className="space-y-4">
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => this.setState({ password: e.target.value, error: "" })}
+                  placeholder="输入密码"
+                  className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-center text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  autoFocus
+                />
+                {error && (
+                  <div className="rounded-lg bg-red-500/10 p-2 text-center text-sm text-red-300">{error}</div>
+                )}
+                <button type="submit" className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition">
+                  验证
+                </button>
+              </form>
+              <div className="mt-6 text-center">
+                <Link href="/" className="text-xs text-white/40 hover:text-white/60">返回首页</Link>
+              </div>
+            </div>
+          </div>
+          {toast && (
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 rounded-full bg-black/80 px-6 py-3 text-sm text-white shadow-lg backdrop-blur-sm animate-fade-in">
+              {toast}
+            </div>
+          )}
+        </>
+      );
+    }
+
+    const typeOptions = [
+      { value: 0, label: "天卡", desc: "1天" },
+      { value: 5, label: "测试卡", desc: "5分钟" },
+      { value: 1, label: "周卡", desc: "7天" },
+      { value: 2, label: "月卡", desc: "30天" },
+      { value: 3, label: "季卡", desc: "90天" },
+      { value: 4, label: "年卡", desc: "365天" },
+    ];
+
+    let filteredHistory = filterType === -1 ? history : history.filter((h) => h.type === filterType);
+    // 按状态筛选
+    if (statusFilter === 1) {
+      filteredHistory = filteredHistory.filter((h) => !h.used && !h.disabled);
+    } else if (statusFilter === 2) {
+      filteredHistory = filteredHistory.filter((h) => h.used);
+    } else if (statusFilter === 3) {
+      filteredHistory = filteredHistory.filter((h) => h.disabled);
+    }
+    // 搜索过滤
+    if (search.trim()) {
+      const keyword = search.trim().toUpperCase();
+      filteredHistory = filteredHistory.filter((h) => h.code.toUpperCase().includes(keyword));
+    }
+    // 分页
+    const totalPages = Math.max(1, Math.ceil(filteredHistory.length / pageSize));
+    const safePage = Math.min(currentPage, totalPages);
+    const pagedHistory = filteredHistory.slice((safePage - 1) * pageSize, safePage * pageSize);
+    const usedCount = history.filter((h) => h.used).length;
+    const disabledCount = history.filter((h) => h.disabled).length;
+
+    return (
+      <>
+        <div className="bg-aurora" />
+        <div className="relative z-10 mx-auto min-h-screen w-full max-w-2xl px-4 py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <Link href="/admin" className="back-btn inline-flex">← 后台管理</Link>
+            <div className="flex gap-2">
+              <button onClick={() => this.setState({ showHistory: !showHistory })} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/70 hover:bg-white/10 transition">
+                {showHistory ? "返回生成" : `📋 记录(${history.length})`}
+              </button>
+              <button onClick={() => window.location.href = "/ticket-admin.html"} className="rounded-full border border-pink-400/30 bg-pink-500/10 px-4 py-2 text-sm text-pink-300 hover:bg-pink-500/20 transition">
+                🎫 工单
+              </button>
+              <button onClick={this.handleLogout} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/60 hover:bg-white/10 transition">
+                退出
+              </button>
+            </div>
+          </div>
+
+          {!showHistory ? (
+            <div className="game-container">
+              <div className="text-center mb-6">
+                <h1 className="game-title">激活码生成器</h1>
+                <div className="game-title-underline" />
+                <p className="mt-3 text-sm text-white/60">生成天卡 / 测试卡 / 周卡 / 月卡 / 季卡 / 年卡激活码</p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm text-white/70 mb-3">选择卡类型</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {typeOptions.map((opt) => (
+                    <button key={opt.value} onClick={() => this.setState({ type: opt.value })}
+                      className={`rounded-xl border p-3 text-center transition ${type === opt.value ? "border-pink-400/60 bg-pink-500/20 ring-2 ring-pink-400/30" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
+                      <div className="text-base font-semibold">{opt.label}</div>
+                      <div className="text-xs text-white/50 mt-1">{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm text-white/70 mb-2">生成数量：{count} 个</label>
+                <input type="range" min="1" max="50" value={count} onChange={(e) => this.setState({ count: parseInt(e.target.value) })} className="w-full accent-pink-500" />
+                <div className="flex justify-between text-xs text-white/40 mt-1"><span>1</span><span>50</span></div>
+              </div>
+
+              <button onClick={this.handleGenerate} disabled={generating} className="w-full rounded-full bg-pink-500 py-3 text-base font-semibold text-white shadow-lg shadow-pink-500/40 hover:bg-pink-400 transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                {generating ? `⏳ 生成中... ${progress}/${totalCount}` : "🎫 生成激活码"}
+              </button>
+              {generating && totalCount > 0 && (
+                <div className="mb-6">
+                  <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300" style={{ width: `${(progress / totalCount) * 100}%` }} />
+                  </div>
+                  <p className="text-center text-xs text-white/40 mt-1">每批生成10个，避免超时，请耐心等待</p>
+                </div>
+              )}
+
+              {codes.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/70">已生成 {codes.length} 个{TYPE_NAMES[type]}</span>
+                    <div className="flex gap-2">
+                      <button onClick={this.handleCopy} className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">
+                        {copied ? "✓ 已复制" : "复制全部"}
+                      </button>
+                      <button onClick={this.handleDownload} className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">
+                        下载TXT
+                      </button>
+                    </div>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto rounded-xl border border-white/10 bg-black/30 p-3">
+                    <div className="space-y-2">
+                      {codes.map((code, i) => (
+                        <div key={i} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2">
+                          <span className="font-mono text-sm text-pink-200">{code}</span>
+                          <button onClick={() => this.handleCopyCode(code)} className="text-xs text-white/40 hover:text-white/70">复制</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="game-container">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white">📋 生成记录</h2>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={this.syncFromCloud} disabled={syncing} className="rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50">
+                    {syncing ? "⏳ 同步中..." : "☁️ 云端同步"}
+                  </button>
+                  <button onClick={this.copyAllUnused} className="rounded-full border border-green-400/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-300 hover:bg-green-500/20 transition">复制未使用</button>
+                  <button onClick={this.exportHistory} className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition">导出{filterType === -1 ? "全部" : TYPE_NAMES[filterType]}</button>
+                  <button onClick={this.clearCloud} className="rounded-full border border-red-500/50 bg-red-500/20 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/30 transition">☁️ 清空云端</button>
+                  <button onClick={this.clearHistory} className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/20 transition">清空本地</button>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex items-center gap-3 text-sm mb-3 flex-wrap">
+                  <span className="text-white/60">共 {history.length} 条</span>
+                  <span className="text-green-400">已用 {usedCount}</span>
+                  <span className="text-yellow-400">未用 {history.length - usedCount - disabledCount}</span>
+                  <span className="text-red-400">已禁用 {disabledCount}</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((type) => {
+                    const typeHistory = history.filter((h) => h.type === type);
+                    const typeUsed = typeHistory.filter((h) => h.used).length;
+                    const typeUnused = typeHistory.length - typeUsed;
+                    return (
+                      <div key={type} className="rounded-lg border border-white/10 bg-white/5 p-2 text-center">
+                        <div className="text-sm font-semibold text-white">{TYPE_NAMES[type]}</div>
+                        <div className="text-xs mt-1">
+                          <span className="text-green-400">已用 {typeUsed}</span>
+                          <span className="text-white/30 mx-1">/</span>
+                          <span className="text-yellow-400">未用 {typeUnused}</span>
+                        </div>
+                        <div className="text-xs text-white/40 mt-0.5">共 {typeHistory.length}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3 text-sm">
+                </div>
+                <button
+                  onClick={this.refreshAllStatus}
+                  disabled={checking}
+                  className="shrink-0 inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs text-blue-300 hover:bg-blue-500/20 transition disabled:opacity-50 whitespace-nowrap"
+                >
+                  {checking ? (
+                    <>
+                      <span className="inline-block w-3 h-3 border-2 border-blue-300/30 border-t-blue-300 rounded-full animate-spin" />
+                      查询中...
+                    </>
+                  ) : (
+                    <>🔄 刷新状态</>
+                  )}
+                </button>
+              </div>
+
+              <div className="mb-3">
+                <div className="text-xs text-white/40 mb-2">卡类型</div>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={() => this.setState({ filterType: -1 })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === -1 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
+                  {typeOptions.map((opt) => (
+                    <button key={opt.value} onClick={() => this.setState({ filterType: opt.value })} className={`rounded-full px-3 py-1 text-xs transition ${filterType === opt.value ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="text-xs text-white/40 mb-2">激活状态</div>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={() => this.setState({ statusFilter: 0 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 0 ? "bg-pink-500 text-white" : "bg-white/5 text-white/60"}`}>全部</button>
+                  <button onClick={() => this.setState({ statusFilter: 1 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 1 ? "bg-yellow-500 text-black" : "bg-white/5 text-white/60"}`}>未激活 ({history.filter(h => !h.used && !h.disabled).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 2 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 2 ? "bg-green-500 text-white" : "bg-white/5 text-white/60"}`}>已激活 ({history.filter(h => h.used).length})</button>
+                  <button onClick={() => this.setState({ statusFilter: 3 })} className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === 3 ? "bg-red-500 text-white" : "bg-white/5 text-white/60"}`}>已禁用 ({history.filter(h => h.disabled).length})</button>
+                </div>
+              </div>
+              {/* 搜索框 */}
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { this.setState({ search: e.target.value, currentPage: 1 }); }}
+                    placeholder="搜索激活码..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-400/50"
+                  />
+                  {search && (
+                    <button onClick={() => this.setState({ search: "", currentPage: 1 })} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">✕</button>
+                  )}
+                </div>
+              </div>
+
+              {filteredHistory.length === 0 ? (
+                <div className="text-center py-12 text-white/40">{search ? "未找到匹配的激活码" : "暂无记录"}</div>
+              ) : (
+                <div className="space-y-2 max-h-[65vh] overflow-y-auto pr-1">
+                  {pagedHistory.map((item, i) => (
+                    <div key={i} className={`rounded-xl border p-3 transition-all ${item.disabled ? "border-red-400/30 bg-red-500/10 opacity-70" : item.used ? "border-green-400/20 bg-green-500/5" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm text-pink-200 truncate">{item.code}</span>
+                            {item.disabled && <span className="shrink-0 rounded bg-red-500/30 px-1.5 py-0.5 text-[10px] text-red-200">已禁用</span>}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-white/50 flex-wrap">
+                            <span className="rounded bg-white/10 px-1.5 py-0.5">{TYPE_NAMES[item.type]}</span>
+                            <span>生成: {this.formatDate(item.createdAt)}</span>
+                            {item.used && <span className="text-green-400">✓ 已激活</span>}
+                          </div>
+                          {item.used && (
+                            <div className="mt-1.5 grid grid-cols-2 gap-1 text-[11px] text-white/40">
+                              <div>🕐 {this.formatFullDate(item.usedAt)}</div>
+                              <div>🌐 {this.formatIp(item.usedIp)}</div>
+                            </div>
+                          )}
+                          {item.disabled && item.disabledReason && (
+                            <div className="mt-1 text-[11px] text-red-300/70">原因: {item.disabledReason}</div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
+                        {!item.disabled && (
+                          <button onClick={() => this.disableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-red-500/15 px-2 py-1 text-[11px] text-red-300 hover:bg-red-500/25 transition disabled:opacity-50">封禁</button>
+                        )}
+                        {item.disabled && (
+                          <button onClick={() => this.enableCode(i)} disabled={disabling} className="flex-1 rounded-full bg-green-500/15 px-2 py-1 text-[11px] text-green-300 hover:bg-green-500/25 transition disabled:opacity-50">解封</button>
+                        )}
+                        <button onClick={() => this.handleCopyCode(item.code)} className="flex-1 rounded-full bg-white/5 px-2 py-1 text-[11px] text-white/60 hover:bg-white/10 transition">复制</button>
+                        <button onClick={() => this.deleteHistory(i)} className="flex-1 rounded-full bg-red-500/10 px-2 py-1 text-[11px] text-red-400/70 hover:bg-red-500/20 transition">删除</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* 分页控件 */}
+              {filteredHistory.length > pageSize && (
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-xs text-white/40">
+                    共 {filteredHistory.length} 条，第 {safePage}/{totalPages} 页
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => this.setState({ currentPage: Math.max(1, safePage - 1) })}
+                      disabled={safePage <= 1}
+                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >上一页</button>
+                    <button
+                      onClick={() => this.setState({ currentPage: Math.min(totalPages, safePage + 1) })}
+                      disabled={safePage >= totalPages}
+                      className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/60 hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    >下一页</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        {toast && (
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 rounded-full bg-black/80 px-6 py-3 text-sm text-white shadow-lg backdrop-blur-sm">
+            {toast}
+          </div>
+        )}
+      </>
+    );
+  }
+}
