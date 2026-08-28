@@ -106,14 +106,21 @@ export default class GeneratePage extends React.Component {
 
   componentDidMount() {
     if (typeof window !== "undefined") {
-      const auth = localStorage.getItem("lg_admin_auth");
-      if (auth === "1") {
-        this.setState({ authenticated: true });
-        // 登录后自动从云端同步生成记录
-        setTimeout(() => this.syncFromCloud(), 300);
-        // 启动自动刷新定时器（每60秒刷新一次云端状态）
-        this.startAutoRefresh();
+      // 统一登录验证（和控制台、工单管理一致）
+      const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+      const expired = Date.now() - loginTime > 15 * 60 * 1000;
+      if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+        localStorage.clear();
+        location.href = "/";
+        return;
       }
+      // 刷新登录时间
+      localStorage.setItem("bbb_login_time", String(Date.now()));
+      this.setState({ authenticated: true });
+      // 登录后自动从云端同步生成记录
+      setTimeout(() => this.syncFromCloud(), 300);
+      // 启动自动刷新定时器（每60秒刷新一次云端状态）
+      this.startAutoRefresh();
       const historyData = localStorage.getItem("lg_gen_history");
       if (historyData) {
         try {
@@ -171,8 +178,8 @@ export default class GeneratePage extends React.Component {
     e.preventDefault();
     const { password } = this.state;
     if (simpleHash(password) === ADMIN_PASSWORD_HASH) {
-      localStorage.setItem("lg_admin_auth", "1");
-      localStorage.setItem("lg_admin_hash", String(simpleHash(password)));
+      localStorage.setItem("bbb_admin_authed", "1");
+      localStorage.setItem("bbb_admin_hash", String(simpleHash(password)));
       this.setState({ authenticated: true, password: "", error: "", adminPassword: password });
       // 登录成功后启动自动刷新
       setTimeout(() => this.startAutoRefresh(), 500);
@@ -182,8 +189,8 @@ export default class GeneratePage extends React.Component {
   };
 
   handleLogout = () => {
-    localStorage.removeItem("lg_admin_auth");
-    localStorage.removeItem("lg_admin_hash");
+    localStorage.removeItem("bbb_admin_authed");
+    localStorage.removeItem("bbb_admin_hash");
     this.setState({ authenticated: false });
     // 退出时清除自动刷新定时器
     if (this.autoRefreshTimer) {
@@ -208,7 +215,7 @@ export default class GeneratePage extends React.Component {
         const res = await fetch(`${API_BASE_URL}/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, count: batchCount, passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+          body: JSON.stringify({ type, count: batchCount, passwordHash: localStorage.getItem("bbb_admin_hash") || "" }),
           signal: AbortSignal.timeout(120000),
         });
 
@@ -335,7 +342,7 @@ export default class GeneratePage extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         code: cleanCode(item.code),
-        passwordHash: localStorage.getItem("lg_admin_hash") || "",
+        passwordHash: localStorage.getItem("bbb_admin_hash") || "",
       }),
     }).catch(() => {});
   };
@@ -445,7 +452,7 @@ export default class GeneratePage extends React.Component {
       const res = await fetch(`${API_BASE_URL}/codes/list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+        body: JSON.stringify({ passwordHash: localStorage.getItem("bbb_admin_hash") || "" }),
         signal: AbortSignal.timeout(30000),
       });
       if (!res.ok) return null;
@@ -507,7 +514,7 @@ export default class GeneratePage extends React.Component {
   syncFromCloud = async () => {
     this.setState({ syncing: true });
     try {
-      const hash = localStorage.getItem("lg_admin_hash") || localStorage.getItem("bbb_admin_hash") || "535441809";
+      const hash = localStorage.getItem("bbb_admin_hash") || localStorage.getItem("bbb_admin_hash") || "535441809";
       const res = await fetch(`${API_BASE_URL}/codes/list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -599,7 +606,7 @@ export default class GeneratePage extends React.Component {
         body: JSON.stringify({
           code: cleanCode(item.code),
           reason: reason || "管理员封禁",
-          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+          passwordHash: localStorage.getItem("bbb_admin_hash") || "",
         }),
         signal: AbortSignal.timeout(30000),
       });
@@ -630,7 +637,7 @@ export default class GeneratePage extends React.Component {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: cleanCode(item.code),
-          passwordHash: localStorage.getItem("lg_admin_hash") || "",
+          passwordHash: localStorage.getItem("bbb_admin_hash") || "",
         }),
         signal: AbortSignal.timeout(30000),
       });
@@ -676,7 +683,7 @@ export default class GeneratePage extends React.Component {
       const res = await fetch(`${API_BASE_URL}/codes/clear`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passwordHash: localStorage.getItem("lg_admin_hash") || "" }),
+        body: JSON.stringify({ passwordHash: localStorage.getItem("bbb_admin_hash") || "" }),
         signal: AbortSignal.timeout(120000),
       });
       const data = await res.json();
@@ -700,29 +707,7 @@ export default class GeneratePage extends React.Component {
     const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, statusFilter, search, currentPage, pageSize } = this.state;
     const { toast } = this.state;
 
-    if (!authenticated) {
-      return (
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
-          <div style={{ width: "100%", maxWidth: "380px", padding: "32px", background: "white", borderRadius: "16px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
-            <div style={{ textAlign: "center", marginBottom: "24px" }}>
-              <div style={{ width: "56px", height: "56px", margin: "0 auto 16px", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px" }}>🔐</div>
-              <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0f172a", marginBottom: "6px" }}>后台管理</h1>
-              <p style={{ fontSize: "14px", color: "#64748b" }}>请输入管理密码</p>
-            </div>
-            <form onSubmit={this.handlePasswordSubmit}>
-              <input type="password" value={password} onChange={(e) => this.setState({ password: e.target.value })} placeholder="输入密码"
-                style={{ width: "100%", padding: "12px 14px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "15px", marginBottom: "12px", outline: "none", background: "#f8fafc" }}
-                onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.background = "white"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; }}
-                onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; }} />
-              {error && <div style={{ color: "#dc2626", fontSize: "13px", marginBottom: "12px", textAlign: "center" }}>{error}</div>}
-              <button type="submit" style={{ width: "100%", padding: "12px", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, cursor: "pointer" }}>登 录</button>
-            </form>
-          </div>
-        </div>
-      );
-    }
-
-    const typeOptions = [
+        const typeOptions = [
       { value: 0, label: "天卡", desc: "1天" },
       { value: 5, label: "测试卡", desc: "5分钟" },
       { value: 1, label: "周卡", desc: "7天" },
