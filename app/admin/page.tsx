@@ -83,7 +83,7 @@ export default function AdminDashboard() {
   };
 
   if (!authed) {
-    return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}><div className="spinner" style={{ borderTopColor: "#6366f1", border: "3px solid #e2e8f0", borderTopColor: "#6366f1" }} /></div>;
+    return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}><div style={{ width: "24px", height: "24px", border: "3px solid #e2e8f0", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.6s linear infinite" }} /></div>;
   }
 
   const navItems = [
