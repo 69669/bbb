@@ -144,6 +144,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
   background: var(--bg-card);
   border-right: 1px solid var(--border);
   position: fixed; top: 0; left: 0; bottom: 0;
+  height: 100vh;
   z-index: 100;
   display: flex; flex-direction: column;
   transition: transform var(--transition-slow);
@@ -155,7 +156,7 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
 .nav-group { margin-bottom: 16px; }
 .nav-label { font-size: var(--font-xs); font-weight: var(--weight-semibold); color: var(--text-400); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 12px; margin-bottom: 6px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); font-size: var(--font-base); font-weight: var(--weight-normal); color: var(--text-600); cursor: pointer; transition: all var(--transition-fast); margin-bottom: 2px; user-select: none; position: relative; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 0 12px; height: 36px; border-radius: var(--radius); font-size: var(--font-base); font-weight: var(--weight-normal); color: var(--text-600); cursor: pointer; transition: all var(--transition-fast); margin-bottom: 2px; user-select: none; position: relative; box-sizing: border-box; }
 .nav-item:hover { background: var(--bg-hover); color: var(--text-800); }
 .nav-item.active { background: var(--primary-bg); color: var(--primary-hover); font-weight: var(--weight-semibold); }
 .nav-item.active::before { content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--primary); border-radius: 0 3px 3px 0; }
