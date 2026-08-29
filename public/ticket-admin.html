@@ -180,7 +180,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .empty-state-icon{width:56px;height:56px;border-radius:50%;background:var(--bg-page);display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--text-400)}
 .empty-state-title{font-size:14px;font-weight:600;color:var(--text-700);margin-bottom:4px}
 .empty-state-desc{font-size:13px;color:var(--text-400)}
-.code-text{font-family:'SF Mono',Monaco,monospace;font-size:11.5px;font-weight:600;color:var(--primary-hover);background:var(--primary-light);padding:3px 8px;border-radius:5px}
+.code-text{font-family:'SF Mono',Monaco,monospace;font-size:11.5px;font-weight:500;color:var(--primary-hover);background:rgba(99,102,241,0.08);padding:4px 10px;border-radius:6px;letter-spacing:.3px}
 .checkbox-col{width:40px;text-align:center}
 .action-col{white-space:nowrap;text-align:right;width:1%}
 .text-xs{font-size:12px}
@@ -656,13 +656,13 @@ function showDetail() {
         </div>` : ""}
       </div>
     </div>
-    <div class="card" style="margin-top:16px;">
+    <div class="card" style="margin-top:20px;">
       <div class="card-header">
         <div class="card-title">💬 回复记录 (${t.replies.length})</div>
       </div>
-      <div class="card-body">
+      <div class="card-body" style="padding:20px 24px;">
         ${t.replies.length ? t.replies.map(r => `
-          <div style="background:${r.isAdmin ? '#f5f7ff' : '#f8fafc'};border-radius:12px;padding:16px 18px;margin-bottom:16px;border-left:3px solid ${r.isAdmin ? '#6366f1' : '#e2e8f0'};">
+          <div style="background:${r.isAdmin ? '#f5f7ff' : '#f8fafc'};border-radius:12px;padding:16px 18px;margin:0 8px 16px 8px;border-left:3px solid ${r.isAdmin ? '#6366f1' : '#e2e8f0'};">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
               <span style="font-size:13px;font-weight:600;color:${r.isAdmin ? '#4f46e5' : '#334155'};">${r.isAdmin ? "👨‍💼 " + (r.adminName || "管理员") : "👤 用户"}</span>
               <span style="font-size:11px;color:#94a3b8;">${r.timeStr}</span>
