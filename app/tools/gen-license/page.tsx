@@ -707,7 +707,7 @@ export default class GeneratePage extends React.Component {
 
   render() {
     const { type, count, codes, copied, authenticated, password, error, history, showHistory, filterType, checking, generating, progress, totalCount, syncing, disabling, statusFilter, search, currentPage, pageSize } = this.state;
-    const { toast } = this.state;
+    const { toast, toastType } = this.state;
 
         const typeOptions = [
       { value: 0, label: "天卡", desc: "1天" },
