@@ -320,7 +320,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 </div>
 <script>
 const API_BASE = "https://api.ttla.top";
-let adminHash = localStorage.getItem("ticket_admin_hash") || "";
+let adminHash = sessionStorage.getItem("ticket_admin_hash") || "";
 let currentPage = 1;
 let totalPages = 1;
 let currentTicket = null;
@@ -340,15 +340,15 @@ function simpleHash(str) {
 // 登录
 function doLogin() {
   // 统一登录：检查bbb后台登录状态和15分钟失效
-  const loginTime = parseInt(localStorage.getItem("bbb_login_time") || "0");
+  const loginTime = parseInt(sessionStorage.getItem("bbb_login_time") || "0");
   const expired = Date.now() - loginTime > 15 * 60 * 1000;
-  if (localStorage.getItem("bbb_admin_authed") !== "true" || expired) {
-    localStorage.clear();
+  if (sessionStorage.getItem("bbb_admin_authed") !== "true" || expired) {
+    sessionStorage.clear();
     window.location.href = "/";
     return;
   }
-  localStorage.setItem("bbb_login_time", String(Date.now()));
-  adminHash = localStorage.getItem("bbb_admin_hash") || "535441809";
+  sessionStorage.setItem("bbb_login_time", String(Date.now()));
+  adminHash = sessionStorage.getItem("bbb_admin_hash") || "535441809";
   // 显示主应用
   var appEl = document.getElementById("app");
   if (appEl) appEl.style.display = "flex";
@@ -360,7 +360,7 @@ function doLogin() {
 
 
 function logout() {
-  localStorage.removeItem("ticket_admin_hash");
+  sessionStorage.removeItem("ticket_admin_hash");
   adminHash = "";
   location.reload();
 }
