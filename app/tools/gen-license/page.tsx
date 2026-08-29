@@ -68,6 +68,7 @@ export default class GeneratePage extends React.Component {
       disabling: false, // 是否正在禁用/启用
       showDetail: null as number | null, // 当前查看详情的索引
       toast: "", // 提示信息
+      toastType: "info" as "success" | "error" | "info",
       statusFilter: 0, // 0=全部, 1=未激活, 2=已激活, 3=已禁用
       search: "", // 搜索关键词
       currentPage: 1, // 当前页码
@@ -97,6 +98,7 @@ export default class GeneratePage extends React.Component {
     disabling: boolean;
     showDetail: number | null;
     toast: string;
+    toastType: "success" | "error" | "info";
     statusFilter: number;
     search: string;
     currentPage: number;
@@ -189,8 +191,8 @@ export default class GeneratePage extends React.Component {
   };
 
   handleLogout = () => {
-    localStorage.removeItem("bbb_admin_authed");
-    localStorage.removeItem("bbb_admin_hash");
+    sessionStorage.removeItem("bbb_admin_authed");
+    sessionStorage.removeItem("bbb_admin_hash");
     this.setState({ authenticated: false });
     // 退出时清除自动刷新定时器
     if (this.autoRefreshTimer) {
@@ -215,29 +217,29 @@ export default class GeneratePage extends React.Component {
         const res = await fetch(`${API_BASE_URL}/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, count: batchCount, passwordHash: localStorage.getItem("bbb_admin_hash") || "" }),
+          body: JSON.stringify({ type, count: batchCount, passwordHash: sessionStorage.getItem("bbb_admin_hash") || "" }),
           signal: AbortSignal.timeout(120000),
         });
 
         if (res.status === 404) {
-          this.showToast("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker");
+          this.showToast("生成失败：Worker版本过旧，缺少/generate接口，请重新部署最新版Worker", "error");
           this.setState({ generating: false });
           return;
         }
         if (res.status === 403) {
-          this.showToast("生成失败：管理密码错误，请退出重新登录");
+          this.showToast("生成失败：管理密码错误，请退出重新登录", "error");
           this.setState({ generating: false });
           return;
         }
         if (!res.ok) {
-          this.showToast(`生成失败：Worker返回错误 HTTP ${res.status}`);
+          this.showToast(`生成失败：Worker返回错误 HTTP ${res.status}`, "error");
           this.setState({ generating: false });
           return;
         }
 
         const data = await res.json();
         if (!data.success) {
-          this.showToast(data.message || "生成失败");
+          this.showToast(data.message || "生成失败", "error");
           this.setState({ generating: false });
           return;
         }
@@ -263,9 +265,9 @@ export default class GeneratePage extends React.Component {
       this.setState({ codes: allCodes, copied: false, generating: false, progress: 0, totalCount: 0 });
     } catch (e: any) {
       if (e?.name === "TimeoutError") {
-        this.showToast(`生成失败：请求超时，已生成 ${completed}/${count} 个。已生成的码已保存，请减少数量重试。`);
+        this.showToast(`生成失败：请求超时，已生成 ${completed}/${count} 个。已生成的码已保存，请减少数量重试。`, "error");
       } else {
-        this.showToast(`生成失败：网络错误 - ${e?.message || String(e)}。已生成 ${completed}/${count} 个，已生成的码已保存。`);
+        this.showToast(`生成失败：网络错误 - ${e?.message || String(e)}。已生成 ${completed}/${count} 个，已生成的码已保存。`, "error");
       }
       // 即使失败，也保存已生成的码
       if (allCodes.length > 0) {
@@ -297,7 +299,7 @@ export default class GeneratePage extends React.Component {
   handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
-      this.showToast("已复制");
+      this.showToast("已复制", "success");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -305,7 +307,7 @@ export default class GeneratePage extends React.Component {
       textarea.select();
       document.execCommand("copy");
       document.body.removeChild(textarea);
-      this.showToast("已复制");
+      this.showToast("已复制", "success");
     }
   };
 
@@ -335,14 +337,14 @@ export default class GeneratePage extends React.Component {
     // 先从本地删除（立即消失）
     const newHistory = history.filter((_, i) => i !== index);
     this.saveHistory(newHistory);
-    this.showToast("✓ 已删除");
+    this.showToast("✓ 已删除", "success");
     // 异步从云端删除（不等待）
     fetch(`${API_BASE_URL}/codes/delete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         code: cleanCode(item.code),
-        passwordHash: localStorage.getItem("bbb_admin_hash") || "",
+        passwordHash: sessionStorage.getItem("bbb_admin_hash") || "",
       }),
     }).catch(() => {});
   };
@@ -401,7 +403,7 @@ export default class GeneratePage extends React.Component {
     }
     const text = unused.map((h) => h.code).join("\n");
     this.copyToClipboard(text);
-    this.showToast(`已复制 ${unused.length} 个未使用激活码`);
+    this.showToast(`已复制 ${unused.length} 个未使用激活码`, "success");
   };
 
   copyToClipboard = (text: string) => {
@@ -452,7 +454,7 @@ export default class GeneratePage extends React.Component {
       const res = await fetch(`${API_BASE_URL}/codes/list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passwordHash: localStorage.getItem("bbb_admin_hash") || "" }),
+        body: JSON.stringify({ passwordHash: sessionStorage.getItem("bbb_admin_hash") || "" }),
         signal: AbortSignal.timeout(30000),
       });
       if (!res.ok) return null;
@@ -480,7 +482,7 @@ export default class GeneratePage extends React.Component {
     try {
       const statusMap = await this.fetchAllCodesFromCloud();
       if (!statusMap) {
-        this.showToast("刷新失败，请检查网络或Worker状态");
+        this.showToast("刷新失败，请检查网络或Worker状态", "error");
         this.setState({ checking: false });
         return;
       }
@@ -504,7 +506,7 @@ export default class GeneratePage extends React.Component {
         this.showToast("刷新成功，已是最新状态");
       }
     } catch (e) {
-      this.showToast("刷新失败，请检查网络后重试");
+      this.showToast("刷新失败，请检查网络后重试", "error");
     } finally {
       this.setState({ checking: false });
     }
@@ -514,7 +516,7 @@ export default class GeneratePage extends React.Component {
   syncFromCloud = async () => {
     this.setState({ syncing: true });
     try {
-      const hash = localStorage.getItem("bbb_admin_hash") || localStorage.getItem("bbb_admin_hash") || "535441809";
+      const hash = sessionStorage.getItem("bbb_admin_hash") || "535441809";
       const res = await fetch(`${API_BASE_URL}/codes/list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -606,7 +608,7 @@ export default class GeneratePage extends React.Component {
         body: JSON.stringify({
           code: cleanCode(item.code),
           reason: reason || "管理员封禁",
-          passwordHash: localStorage.getItem("bbb_admin_hash") || "",
+          passwordHash: sessionStorage.getItem("bbb_admin_hash") || "",
         }),
         signal: AbortSignal.timeout(30000),
       });
@@ -637,7 +639,7 @@ export default class GeneratePage extends React.Component {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: cleanCode(item.code),
-          passwordHash: localStorage.getItem("bbb_admin_hash") || "",
+          passwordHash: sessionStorage.getItem("bbb_admin_hash") || "",
         }),
         signal: AbortSignal.timeout(30000),
       });
@@ -667,9 +669,9 @@ export default class GeneratePage extends React.Component {
     return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
   };
   // 显示提示
-  showToast = (msg: string) => {
-    this.setState({ toast: msg });
-    setTimeout(() => this.setState({ toast: "" }), 2000);
+  showToast = (msg: string, type: "success" | "error" | "info" = "info") => {
+    this.setState({ toast: msg, toastType: type });
+    setTimeout(() => this.setState({ toast: "" }), 2500);
   };
   // 清空云端所有激活码记录
   clearCloud = async () => {
@@ -683,7 +685,7 @@ export default class GeneratePage extends React.Component {
       const res = await fetch(`${API_BASE_URL}/codes/clear`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passwordHash: localStorage.getItem("bbb_admin_hash") || "" }),
+        body: JSON.stringify({ passwordHash: sessionStorage.getItem("bbb_admin_hash") || "" }),
         signal: AbortSignal.timeout(120000),
       });
       const data = await res.json();
@@ -927,7 +929,7 @@ export default class GeneratePage extends React.Component {
             )}
           </main>
         </div>
-        {toast && <div className="toast">{toast}</div>}
+        {toast && <div className={`toast toast-${toastType}`}>{toast}</div>}
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
